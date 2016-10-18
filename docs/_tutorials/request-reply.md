@@ -329,9 +329,3 @@ With that you now know how to successfully implement request-reply message excha
 
 If you have any issues sending and replying a message, check the [Solace community Q&A](http://dev.solacesystems.com/community/){:target="_top"} for answers to common issues seen.
 
-## Up Next:
-
-*   [Get a better understanding of Solace technology.](http://dev.solacesystems.com/tech/){:target="_top"}
-*   [Check out the blog for other interesting discussions around Solace technology.](http://dev.solacesystems.com/blog/){:target="_top"}
-*   [Join the Solace community.](http://dev.solacesystems.com/community/){:target="_top"}
-
