@@ -47,7 +47,7 @@ For direct messages however, this is simplified through the use of the `Requesto
 
 ## Obtaining the Solace API
 
-This tutorial depends on you having the Solace Systems Web Messaging API for JavaScript downloaded and available. The Solace Systems Web Messaging API for JavaScript distribution package can be [downloaded here](http://dev.solacesystems.com/downloads/). The Web Messaging API for JavaScript is distributed as a zip file containing the required JavaScript files, API documentation, and examples. The instructions in this tutorial assume you have downloaded the Web Messaging API for JavaScript library and unpacked it to a known location.
+This tutorial depends on you having the Solace Systems Web Messaging API for JavaScript downloaded and available. The Solace Systems Web Messaging API for JavaScript distribution package can be [downloaded here](http://dev.solacesystems.com/downloads/){:target="_top"}. The Web Messaging API for JavaScript is distributed as a zip file containing the required JavaScript files, API documentation, and examples. The instructions in this tutorial assume you have downloaded the Web Messaging API for JavaScript library and unpacked it to a known location.
 
 ## Loading Solace Systems Web Messaging API for JavaScript
 
