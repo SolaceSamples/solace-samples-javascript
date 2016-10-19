@@ -1,8 +1,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 // Solace Systems Messaging API for JavaScript
-// Copyright 2010-2016 Solace Systems, Inc.
-//
+// 
 // Permission is hereby granted, free of charge, to any person obtaining a copy of
 // this software and associated documentation files (the "Software"), to use and
 // copy the Software, and to permit persons to whom the Software is furnished to
