@@ -1,8 +1,8 @@
 ---
 layout: tutorials
-title: publish-subscribe
-summary: This is a short description for the landing page.
-icon: tutorial-1-icon.png
+title: Publish-Subscribe
+summary: Learn the basis for any publish / subscribe message exchange 
+icon: publish-subscribe.png
 ---
 
 This tutorial will introduce you to the fundamentals of the Solace Systems Web Messaging API for JavaScript by connecting a client, adding a topic subscription and sending a message matching this topic subscription. This forms the basis for any publish / subscribe message exchange illustrated here:  
