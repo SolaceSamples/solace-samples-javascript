@@ -1,3 +1,4 @@
 - title: Tutorials
   tutorials:
+  - publish-subscribe
   - request-reply

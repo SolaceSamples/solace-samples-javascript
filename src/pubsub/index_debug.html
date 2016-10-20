@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html xmlns="">
+<head>
+    <title>Solclientjs: DirectPubSub </title>
+    <!-- style -->
+    <link type="text/css" href="../common/ui-lightness/jquery-ui-1.8.6.custom.css" rel="stylesheet">
+    <link type="text/css" href="../common/style.css" rel="stylesheet">
+
+
+    <!-- jquery ui -->
+    <script type="text/javascript" src="../common/jquery-1.4.2.min.js"></script>
+    <script type="text/javascript" src="../common/jquery-ui-1.8.6.custom.min.js"></script>
+    <!-- sample ui -->
+    <script type="text/javascript" src="../common/solui.js"></script>
+    <!-- solclientjs -->
+    <script type="text/javascript" src="../../lib/solclient-debug.js"></script>
+    <!-- sample code -->
+    <script type="text/javascript" src="sol-direct-pubsub-ui.js"></script>
+    <script type="text/javascript" src="sol-direct-pubsub.js"></script>
+    <script type="text/javascript">
+	    var factoryProps = new solace.SolclientFactoryProperties();
+        factoryProps.logger = new solace.sample.UIConsoleLogger("pubsub_logs");
+		factoryProps.logLevel = solace.LogLevel.INFO;
+		solace.SolclientFactory.init(factoryProps);
+	</script>
+</head>
+
+<body vlink="#eb8f00">
+
+
+<table border="0">
+    <tr>
+        <td>
+            <span class="breadcrumb">
+                <h1><a href="../index.html"> Solclientjs Samples </a> > DirectPubSub </h1>
+            </span>
+        </td>
+    </tr>
+    <tr><td><br></td></tr>
+    <tr>
+        <td>
+            <table>
+                <tr>
+                    <div id="tabs">
+                        <ul>
+                            <li><a href="#tabs-1">Session Properties</a></li>
+                            <li><a href="#tabs-2">Add/Remove Subscriptions</a></li>
+                            <li><a href="#tabs-3">Publish Messages</a></li>
+                        </ul>
+                        <div id="tabs-1">
+                            <strong>
+                                Appliance url:
+                            </strong>
+                            <br>
+                            <input type="input" style="background-color:#ffffff;" id="input_session_url" size="80"
+                                   value=""
+                                   class="ui-widget-content ui-corner-all"/>
+                            <br>
+                            <strong>User
+                                name:
+                            </strong>
+                            <br>
+                            <input type="input" style="background-color:#ffffff;" id="input_session_username"
+                                   value=""
+                                   size="80"
+                                   class="ui-widget-content ui-corner-all"/>
+                            <br>
+                            <strong>
+                                Message VPN:
+                            </strong>
+                            <br>
+                            <input type="input" style="background-color:#ffffff;" id="input_session_vpn"
+                                   value=""
+                                   size="80"
+                                   class="ui-widget-content ui-corner-all"/>
+                            <br>
+                            <strong>
+                                Password:
+                            </strong>
+                            <br>
+                            <input type="input" style="background-color:#ffffff;" id="input_session_password"
+                                   value="secret"
+                                   size="38"
+                                   class="ui-widget-content ui-corner-all"/>
+                            <br><br>
+                            <label for="input_auto_reconnect" class="ui-widget ui-widget-content ui-corner-all" style="vertical-align: middle; padding: 4px 2px 4px 2px;">
+                                <input type="checkbox" id="input_auto_reconnect"  class="ui-widget ui-widget-content ui-corner-all" style="vertical-align: middle;"/>
+                                Auto-reconnect if connection is dropped
+                            </label>
+                            <br>
+                            <br>
+                            <!-- Tool bar -->
+                        <span id="toolbar-session-properties" class=" ui-corner-all">
+                            <button id="CreateSession" onclick="solace.sample.onCreateSession();">Create</button>
+                            <button id="ConnectSession" onclick="solace.sample.onConnectSession();">Connect</button>
+                            <button id="DisconnectSession" onclick="solace.sample.onDisconnectSession();">Disconnect</button>
+                            <button id="DisposeSession" onclick="solace.sample.onDisposeSession();">Dispose</button>
+                        </span>
+                        </div>
+
+                        <div id="tabs-2">
+                            <strong>
+                                Appliance Subscription
+                            </strong>
+                            <br>
+                            <input type="input" style="background-color:#ffffff;" id="input_subscription"
+                                   value="world" size="33"
+                                   width="110"
+                                   class="ui-widget-content ui-corner-all"/>
+                            <br><br>
+                            <!-- Tool bar -->
+                        <span id="toolbar-subscriptions" class=" ui-corner-all">
+                            <button id="AddSubscription" onclick="solace.sample.onAddSubscription();">Add subscription</button>
+                            <button id="RemoveSubscription" onclick="solace.sample.onRemoveSubscription();">Remove subscription
+                            </button>
+                        </span>
+                        </div>
+
+                        <div id="tabs-3">
+                            <strong>
+                                Message text
+                            </strong>
+                            <br>
+                            <input type="input" style="background-color:#ffffff;" id="input_message_text"
+                                   value="Hello World!"
+                                   size="27"
+                                   width="100"
+                                   class="ui-widget-content ui-corner-all"/>
+                            <br>
+                            <strong>
+                                Message Topic
+                            </strong>
+                            <br>
+                            <input type="input" style="background-color:#ffffff;" id="input_message_topic"
+                                   value="world"
+                                   size="27"
+                                   width="100"
+                                   class="ui-widget-content ui-corner-all"/>
+                            <br>
+                            <strong>
+                                Publish interval (in msecs)
+                            </strong>
+                            <br>
+                            <input name="publish_interval" type="input"
+                                   id="input_publish_interval" value="500" size="27"
+                                   width="100"
+                                   class="ui-widget-content ui-corner-all"
+                                   onchange="solace.sample.validate_publishInterval();"/>
+                            <br><br>
+                            <!-- Tool bar -->
+                        <span id="toolbar-publishing" class="ui-corner-all">
+                            <button id="StartPublishing" onclick="solace.sample.onStartPublishing(true);">Start publishing</button>
+                            <button id="StopPublishing" onclick="solace.sample.onStopPublishing();">Stop publishing</button>
+                        </span>
+                        </div>
+
+                    </div>
+                </tr>
+                <tr>
+                    <td>
+                        <table>
+                            <tr>
+                                <td style="width: 100%;">
+                                    <h3 class="demoHeaders">Console</h3>
+                                </td>
+                                <td style="align: right;">
+                                    <button id="ClearButton" onclick="solace.sample.onClearConsole();">Clear</button>
+                                </td>
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <table border="0">
+                            <tr>
+                                <td width="50%">
+                                    <textarea style="font: 95% sans-serif; width:800px;" readonly="true" id="pubsub_logs" wrap="on"
+                                              rows="10" 
+                                              class="ui-widget-content ui-corner-all"></textarea>
+                                </td>
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <h3 class="demoHeaders">Messages  <label id="stats_rxMsgCount">(0)</label> 
+                        </h3>
+                    </td>
+                </tr>
+            </table>
+        </td>
+    </tr>
+    <tr>
+        <td style="padding-top: 10px">
+            <h6>Licensed to the Apache Software Foundation (ASF) under one
+				or more contributor license agreements.  See the NOTICE file
+				distributed with this work for additional information
+				regarding copyright ownership.  The ASF licenses this file
+				to you under the Apache License, Version 2.0 (the
+				"License"); you may not use this file except in compliance
+				with the License.  You may obtain a copy of the License at</h6>
+				
+            <h6>http://www.apache.org/licenses/LICENSE-2.0</h6>
+			
+            <h6>
+                Unless required by applicable law or agreed to in writing,
+				software distributed under the License is distributed on an
+				"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+				KIND, either express or implied.  See the License for the
+				specific language governing permissions and limitations
+				under the License.
+            </h6>
+            <a href="http://www.solacesystems.com">http://www.SolaceSystems.com</a>        </td>
+    </tr>
+</table>
+
+</body>
+
+</html>
+
+
+
+
