@@ -6,8 +6,11 @@ repository: https://github.com/SolaceSamples/solace-samples-javascript
 # Also see _includes/intro.html to customize the description which gets included in index.html.
 
 # Links
+links-downloads: http://dev.solace.com/downloads/
+links-community: http://dev.solace.com/community/
 docs-vmr-setup: http://docs.solace.com/Solace-VMR-Set-Up/Setting-Up-VMRs.htm
-
+docs-core-concepts: http://docs.solace.com/Features/Core-Concepts.htm
+docs-session-events: http://docs.solace.com/Solace-Messaging-APIs/Connecting-Sessions.htm#creating_client_sessions_1776488859_324135
 #----------------------------------------------------
 # Generally don't modify items below this point
 url: "solacesamples.github.io" # the base hostname & protocol for your site

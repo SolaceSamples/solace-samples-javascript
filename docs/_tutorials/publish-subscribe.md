@@ -6,18 +6,19 @@ icon: publish-subscribe.png
 ---
 
 This tutorial will introduce you to the fundamentals of the Solace Systems Web Messaging API for JavaScript by connecting a client, adding a topic subscription and sending a message matching this topic subscription. This forms the basis for any publish / subscribe message exchange illustrated here:  
+
 ![]({{ site.baseurl }}/images/publish-subscribe.png)
 
 ## Assumptions
 
 This tutorial assumes the following:
 
-*   You are familiar with Solace [core concepts](http://docs.solacesystems.com/Features/Core-Concepts.htm).
+*   You are familiar with Solace [core concepts]({{ site.docs-core-concepts }}){:target="_top"}.
 *   You have access to a running Solace message router with the following configuration:
 *   Enabled message VPN
 *   Enabled client username
 
-One simple way to get access to a Solace message router is to start a Solace VMR load [as outlined here](http://docs.solacesystems.com/Solace-VMR-Set-Up/Starting-VMRs-for-the-First-Time/Setting-Up-an-Eval-VMR-in-AWS.htm). By default the Solace VMR will run with the “default” message VPN configured and ready for messaging. Going forward, this tutorial assumes that you are using the Solace VMR. If you are using a different Solace message router configuration, adapt the instructions to match your configuration.
+One simple way to get access to a Solace message router is to start a Solace VMR load [as outlined here]({{ site.docs-vmr-setup }}){:target="_top"}. By default the Solace VMR will run with the “default” message VPN configured and ready for messaging. Going forward, this tutorial assumes that you are using the Solace VMR. If you are using a different Solace message router configuration, adapt the instructions to match your configuration.
 
 ## Goals
 
@@ -30,21 +31,39 @@ The goal of this tutorial is to demonstrate the most basic messaging interaction
 
 In order to send or receive messages to a Solace message router, you need to know a few details of how to connect to the Solace message router. Specifically you need to know the following:
 
-This is the address client’s use when connecting to the Solace message router to send and receive messages. For a Solace VMR this there is only a single interface so the IP is the same as the management IP address.
-
-For Solace message router appliances this is the host address of the message-backbone.
-
-The Solace message router Message VPN that this client should connect to. The simplest option is to use the “default” message-vpn which is present on all Solace message routers and fully enabled for message traffic on Solace VMRs.</td>
-
-The client username. For the Solace VMR default message VPN, authentication is disabled by default, so this can be any value.</td>
-
-The optional client password. For the Solace VMR default message VPN, authentication is disabled by default, so this can be any value or omitted.</td>
+<table>
+  <tr>
+    <th>Resource</th>
+    <th>Value</th>
+    <th>Description</th>
+  </tr>
+  <tr>
+    <td>Host</td>
+    <td>String of the form <code>DNS name</code> or <code>IP:Port</code></td>
+    <td>This is the address clients use when connecting to the Solace message router to send and receive messages. For a Solace VMR this there is only a single interface so the IP is the same as the management IP address. For Solace message router appliances this is the host address of the message-backbone.</td>
+  </tr>
+  <tr>
+    <td>Message VPN</td>
+    <td>String</td>
+    <td>The Solace message router Message VPN that this client should connect to. The simplest option is to use the “default” message-vpn which is present on all Solace message routers and fully enabled for message traffic on Solace VMRs.</td>
+  </tr>
+  <tr>
+    <td>Client Username</td>
+    <td>String</td>
+    <td>The client username. For the Solace VMR default message VPN, authentication is disabled by default, so this can be any value.</td>
+  </tr>
+  <tr>
+    <td>Client Password</td>
+    <td>String</td>
+    <td>The optional client password. For the Solace VMR default message VPN, authentication is disabled by default, so this can be any value or omitted.</td>
+  </tr>
+</table>
 
 For the purposes of this tutorial, you will connect to the default message VPN of a Solace VMR so the only required information to proceed is the Solace VMR host string which this tutorial accepts as an argument.
 
 ## Obtaining the Solace API
 
-This tutorial depends on you having the Solace Systems Web Messaging API for JavaScript downloaded and available. The Solace Systems Web Messaging API for JavaScript distribution package can be [downloaded here](http://dev.solacesystems.com/downloads/). The Web Messaging API for JavaScript is distributed as a zip file containing the required JavaScript files, API documentation, and examples. The instructions in this tutorial assume you have downloaded the Web Messaging API for JavaScript library and unpacked it to a known location.
+This tutorial depends on you having the Solace Systems Web Messaging API for JavaScript downloaded and available. The Solace Systems Web Messaging API for JavaScript distribution package can be [downloaded here]({{ site.links-downloads }}){:target="_top"}. The Web Messaging API for JavaScript is distributed as a zip file containing the required JavaScript files, API documentation, and examples. The instructions in this tutorial assume you have downloaded the Web Messaging API for JavaScript library and unpacked it to a known location.
 
 ## Loading Solace Systems Web Messaging API for JavaScript
 
@@ -170,13 +189,13 @@ subscriber.sessionEventCb = function (session, event) {
 };
 ~~~
 
-See the [Solace Systems Web Messaging API “Handling session events”](https://sftp.solacesystems.com/Portal_Docs/#page/Solace_Web_Messaging_APIs_Developer_Guide/Creating_Client_Sessions.html) documentation for the full list of session event codes.
+See the [Web Messaging API Concepts: “Handling session events”]({{ site.docs-session-events }}){:target="_top"} documentation for the full list of session event codes.
 
 ## Receiving a message
 
 This tutorial uses “Direct” messages which are at most once delivery messages. So first, let’s express interest in the messages by subscribing to a Solace topic. Then you can look at publishing a matching message and see it received.
 
-![pub-sub-receiving-message](http://dev.solacesystems.com/wp-content/uploads/2015/08/pub-sub-receiving-message.png)
+![pub-sub-receiving-message]({{ site.baseurl }}/images/pub-sub-receiving-message-300x134.png)
 
 With a subscriber session created and connected in the previous step, we declared the message event callback of `solace.MessageRxCBInfo` type that redirects its call to the `messageEventCb` function.
 
@@ -226,7 +245,7 @@ After the subscription is successfully added the subscriber is ready to receive 
 
 Now it is time to send a message to the waiting consumer.
 
-![pub-sub-receiving-message](http://dev.solacesystems.com/wp-content/uploads/2015/08/pub-sub-receiving-message.png)
+![pub-sub-receiving-message]({{ site.baseurl }}/images/pub-sub-sending-message-300x134.png)
 
 ## Creating and sending the message
 
@@ -261,8 +280,10 @@ At this point a message to the Solace message router has been sent and your wait
 
 Combining the example source code shown above results in the following source code files:
 
-*   [TopicPublisher.zip](/wp-content/uploads/javascript/TopicPublisher.zip)
-*   [TopicSubscriber.zip](/wp-content/uploads/javascript/TopicSubscriber.zip)
+*   [TopicPublisher.html]({{ site.repository }}/blob/master/src/TopicPublisher/TopicPublisher.html)
+*   [TopicPublisher.js]({{ site.repository }}/blob/master/src/TopicPublisher/TopicPublisher.js)
+*   [TopicSubscriber.html]({{ site.repository }}/blob/master/src/TopicSubscriber/TopicSubscriber.html)
+*   [TopicSubscriber.js]({{ site.repository }}/blob/master/src/BasicReplier/TopicSubscriber.js)
 
 ### Running samples
 
@@ -272,18 +293,20 @@ JavaScript functions get connected to HTML buttons when the browser window loads
 
 In the publisher (`TopicPublisher.html`):
 
-<pre class="brush: jscript; title: ; notranslate" title="">document.getElementById("connect").addEventListener("click", publisher.connect);
+```
+document.getElementById("connect").addEventListener("click", publisher.connect);
 document.getElementById("disconnect").addEventListener("click", publisher.disconnect);
 document.getElementById("publish").addEventListener("click", publisher.publish);
-</pre>
+```
 
 In the subscriber (`TopicSubscriber.html`):
 
-<pre class="brush: jscript; title: ; notranslate" title="">document.getElementById("connect").addEventListener("click", subscriber.connect);
+```
+document.getElementById("connect").addEventListener("click", subscriber.connect);
 document.getElementById("disconnect").addEventListener("click", subscriber.disconnect);
 document.getElementById("subscribe").addEventListener("click", subscriber.subscribe);
 document.getElementById("unsubscribe").addEventListener("click", subscriber.unsubscribe);
-</pre>
+```
 
 ### Sample Output
 
@@ -319,4 +342,4 @@ This is the subscriber is receiving a message (`TopicSubscriber/TopicSubscriber.
 
 With that you now know how to successfully implement publish-subscribe message exchange pattern using Direct messages.
 
-If you have any issues publishing and receiving a message, check the [Solace community Q&A](http://dev.solacesystems.com/community/) for answers to common issues seen.
+If you have any issues publishing and receiving a message, check the [Solace community Q&A]({{ site.links-community }}){:target="_top"} for answers to common issues seen.

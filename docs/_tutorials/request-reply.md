@@ -13,12 +13,12 @@ This tutorial outlines both roles in the request-response message exchange patte
 
 This tutorial assumes the following:
 
-*   You are familiar with Solace core concepts.
+*   You are familiar with Solace [core concepts]({{ site.docs-core-concepts }}){:target="_top"}.
 *   You have access to a running Solace message router with the following configuration:
 *   Enabled message VPN
 *   Enabled client username
 
-One simple way to get access to a Solace message router is to start a Solace VMR load [as outlined here](http://docs.solacesystems.com/Solace-VMR-Set-Up/Starting-VMRs-for-the-First-Time/Setting-Up-an-Eval-VMR-in-AWS.htm){:target="_top"}. By default the Solace VMR will run with the “default” message VPN configured and ready for messaging. Going forward, this tutorial assumes that you are using the Solace VMR. If you are using a different Solace message router configuration, adapt the instructions to match your configuration.
+One simple way to get access to a Solace message router is to start a Solace VMR load [as outlined here]({{ site.docs-vmr-setup }}){:target="_top"}. By default the Solace VMR will run with the “default” message VPN configured and ready for messaging. Going forward, this tutorial assumes that you are using the Solace VMR. If you are using a different Solace message router configuration, adapt the instructions to match your configuration.
 
 ## Goals
 
@@ -47,7 +47,7 @@ For direct messages however, this is simplified through the use of the `Requesto
 
 ## Obtaining the Solace API
 
-This tutorial depends on you having the Solace Systems Web Messaging API for JavaScript downloaded and available. The Solace Systems Web Messaging API for JavaScript distribution package can be [downloaded here](http://dev.solacesystems.com/downloads/){:target="_top"}. The Web Messaging API for JavaScript is distributed as a zip file containing the required JavaScript files, API documentation, and examples. The instructions in this tutorial assume you have downloaded the Web Messaging API for JavaScript library and unpacked it to a known location.
+This tutorial depends on you having the Solace Systems Web Messaging API for JavaScript downloaded and available. The Solace Systems Web Messaging API for JavaScript distribution package can be [downloaded here]({{ site.links-downloads }}){:target="_top"}. The Web Messaging API for JavaScript is distributed as a zip file containing the required JavaScript files, API documentation, and examples. The instructions in this tutorial assume you have downloaded the Web Messaging API for JavaScript library and unpacked it to a known location.
 
 ## Loading Solace Systems Web Messaging API for JavaScript
 
@@ -173,7 +173,7 @@ replier.sessionEventCb = function (session, event) {
 };
 ~~~
 
-See the [Solace Systems Web Messaging API “Handling session events”](https://sftp.solacesystems.com/Portal_Docs/#page/Solace_Web_Messaging_APIs_Developer_Guide/Creating_Client_Sessions.html){:target="_top"} documentation for the full list of session event codes.
+See the [Web Messaging API Concepts: “Handling session events”]({{ site.docs-session-events }}){:target="_top"} documentation for the full list of session event codes.
 
 ## Making a request
 
@@ -327,5 +327,5 @@ This is the replier is receiving the request and replying to it (_BasicReplier/B
 
 With that you now know how to successfully implement request-reply message exchange pattern using Direct messages.
 
-If you have any issues sending and replying a message, check the [Solace community Q&A](http://dev.solacesystems.com/community/){:target="_top"} for answers to common issues seen.
+If you have any issues sending and replying a message, check the [Solace community Q&A]({{ site.links-community }}){:target="_top"} for answers to common issues seen.
 
