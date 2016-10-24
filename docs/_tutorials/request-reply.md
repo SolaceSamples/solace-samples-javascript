@@ -265,8 +265,8 @@ requestor.requestFailedCb = function (session, event) {
 
 Combining the example source code shown above results in the following source code files:
 
-*   [BasicRequestor.html]({{ site.repository }}/blob/master/src/BasicRequestor/BasicRequest.html)
-*   [BasicRequestor.js]({{ site.repository }}/blob/master/src/BasicRequestor/BasicRequest.js)
+*   [BasicRequestor.html]({{ site.repository }}/blob/master/src/BasicRequestor/BasicRequestor.html)
+*   [BasicRequestor.js]({{ site.repository }}/blob/master/src/BasicRequestor/BasicRequestor.js)
 *   [BasicReplier.html]({{ site.repository }}/blob/master/src/BasicReplier/BasicReplier.html)
 *   [BasicReplier.js]({{ site.repository }}/blob/master/src/BasicReplier/BasicReplier.js)
 
