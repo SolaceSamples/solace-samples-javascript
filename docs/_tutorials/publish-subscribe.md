@@ -283,7 +283,7 @@ Combining the example source code shown above results in the following source co
 *   [TopicPublisher.html]({{ site.repository }}/blob/master/src/TopicPublisher/TopicPublisher.html)
 *   [TopicPublisher.js]({{ site.repository }}/blob/master/src/TopicPublisher/TopicPublisher.js)
 *   [TopicSubscriber.html]({{ site.repository }}/blob/master/src/TopicSubscriber/TopicSubscriber.html)
-*   [TopicSubscriber.js]({{ site.repository }}/blob/master/src/BasicReplier/TopicSubscriber.js)
+*   [TopicSubscriber.js]({{ site.repository }}/blob/master/src/TopicSubscriber/TopicSubscriber.js)
 
 ### Running samples
 
