@@ -14,9 +14,12 @@ This tutorial outlines both roles in the request-response message exchange patte
 This tutorial assumes the following:
 
 *   You are familiar with Solace [core concepts]({{ site.docs-core-concepts }}){:target="_top"}.
+
+```************** Note: expand with DataGo options **************```
+
 *   You have access to a running Solace message router with the following configuration:
-*   Enabled message VPN
-*   Enabled client username
+    *   Enabled message VPN
+    *   Enabled client username
 
 One simple way to get access to a Solace message router is to start a Solace VMR load [as outlined here]({{ site.docs-vmr-setup }}){:target="_top"}. By default the Solace VMR will run with the “default” message VPN configured and ready for messaging. Going forward, this tutorial assumes that you are using the Solace VMR. If you are using a different Solace message router configuration, adapt the instructions to match your configuration.
 
@@ -25,13 +28,12 @@ One simple way to get access to a Solace message router is to start a Solace VMR
 The goal of this tutorial is to understand the following:
 
 *   On the requestor side:
-1.  How to create a request
-2.  How to receive a response
-3.  How to use the Solace API to correlate the request and response
-
+    1.  How to create a request
+    2.  How to receive a response
+    3.  How to use the Solace API to correlate the request and response
 *   On the replier side:
-1.  How to detect a request expecting a reply
-2.  How to generate a reply message
+    1.  How to detect a request expecting a reply
+    2.  How to generate a reply message
 
 ## Overview
 
@@ -45,174 +47,108 @@ For request-reply messaging to be successful it must be possible for the request
 
 For direct messages however, this is simplified through the use of the `Requestor` object as shown in this sample.
 
+## Solace message router properties
+
+In order to send or receive messages to a Solace message router, you need to know a few details of how to connect to the Solace message router. Specifically you need to know the following:
+
+<table>
+<tbody>
+<tr>
+<td>Resource</td>
+<td>Value</td>
+<td>Description</td>
+</tr>
+<tr>
+<td>Host</td>
+<td>String of the form <code>DNS name</code> or <code>IP:Port</code></td>
+<td>This is the address clients use when connecting to the Solace message router to send and receive messages. For a Solace VMR this there is only a single interface so the IP is the same as the management IP address.
+For Solace message router appliances this is the host address of the message-backbone.
+</td>
+</tr>
+<tr>
+<td>Message VPN</td>
+<td>String</td>
+<td>The Solace message router Message VPN that this client should connect to. For the Solace VMR the simplest option is to use the “default” message-vpn which is fully enabled for message traffic.</td>
+</tr>
+<tr>
+<td>Client Username</td>
+<td>String</td>
+<td>The client username. For the Solace VMR default message VPN, authentication is disabled by default, so this can be any value.</td>
+</tr>
+<tr>
+<td>Client Password</td>
+<td>String</td>
+<td>The client password. For the Solace VMR default message VPN, authentication is disabled by default, so this can be any value.</td>
+</tr>
+</tbody>
+</table>
+
+This information will be need to be passed as parameters to the input fields of the samples as described in the "Running the Samples" section below.
+
 ## Obtaining the Solace API
 
-This tutorial depends on you having the Solace Systems Web Messaging API for JavaScript downloaded and available. The Solace Systems Web Messaging API for JavaScript distribution package can be [downloaded here]({{ site.links-downloads }}){:target="_top"}. The Web Messaging API for JavaScript is distributed as a zip file containing the required JavaScript files, API documentation, and examples. The instructions in this tutorial assume you have downloaded the Web Messaging API for JavaScript library and unpacked it to a known location.
+This tutorial depends on you having the Solace Web Messaging API for JavaScript downloaded and available. The Solace Web Messaging API for JavaScript distribution package can be [downloaded here]({{ site.links-downloads }}){:target="_top"}. The Web Messaging API for JavaScript is distributed as a zip file containing the required JavaScript library files and API documentation. The instructions in this tutorial assume you have downloaded the Web Messaging API for JavaScript library and unpacked it to a known location.
 
-## Loading Solace Systems Web Messaging API for JavaScript
+The API Reference is available online at the [Web Messaging API for JavaScript documentation]({{ site.docs-api-reference }}){:target="_top"}.
 
-To load the Solace Systems Web Messaging API for JavaScript on your HTML page simply include the `lib/solclient.js` file from the distribution.
+## Trying it yourself
 
-~~~HTML
-<head>
-    <script src="lib/solclient.js"></script>
-</head>
-~~~
+This tutorial is available in [GitHub]({{ site.repository }}){:target="_blank"} along with the other [Solace Developer Getting Started Examples]({{ site.links-get-started }}){:target="_top"}.
 
-Use the debug version of the API in `lib/solclient-debug.js` file instead, if you’re planning to see console log messages and/or debug it.
+At the end, this tutorial walks through downloading and running the sample from source.
 
-~~~HTML
-<head>
-    <script src="lib/solclient-debug.js"></script>
-</head>
-~~~
+## Implementing Request/Reply
 
-If the debug version is used, it is necessary to initialize `solace.SolclientFactory` with required level of logging like so:
+This tutorial’s sample code comes as two separated web applications: one (with the “requestor” object) send requests to a specific topic and the other (with the “replier” object) subscribes to requests on that topic, receives the requests and replies on them.
 
-~~~javascript
-var factoryProps = new solace.SolclientFactoryProperties();
-factoryProps.logLevel = solace.LogLevel.INFO;
-solace.SolclientFactory.init(factoryProps);
-~~~
+The structure of the requestor application is similar to the publish/subscribe tutorial's topic publisher. Here instead of simply publishing a message, a request will be sent.
 
-## Connecting to the Solace message router
+The structure of the replier application is similar to the topic subscriber. It differs in that when receiving the request it doesn't only log the message but sends a reply.
 
-In order to send or receive messages, an application must connect a Solace session. The Solace session is the basis for all client communication with the Solace message router.
+The followings are exactly the same as in the [publish/subscribe tutorial]({{ site.baseurl }}/publish-subscribe), refer to it for all the detailed descriptions.
+    
+* Loading and Initializing Solace Web Messaging API for JavaScript
+* Connecting to the Solace message router
+* Session Events
+* Integrating the code into a web application
 
-The `solace.SolclientFactory` is used to create Solace session from a set of `SessionProperties`.
+### Making a request
 
-Notice the two mandatory callbacks in the `createSession()` call. The first one (of `solace.MessageRxCBInfo` type) is the message event callback. It receives messages. The second one (of `solace.SessionEventCBInfo` type) is the session event callback. It receives events indicating the Solace session connected, disconnected, ready for sending requests or subscribing to a request topic or encountered an error.
-
-The created session connects to the Solace message router with the `session.connect()` call.
-
-This tutorial’s sample code comes as two separated applications: one (with the “requestor” object) send requests to a specific topic and the other (with the “replier” object) subscribes to requests on that topic, receives the requests and replies on them.
-
-The following is an example of session creating and connecting to the Solace message router for the requestor. The replier’s code will be exactly the same.
-
-~~~javascript
-var sessionProperties = new solace.SessionProperties();
-sessionProperties.url = 'ws://' + host;
-sessionProperties.vpnName = 'default';
-sessionProperties.userName = 'tutorial';
-requestor.session = solace.SolclientFactory.createSession(
-    sessionProperties,
-    new solace.MessageRxCBInfo(function (session, message) {
-        requestor.messageEventCb(session, message);
-    }, requestor),
-    new solace.SessionEventCBInfo(function (session, event) {
-        requestor.sessionEventCb(session, event);
-    }, requestor)
-);
-try {
-    requestor.session.connect();
-} catch (error) {
-    requestor.log(error.toString());
-}
-~~~
-
-At this point your browser is connected as a client to the Solace message router. You can use SolAdmin to view this client connection and related details.
-
-## Session Events
-
-The Solace Systems Web Messaging API for JavaScript communicates changes in status and results of connect and subscription calls through the session callback of type `solace.SessionEventCBInfo`.
-
-It is necessary to wire your application logic to events from this callback. The most important events are:
-
-*   `SessionEventCode.UP_NOTICE`: success connecting session to the Solace message router
-*   `SessionEventCode.DISCONNECTED`: session was disconnected from the Solace message router
-*   `SessionEventCode.SUBSCRIPTION_OK`: subscription to a topic was successfully created on the Solace message router
-
-This is how this callback can be implemented in the sample requestor:
-
-~~~javascript
-requestor.sessionEventCb = function (session, event) {
-    requestor.log(event.toString());
-    if (event.sessionEventCode === solace.SessionEventCode.UP_NOTICE) {
-        requestor.log('=== Successfully connected and ready to send requests. ===');
-    } else if (event.sessionEventCode === solace.SessionEventCode.CONNECTING) {
-        requestor.log('Connecting...');
-    } else if (event.sessionEventCode === solace.SessionEventCode.DISCONNECTED) {
-        requestor.log('Disconnected.');
-        if (requestor.session !== null) {
-            requestor.session.dispose();
-            requestor.session = null;
-        }
-    }
-};
-~~~
-
-On the replier side we also might want to implement reaction to subscription error and to subscription added or removed:
-
-~~~javascript
-replier.sessionEventCb = function (session, event) {
-    replier.log(event.toString());
-    if (event.sessionEventCode === solace.SessionEventCode.UP_NOTICE) {
-        replier.log('=== Successfully connected and ready to subscribe to request topic. ===');
-    } else if (event.sessionEventCode === solace.SessionEventCode.CONNECTING) {
-        replier.log('Connecting...');
-        replier.subscribed = false;
-    } else if (event.sessionEventCode === solace.SessionEventCode.DISCONNECTED) {
-        replier.log('Disconnected.');
-        replier.subscribed = false;
-        if (replier.session !== null) {
-            replier.session.dispose();
-            replier.session = null;
-        }
-    } else if (event.sessionEventCode === solace.SessionEventCode.SUBSCRIPTION_ERROR) {
-        replier.log('Cannot subscribe to topic: ' + event.correlationKey);
-    } else if (event.sessionEventCode === solace.SessionEventCode.SUBSCRIPTION_OK) {
-        if (replier.subscribed) {
-            replier.subscribed = false;
-            replier.log('Successfully unsubscribed from request topic: ' + event.correlationKey);
-        } else {
-            replier.subscribed = true;
-            replier.log('Successfully subscribed to request topic: ' + event.correlationKey);
-            replier.log('=== Ready to receive requests. ===');
-        }
-    }
-};
-~~~
-
-See the [Web Messaging API Concepts: “Handling session events”]({{ site.docs-session-events }}){:target="_top"} documentation for the full list of session event codes.
-
-## Making a request
-
-First let’s look at the requestor. This is the application that will send the initial request message and wait for the reply.  
+First let’s look at the requestor. This is the application that will send the initial request message and wait for the reply.
 
 ![]({{ site.baseurl }}/images/Request-Reply_diagram-2.png)
 
 The requestor must create a message and the topic to send the message to:
 
-~~~javascript
+```javascript
 var requestText = 'Sample Request';
 var request = solace.SolclientFactory.createMessage();
-requestor.log('Sending request "' + requestText + '" to topic "' + requestor.topicName + '"...');
 request.setDestination(solace.SolclientFactory.createTopic(requestor.topicName));
 request.setSdtContainer(solace.SDTField.create(solace.SDTFieldType.STRING, requestText));
 request.setDeliveryMode(solace.MessageDeliveryModeType.DIRECT);
-~~~
+```
 
 Now the request can be sent. Notice callbacks `replyReceivedCb` and `requestFailedCb`. These are functions that will be called when a reply message is received (`replyReceivedCb`) or sending of the request is failed (`requestFailedCb`).
 
-~~~javascript
+```javascript
 try {
-    requestor.session.sendRequest(
-        request,
-        5000, // 5 seconds timeout for this operation
-        function (session, message) {
-            requestor.replyReceivedCb(session, message);
-        },
-        function (session, event) {
-            requestor.requestFailedCb(session, event);
-        },
-        null // not providing correlation object
-    );
+	requestor.session.sendRequest(
+		request,
+		5000, // 5 seconds timeout for this operation
+		function (session, message) {
+			requestor.replyReceivedCb(session, message);
+		},
+		function (session, event) {
+			requestor.requestFailedCb(session, event);
+		},
+		null // not providing correlation object
+	);
 } catch (error) {
-    requestor.log(error.toString());
+	requestor.log(error.toString());
 }
-~~~
+```
 
-## Replying to a request
+### Replying to a request
 
 Now it is time to receive the request and generate an appropriate reply.
 
@@ -220,110 +156,97 @@ Now it is time to receive the request and generate an appropriate reply.
 
 Just as with previous tutorials, you still need to connect a session and subscribe to the topics that requests are sent on (the request topic). The following is an example of such reply.
 
-~~~javascript
+```javascript
 replier.reply = function (message) {
-    replier.log('Received message: "' + message.getSdtContainer().getValue() + '", replying...');
-    if (replier.session !== null) {
-        var reply = solace.SolclientFactory.createMessage();
-        var replyText = message. message.getSdtContainer().getValue() + " - Sample Reply";
-        reply.setSdtContainer(solace.SDTField.create(solace.SDTFieldType.STRING, replyText));
-        replier.session.sendReply(message, reply);
-        replier.log('Replied.');
-    } else {
-        replier.log('Cannot reply: not connected to Solace message router.');
-    }
+                                                                                                 
+	if (replier.session !== null) {
+		var reply = solace.SolclientFactory.createMessage();
+		var replyText = message. message.getSdtContainer().getValue() + " - Sample Reply";
+		reply.setSdtContainer(solace.SDTField.create(solace.SDTFieldType.STRING, replyText));
+		replier.session.sendReply(message, reply);
+                                
+	} else {
+		replier.log('Cannot reply: not connected to Solace message router.');
+	}
 };
-~~~
+```
 
-The `replier.reply` is the function that is called from the replier message event callback that is passed to the `solace.SolclientFactory.createSession` call:
+The replier.reply is the function that is called from the replier message event listener defined for `replier.session`:
 
-~~~javascript
-replier.messageEventCb = function (session, message) {
+```javascript
+// define message event listener
+replier.session.on(solace.SessionEventCode.MESSAGE, (message) => {
     try {
         replier.reply(message);
     } catch (error) {
         replier.log(error.toString());
     }
-};
-~~~
+});
+```
 
-## Receiving the Reply Message
+###Receiving the Reply Message
 
 All that’s left is to receive and process the reply message as it is received at the requestor or report a failure to send the request:
 
-~~~javascript
+```javascript
 requestor.replyReceivedCb = function (session, message) {
-    requestor.log('Received reply: "' + message.getSdtContainer().getValue() + '"');
+	requestor.log('Received reply: "' + message.getSdtContainer().getValue() + '"');
 };
 
 requestor.requestFailedCb = function (session, event) {
-    requestor.log('Request failure: ' + event.toString());
+	requestor.log('Request failure: ' + event.toString());
 };
-~~~
+```
 
 ## Summarizing
 
-Combining the example source code shown above results in the following source code files:
+The full source code for this example is available in [GitHub]({{ site.repository }}){:target="_blank"}. If you combine the example source code shown above results in the following source:
 
-*   [BasicRequestor.html]({{ site.repository }}/blob/master/src/BasicRequestor/BasicRequestor.html)
-*   [BasicRequestor.js]({{ site.repository }}/blob/master/src/BasicRequestor/BasicRequestor.js)
-*   [BasicReplier.html]({{ site.repository }}/blob/master/src/BasicReplier/BasicReplier.html)
-*   [BasicReplier.js]({{ site.repository }}/blob/master/src/BasicReplier/BasicReplier.js)
+*   [BasicRequestor.html]({{ site.repository }}/blob/master/src/basic-samples/BasicRequestor/BasicRequestor.html)
+*   [BasicRequestor.js]({{ site.repository }}/blob/master/src/basic-samples/BasicRequestor/BasicRequestor.js)
+*   [BasicReplier.html]({{ site.repository }}/blob/master/src/basic-samples/BasicReplier/BasicReplier.html)
+*   [BasicReplier.js]({{ site.repository }}/blob/master/src/basic-samples/BasicReplier/BasicReplier.js)
 
-### Running samples
+### Getting the Source
+
+Clone the GitHub repository containing the Solace samples.
+
+```
+git clone https://github.com/SolaceSamples/solace-samples-nodejs
+cd {{ site.baseurl | remove: '/'}}/src/basic-samples
+```
+
+### Installing the Web Messaging API for JavaScript
+
+It is assumed that the `lib` directory containing the API libraries will be installed at the root of the cloned `solace-samples-javascript` repository:
+
+```bash
+cp -R <path_to_unzipped_API_distribution_package>/lib/ .
+```
+
+### Running the Samples
 
 The samples consist of two separate requestor and replier browser applications, each comes as a pair: one HTML file and one JavaScript file that is loaded by the HTML file.
 
-JavaScript functions get connected to HTML buttons when the browser window loads (`window.onload`) as follows.
+**Sample Output**
 
-In the requestor (_BasicRequestor.html_):
-
-~~~javascript
-document.getElementById("connect").addEventListener("click", requestor.connect);
-document.getElementById("disconnect").addEventListener("click", requestor.disconnect);
-document.getElementById("request").addEventListener("click", requestor.request);
-~~~
-
-In the replier (_BasicReplier.html_):
-
-~~~javascript
-document.getElementById("connect").addEventListener("click", replier.connect);
-document.getElementById("disconnect").addEventListener("click", replier.disconnect);
-document.getElementById("subscribe").addEventListener("click", replier.subscribe);
-document.getElementById("unsubscribe").addEventListener("click", replier.unsubscribe);
-~~~
-
-### Sample Output
-
-First open _BasicReplier/BasicReplier.html_ page in the browser and connect to a Solace message router by specifying the router’s URL and clicking “Connect” button.
-
-The following is a screenshot of the tutorial’s _BasicReplier/BasicReplier.html_ web page with the JavaScript debug console open in the Firefox browser. It captures the page after it was loaded and the “Connect” button was clicked.
-
-![]({{ site.baseurl }}/images/javascript-request-reply_1.png)
-
-Then subscribe to the subscription topic by clicking the “Subscribe” button.
+First open _BasicReplier/BasicReplier.html_ page in the browser and connect to a Solace message router by specifying the router’s URL and clicking “Connect” button. Then subscribe to the subscription topic by clicking the “Subscribe” button.
 
 The following is a screenshot of the tutorial’s _BasicReplier/BasicReplier.html_ web page with the JavaScript debug console open in the Firefox browser. It captures the page after it was loaded and the “Connect” button was clicked and then the “Subscribe” button was clicked.
 
+![]({{ site.baseurl }}/images/javascript-request-reply_1.png)
+
+Now, open _BasicRequestor/BasicRequestor.html_ page in the browser and connect to the same Solace message router as the _BasicReplier_ specifying the router’s URL and clicking “Connect” button. Then send the request by clicking the “Send Request” button on the _BasicRequestor/BasicRequestor.html_ page.
+
+The following screenshots of the tutorial’s _BasicRequestor/BasicRequestor.html_ and _BasicReplier/BasicReplier.html_ web pages with the JavaScript debug console open in the Firefox browser. It captures the pages after a request was sent and replied.
+
+This is the requestor is having sent a request and receiving a reply (_BasicRequestor/BasicRequestor.html)_:
+
 ![]({{ site.baseurl }}/images/javascript-request-reply_2.png)
-
-Now, open _BasicRequestor/BasicRequestor.html_ page in the browser and connect to the same Solace message router as the _BasicReplier_ specifying the router’s URL and clicking “Connect” button.
-
-The following is a screenshot of the tutorial’s _BasicRequestor/BasicRequestor.html_ web page with the JavaScript debug console open in the Firefox browser. It captures the page after it was loaded and the “Connect” button was clicked.
-
-![]({{ site.baseurl }}/images/javascript-request-reply_3.png)
-
-Send request by clicking the “Send Request” button on the _BasicRequestor/BasicRequestor.html_ page.
-
-The following screenshots of the tutorial’s _BasicRequestor/BasicRequestor.html_ and _BasicReplier/BasicReplier.html_ web pages with the JavaScript debug console open in the Firefox browser. It captures the page after a request was sent and replied.
-
-This is the requestor is sending a request and receiving a reply (_BasicRequestor/BasicRequestor.html)_:
-
-![]({{ site.baseurl }}/images/javascript-request-reply_4.png)
 
 This is the replier is receiving the request and replying to it (_BasicReplier/BasicReplier.html)_:
 
-![]({{ site.baseurl }}/images/javascript-request-reply_5.png)
+![]({{ site.baseurl }}/images/javascript-request-reply_3.png)
 
 With that you now know how to successfully implement request-reply message exchange pattern using Direct messages.
 

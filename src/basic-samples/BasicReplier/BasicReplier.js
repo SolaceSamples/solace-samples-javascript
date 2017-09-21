@@ -36,7 +36,8 @@ var BasicReplier = function (topicName) {
     // Logger
     replier.log = function (line) {
         var now = new Date();
-        var time = [('0' + now.getHours()).slice(-2), ('0' + now.getMinutes()).slice(-2), ('0' + now.getSeconds()).slice(-2)];
+        var time = [('0' + now.getHours()).slice(-2), ('0' + now.getMinutes()).slice(-2),
+            ('0' + now.getSeconds()).slice(-2)];
         var timestamp = '[' + time.join(':') + '] ';
         console.log(timestamp + line);
         var logTextArea = document.getElementById('log');
@@ -46,112 +47,76 @@ var BasicReplier = function (topicName) {
 
     replier.log('\n*** replier to topic "' + replier.topicName + '" is ready to connect ***');
 
-    replier.reply = function (message) {
-        replier.log('Received message: "' + message.getSdtContainer().getValue() + '", replying...');
-        if (replier.session !== null) {
-            var reply = solace.SolclientFactory.createMessage();
-            var replyText = message.getSdtContainer().getValue() + " - Sample Reply";
-            reply.setSdtContainer(solace.SDTField.create(solace.SDTFieldType.STRING, replyText));
-            replier.session.sendReply(message, reply);
-            replier.log('Replied.');
-        } else {
-            replier.log('Cannot reply: not connected to Solace message router.');
-        }
-    };
-
-    // Callback for message events
-    replier.messageEventCb = function (session, message) {
-        try {
-            replier.reply(message);
-        } catch (error) {
-            replier.log(error.toString());
-        }
-    };
-
-    // Callback for session events
-    replier.sessionEventCb = function (session, event) {
-        replier.log(event.toString());
-        if (event.sessionEventCode === solace.SessionEventCode.UP_NOTICE) {
-            replier.log('=== Successfully connected and ready to subscribe to request topic. ===');
-        } else if (event.sessionEventCode === solace.SessionEventCode.CONNECTING) {
-            replier.log('Connecting...');
-            replier.subscribed = false;
-        } else if (event.sessionEventCode === solace.SessionEventCode.DISCONNECTED) {
-            replier.log('Disconnected.');
-            replier.subscribed = false;
-            if (replier.session !== null) {
-                replier.session.dispose();
-                replier.session = null;
-            }
-        } else if (event.sessionEventCode === solace.SessionEventCode.SUBSCRIPTION_ERROR) {
-            replier.log('Cannot subscribe to topic: ' + event.correlationKey);
-        } else if (event.sessionEventCode === solace.SessionEventCode.SUBSCRIPTION_OK) {
-            if (replier.subscribed) {
-                replier.subscribed = false;
-                replier.log('Successfully unsubscribed from request topic: ' + event.correlationKey);
-            } else {
-                replier.subscribed = true;
-                replier.log('Successfully subscribed to request topic: ' + event.correlationKey);
-                replier.log('=== Ready to receive requests. ===');
-            }
-        }
-    };
-
     // Establishes connection to Solace message router
     replier.connect = function () {
         if (replier.session !== null) {
             replier.log('Already connected and ready to subscribe to request topic.');
         } else {
             var host = document.getElementById('host').value;
-            if (host) {
-                replier.connectToSolace(host);
+            var username = document.getElementById('username').value;
+            var password = document.getElementById('password').value;
+            var vpn = document.getElementById('message-vpn').value;
+            if (host && vpn && username && password) {
+                replier.connectToSolace(host, username, password, vpn);
             } else {
-                replier.log('Cannot connect: please specify the Solace message router web transport URL.');
+                replier.log('Cannot connect: please specify all the Solace message router properties.');
             }
         }
     };
 
-    replier.connectToSolace = function (host) {
-        replier.log('Connecting to Solace message router web transport URL ' + host + '.');
-        var sessionProperties = new solace.SessionProperties();
+    replier.connectToSolace = function (host, username, password, vpn) {
+        const sessionProperties = new solace.SessionProperties();
         sessionProperties.url = 'ws://' + host;
-        // NOTICE: the Solace message router VPN name
-        sessionProperties.vpnName = 'default';
+        replier.log('Connecting to Solace message router using WebSocket transport url ws://' + host);
+        sessionProperties.vpnName = vpn;
         replier.log('Solace message router VPN name: ' + sessionProperties.vpnName);
-        // NOTICE: the client username
-        sessionProperties.userName = 'tutorial';
+        sessionProperties.userName = username;
         replier.log('Client username: ' + sessionProperties.userName);
-        replier.session = solace.SolclientFactory.createSession(
-            sessionProperties,
-            new solace.MessageRxCBInfo(function (session, message) {
-                // calling callback for message events
-                replier.messageEventCb(session, message);
-            }, replier),
-            new solace.SessionEventCBInfo(function (session, event) {
-                // calling callback for session events
-                replier.sessionEventCb(session, event);
-            }, replier)
-        );
+        sessionProperties.password = password;
+        // create session
+        replier.session = solace.SolclientFactory.createSession(sessionProperties);
+        // define session event listeners
+        replier.session.on(solace.SessionEventCode.UP_NOTICE, function (sessionEvent) {
+            replier.log('=== Successfully connected and ready to subscribe to request topic. ===');
+        });
+        replier.session.on(solace.SessionEventCode.CONNECTING, function (sessionEvent) {
+            replier.log('Connecting...');
+            replier.subscribed = false;
+        });
+        replier.session.on(solace.SessionEventCode.DISCONNECTED, function (sessionEvent) {
+            replier.log('Disconnected.');
+            replier.subscribed = false;
+            if (replier.session !== null) {
+                replier.session.dispose();
+                replier.session = null;
+            }
+        });
+        replier.session.on(solace.SessionEventCode.SUBSCRIPTION_ERROR, function (sessionEvent) {
+            replier.log('Cannot subscribe to topic: ' + sessionEvent.correlationKey);
+        });
+        replier.session.on(solace.SessionEventCode.SUBSCRIPTION_OK, function (sessionEvent) {
+            if (replier.subscribed) {
+                replier.subscribed = false;
+                replier.log('Successfully unsubscribed from request topic: ' + sessionEvent.correlationKey);
+            } else {
+                replier.subscribed = true;
+                replier.log('Successfully subscribed to request topic: ' + sessionEvent.correlationKey);
+                replier.log('=== Ready to receive requests. ===');
+            }
+        });
+        // define message event listener
+        replier.session.on(solace.SessionEventCode.MESSAGE, (message) => {
+            try {
+                replier.reply(message);
+            } catch (error) {
+                replier.log(error.toString());
+            }
+        });
+        // connect the session
         try {
             replier.session.connect();
         } catch (error) {
             replier.log(error.toString());
-        }
-    };
-
-    // Gracefully disconnects from Solace message router
-    replier.disconnect = function () {
-        replier.log('Disconnecting from Solace message router...');
-        if (replier.session !== null) {
-            try {
-                replier.session.disconnect();
-                replier.session.dispose();
-                replier.session = null;
-            } catch (error) {
-                replier.log(error.toString());
-            }
-        } else {
-            replier.log('Not connected to Solace message router.');
         }
     };
 
@@ -198,6 +163,34 @@ var BasicReplier = function (topicName) {
             }
         } else {
             replier.log('Cannot unsubscribe because not connected to Solace message router.');
+        }
+    };
+
+    replier.reply = function (message) {
+        replier.log('Received message: "' + message.getSdtContainer().getValue() + '", details:\n' + message.dump());
+        replier.log('Replying...');
+        if (replier.session !== null) {
+            var reply = solace.SolclientFactory.createMessage();
+            var replyText = message.getSdtContainer().getValue() + " - Sample Reply";
+            reply.setSdtContainer(solace.SDTField.create(solace.SDTFieldType.STRING, replyText));
+            replier.session.sendReply(message, reply);
+            replier.log('Replied.');
+        } else {
+            replier.log('Cannot reply: not connected to Solace message router.');
+        }
+    };
+
+    // Gracefully disconnects from Solace message router
+    replier.disconnect = function () {
+        replier.log('Disconnecting from Solace message router...');
+        if (replier.session !== null) {
+            try {
+                replier.session.disconnect();
+            } catch (error) {
+                replier.log(error.toString());
+            }
+        } else {
+            replier.log('Not connected to Solace message router.');
         }
     };
 

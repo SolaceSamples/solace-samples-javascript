@@ -19,15 +19,18 @@ To check out the project and build it, do the following:
  
 ### Download the Solace JavaScript API
 
-The Solace JavaScript API library can be [downloaded here](http://dev.solace.com/downloads/).  The instructions in this tutorial assume you have downloaded the Web Messaging API for JavaScript library and unpacked it to a known location. The samples assume a `lib` subdirectory within each samples directory. For example `src/TopicPublisher/lib`.
+The Solace JavaScript API library can be [downloaded here](http://dev.solace.com/downloads/).  The instructions in this tutorial assume you have downloaded the Web Messaging API for JavaScript library and unpacked it to a known location. The samples assume a  `lib` directory containing the API libraries will be installed at the root of the cloned `solace-samples-javascript` repository:
 
+```bash
+cp -R <path_to_unzipped_API_distribution_package>/lib/ .
+```
 ## Running the Samples
 
 The samples are found in the `src` directory. Each sample is in it's own subdirectory. Within each sample subdirectory there is an html file which you load to launch the sample.
 
 For example the `TopicPublisher` is found here:
 
-    src/TopicPublisher
+    src/basic-samples/TopicPublisher
 
 And it is launched by running the following in your browser:
 

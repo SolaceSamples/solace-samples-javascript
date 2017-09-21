@@ -1,4 +1,6 @@
 - title: JavaScript Tutorials
   tutorials:
   - publish-subscribe
+  - persistence-with-queues
   - request-reply
+  - confirmed-delivery
