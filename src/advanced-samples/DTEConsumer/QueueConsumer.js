@@ -32,7 +32,7 @@ var QueueConsumer = function (queueName) {
     consumer.session = null;
     consumer.flow = null;
     consumer.queueName = queueName;
-    consumer.queueDestination = new solace.Destination(consumer.queueName, solace.DestinationType.QUEUE);
+    consumer.topicDestination = new solace.Destination(consumer.queueName, solace.DestinationType.QUEUE);
     consumer.consuming = false;
 
     // Logger
@@ -50,7 +50,7 @@ var QueueConsumer = function (queueName) {
     consumer.log('\n*** Consumer to queue "' + consumer.queueName + '" is ready to connect ***');
 
     // Establishes connection to Solace message router
-    consumer.connect = function (argv) {
+    consumer.connect = function () {
         if (consumer.session !== null) {
             consumer.log('Already connected and ready to consume messages.');
         } else {
@@ -116,7 +116,7 @@ var QueueConsumer = function (queueName) {
                     // Create a flow
                     consumer.flow = consumer.session.createSubscriberFlow(new solace.SubscriberFlowProperties({
                         endpoint: {
-                            destination: consumer.queueDestination,
+                            destination: consumer.topicDestination,
                         },
                     }));
                     // Define flow event listeners

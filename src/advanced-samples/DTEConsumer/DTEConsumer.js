@@ -19,20 +19,21 @@
 
 /**
  * Solace Systems Web Messaging API for JavaScript
- * Persistence with Queues tutorial - Queue Consumer
- * Demonstrates receiving persistent messages from a queue
+ * Durable Topic Endpoint Subscriber tutorial - DTE Consumer
+ * Demonstrates receiving persistent messages from a DTE
  */
 
 /*jslint es6 browser devel:true*/
 /*global solace*/
 
-var QueueConsumer = function (queueName) {
+var DTEConsumer = function (topicEndpointName, topicName) {
     'use strict';
     var consumer = {};
     consumer.session = null;
     consumer.flow = null;
-    consumer.queueName = queueName;
-    consumer.queueDestination = new solace.Destination(consumer.queueName, solace.DestinationType.QUEUE);
+    consumer.topicEndpointName = topicEndpointName;
+    consumer.topicName = topicName;
+    consumer.topicDestination = new solace.Destination(consumer.topicName, solace.DestinationType.TOPIC);
     consumer.consuming = false;
 
     // Logger
@@ -47,10 +48,10 @@ var QueueConsumer = function (queueName) {
         logTextArea.scrollTop = logTextArea.scrollHeight;
     };
 
-    consumer.log('\n*** Consumer to queue "' + consumer.queueName + '" is ready to connect ***');
+    consumer.log('\n*** Consumer to DTE "' + consumer.topicEndpointName + '" is ready to connect ***');
 
     // Establishes connection to Solace message router
-    consumer.connect = function (argv) {
+    consumer.connect = function () {
         if (consumer.session !== null) {
             consumer.log('Already connected and ready to consume messages.');
         } else {
@@ -62,6 +63,7 @@ var QueueConsumer = function (queueName) {
                 consumer.connectToSolace(host, username, password, vpn);
             } else {
                 consumer.log('Cannot connect: please specify all the Solace message router properties.');
+                                                                                       
             }
         }
     };
@@ -81,9 +83,9 @@ var QueueConsumer = function (queueName) {
         } catch (error) {
             consumer.log(error.toString());
         }
-        // define session event handlers
+        // define session event listeners
         consumer.session.on(solace.SessionEventCode.UP_NOTICE, function (sessionEvent) {
-            consumer.log('=== Successfully connected and ready to start the message consumer. ===');
+            consumer.log('=== Successfully connected and ready to start the DTE message consumer. ===');
         });
         consumer.session.on(solace.SessionEventCode.CONNECTING, function (sessionEvent) {
             consumer.log('Connecting...');
@@ -105,18 +107,21 @@ var QueueConsumer = function (queueName) {
         }
     };
 
-    // Starts consuming from a queue on Solace message router
+    // Starts consuming from a Durable Topic Endpoint (DTE) on Solace message router
     consumer.startConsume = function () {
         if (consumer.session !== null) {
             if (consumer.consuming) {
-                consumer.log('Already started consumer for queue "' + consumer.queueName + '" and ready to receive messages.');
+                consumer.log('Already started consumer for DTE "' + consumer.topicEndpointName +
+                    '" and ready to receive messages.');
             } else {
-                consumer.log('Starting consumer for queue: ' + consumer.queueName);
+                consumer.log('Starting consumer for DTE: ' + consumer.topicEndpointName);
+                consumer.log('The DTE will catch messages published to topic "' + consumer.topicName + '"');
                 try {
                     // Create a flow
                     consumer.flow = consumer.session.createSubscriberFlow(new solace.SubscriberFlowProperties({
                         endpoint: {
-                            destination: consumer.queueDestination,
+                            destination: consumer.topicDestination,
+                            topicEndpointName: consumer.topicEndpointName,
                         },
                     }));
                     // Define flow event listeners
@@ -126,13 +131,14 @@ var QueueConsumer = function (queueName) {
                     });
                     consumer.flow.on(solace.FlowEventName.BIND_FAILED_ERROR, function () {
                         consumer.consuming = false;
-                        consumer.log("=== Error: the flow couldn't bind to queue " + consumer.queueName + " ===");
+                        consumer.log('=== Error: the flow could not bind to DTE "' + consumer.topicEndpointName +
+                            '" ===\n   Ensure the Durable Topic Endpoint exists on the message router vpn');
                     });
                     consumer.flow.on(solace.FlowEventName.DOWN, function () {
                         consumer.consuming = false;
                         consumer.log('=== An error happened, the flow is down ===');
                     });
-                    // Define flow message event listener
+                    // Define message event listener
                     consumer.flow.on(solace.FlowEventName.MESSAGE, function (message) {
                         consumer.log('Received message: "' + message.getBinaryAttachment() + '",' +
                             ' details:\n' + message.dump());
@@ -144,24 +150,16 @@ var QueueConsumer = function (queueName) {
                 }
             }
         } else {
-            consumer.log('Cannot start the queue consumer because not connected to Solace message router.');
+            consumer.log('Cannot start the DTE consumer because not connected to Solace message router.');
         }
     };
 
-    consumer.exit = function () {
-        consumer.stopConsume();
-        consumer.disconnect();
-        setTimeout(function () {
-            process.exit();
-        }, 1000); // wait for 1 second to finish
-    };
-
-    // Disconnects the consumer from queue on Solace message router
+    // Disconnects the consumer from DTE on Solace message router
     consumer.stopConsume = function () {
         if (consumer.session !== null) {
             if (consumer.consuming) {
-                consumer.consuming = false;
-                consumer.log('Disconnecting consumption from queue: ' + consumer.queueName);
+               consumer.consuming = false;
+               consumer.log('Disconnecting consumption from DTE: ' + consumer.topicEndpointName);
                 try {
                     consumer.flow.disconnect();
                     consumer.flow.dispose();
@@ -169,8 +167,8 @@ var QueueConsumer = function (queueName) {
                     consumer.log(error.toString());
                 }
             } else {
-                consumer.log('Cannot disconnect the consumer because it is not connected to queue "' +
-                    consumer.queueName + '"');
+                consumer.log('Cannot disconnect the consumer because it is not connected to DTE "' +
+                    consumer.topicEndpointName + '"');
             }
         } else {
             consumer.log('Cannot disconnect the consumer because not connected to Solace message router.');
@@ -193,4 +191,3 @@ var QueueConsumer = function (queueName) {
 
     return consumer;
 };
-

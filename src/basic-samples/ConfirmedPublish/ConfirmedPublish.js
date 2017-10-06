@@ -123,8 +123,7 @@ var QueueProducer = function (queueName) {
     producer.sendMessage = function (curr) {
         var messageText = 'Sample Message';
         var message = solace.SolclientFactory.createMessage();
-        message.setDestination(
-            solace.SolclientFactory.createDestination(solace.DestinationType.QUEUE, producer.queueName));
+        message.setDestination(new solace.Destination(producer.queueName, solace.DestinationType.QUEUE));
         message.setBinaryAttachment(messageText);
         message.setDeliveryMode(solace.MessageDeliveryModeType.PERSISTENT);
         // Define an arbitrary correlation key object

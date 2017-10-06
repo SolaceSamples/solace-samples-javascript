@@ -19,20 +19,20 @@
 
 /**
  * Solace Systems Web Messaging API for JavaScript
- * Persistence with Queues tutorial - Queue Consumer
- * Demonstrates receiving persistent messages from a queue
+ * Client Ack tutorial - Queue Consumer
+ * Demonstrates acknowledging persistent messages by the application
  */
 
 /*jslint es6 browser devel:true*/
 /*global solace*/
 
-var QueueConsumer = function (queueName) {
+var QueueConsumerClientAck = function (queueName) {
     'use strict';
     var consumer = {};
     consumer.session = null;
     consumer.flow = null;
     consumer.queueName = queueName;
-    consumer.queueDestination = new solace.Destination(consumer.queueName, solace.DestinationType.QUEUE);
+    consumer.topicDestination = new solace.Destination(consumer.queueName, solace.DestinationType.QUEUE);
     consumer.consuming = false;
 
     // Logger
@@ -50,7 +50,7 @@ var QueueConsumer = function (queueName) {
     consumer.log('\n*** Consumer to queue "' + consumer.queueName + '" is ready to connect ***');
 
     // Establishes connection to Solace message router
-    consumer.connect = function (argv) {
+    consumer.connect = function () {
         if (consumer.session !== null) {
             consumer.log('Already connected and ready to consume messages.');
         } else {
@@ -81,7 +81,7 @@ var QueueConsumer = function (queueName) {
         } catch (error) {
             consumer.log(error.toString());
         }
-        // define session event handlers
+        // define session event listeners
         consumer.session.on(solace.SessionEventCode.UP_NOTICE, function (sessionEvent) {
             consumer.log('=== Successfully connected and ready to start the message consumer. ===');
         });
@@ -116,8 +116,9 @@ var QueueConsumer = function (queueName) {
                     // Create a flow
                     consumer.flow = consumer.session.createSubscriberFlow(new solace.SubscriberFlowProperties({
                         endpoint: {
-                            destination: consumer.queueDestination,
+                            destination: consumer.topicDestination,
                         },
+                        acknowledgeMode: solace.SubscriberFlowAcknowledgeMode.CLIENT, // Enabling Client ack
                     }));
                     // Define flow event listeners
                     consumer.flow.on(solace.FlowEventName.UP, function () {
@@ -126,16 +127,19 @@ var QueueConsumer = function (queueName) {
                     });
                     consumer.flow.on(solace.FlowEventName.BIND_FAILED_ERROR, function () {
                         consumer.consuming = false;
-                        consumer.log("=== Error: the flow couldn't bind to queue " + consumer.queueName + " ===");
+                        consumer.log('=== Error: the flow could not bind to queue "' + consumer.queueName +
+                            '" ===\n   Ensure the queue exists on the message router vpn');
                     });
                     consumer.flow.on(solace.FlowEventName.DOWN, function () {
                         consumer.consuming = false;
                         consumer.log('=== An error happened, the flow is down ===');
                     });
-                    // Define flow message event listener
+                    // Define message event listener
                     consumer.flow.on(solace.FlowEventName.MESSAGE, function (message) {
-                        consumer.log('Received message: "' + message.getBinaryAttachment() + '",' +
-                            ' details:\n' + message.dump());
+                        consumer.log('Received message: "' + message.getBinaryAttachment());
+                        // Need to explicitly ack otherwise it will not be deleted from the message router
+                        message.acknowledge();
+                        consumer.log('Acknowledged message from the application.');
                     });
                     // Connect the flow
                     consumer.flow.connect();
@@ -148,20 +152,12 @@ var QueueConsumer = function (queueName) {
         }
     };
 
-    consumer.exit = function () {
-        consumer.stopConsume();
-        consumer.disconnect();
-        setTimeout(function () {
-            process.exit();
-        }, 1000); // wait for 1 second to finish
-    };
-
     // Disconnects the consumer from queue on Solace message router
     consumer.stopConsume = function () {
         if (consumer.session !== null) {
             if (consumer.consuming) {
-                consumer.consuming = false;
-                consumer.log('Disconnecting consumption from queue: ' + consumer.queueName);
+               consumer.consuming = false;
+               consumer.log('Disconnecting consumption from queue: ' + consumer.queueName);
                 try {
                     consumer.flow.disconnect();
                     consumer.flow.dispose();
@@ -193,4 +189,3 @@ var QueueConsumer = function (queueName) {
 
     return consumer;
 };
-

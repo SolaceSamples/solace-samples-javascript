@@ -106,8 +106,7 @@ var QueueProducer = function (queueName) {
             var messageText = 'Sample Message';
             var message = solace.SolclientFactory.createMessage();
             producer.log('Sending message "' + messageText + '" to queue "' + producer.queueName + '"...');
-            message.setDestination(
-                solace.SolclientFactory.createDestination(solace.DestinationType.QUEUE, producer.queueName));
+            message.setDestination(new solace.Destination(producer.queueName, solace.DestinationType.QUEUE));
             message.setBinaryAttachment(messageText);
             message.setDeliveryMode(solace.MessageDeliveryModeType.PERSISTENT);
             try {
