@@ -2,7 +2,7 @@
 layout: tutorials
 title: Publish/Subscribe
 summary: Learn the basis for any publish / subscribe message exchange 
-icon: publish-subscribe.png
+icon: I_dev_P+S.svg
 ---
 
 This tutorial will introduce you to the fundamentals of the Solace Web Messaging API for JavaScript by connecting a client, adding a topic subscription and sending a message matching this topic subscription. This forms the basis for any publish / subscribe message exchange illustrated here:  
@@ -14,9 +14,6 @@ This tutorial will introduce you to the fundamentals of the Solace Web Messaging
 This tutorial assumes the following:
 
 *   You are familiar with Solace [core concepts]({{ site.docs-core-concepts }}){:target="_top"}.
-
-```************** Note: expand with DataGo options **************```
-
 *   You have access to a running Solace message router with the following configuration:
     *   Enabled message VPN
     *   Enabled client username
