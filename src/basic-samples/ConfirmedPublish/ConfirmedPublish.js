@@ -90,10 +90,6 @@ var QueueProducer = function (queueName) {
             producer.log('Delivery of message with correlation key = ' + JSON.stringify(sessionEvent.correlationKey) +
                 ' rejected, info: ' + sessionEvent.infoStr);
         });
-        
-        producer.session.on(solace.SessionEventCode.CONNECTING, (sessionEvent) => {
-            producer.log('Connecting...');
-        });
         producer.session.on(solace.SessionEventCode.DISCONNECTED, (sessionEvent) => {
             producer.log('Disconnected.');
             if (producer.session !== null) {

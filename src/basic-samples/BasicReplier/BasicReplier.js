@@ -79,10 +79,6 @@ var BasicReplier = function (topicName) {
         replier.session.on(solace.SessionEventCode.UP_NOTICE, function (sessionEvent) {
             replier.log('=== Successfully connected and ready to subscribe to request topic. ===');
         });
-        replier.session.on(solace.SessionEventCode.CONNECTING, function (sessionEvent) {
-            replier.log('Connecting...');
-            replier.subscribed = false;
-        });
         replier.session.on(solace.SessionEventCode.DISCONNECTED, function (sessionEvent) {
             replier.log('Disconnected.');
             replier.subscribed = false;

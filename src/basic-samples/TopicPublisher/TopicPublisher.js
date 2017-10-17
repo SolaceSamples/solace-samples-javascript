@@ -82,9 +82,6 @@ var TopicPublisher = function (topicName) {
         publisher.session.on(solace.SessionEventCode.UP_NOTICE, function (sessionEvent) {
             publisher.log('=== Successfully connected and ready to publish messages. ===');
         });
-        publisher.session.on(solace.SessionEventCode.CONNECTING, (sessionEvent) => {
-            publisher.log('Connecting...');
-        });
         publisher.session.on(solace.SessionEventCode.DISCONNECTED, (sessionEvent) => {
             publisher.log('Disconnected.');
             if (publisher.session !== null) {

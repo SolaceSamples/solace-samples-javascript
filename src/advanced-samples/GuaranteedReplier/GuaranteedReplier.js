@@ -80,10 +80,6 @@ var GuaranteedReplier = function (requestQueueName) {
         replier.session.on(solace.SessionEventCode.UP_NOTICE, function (sessionEvent) {
             replier.log('=== Successfully connected and ready to subscribe to request queue. ===');
         });
-        replier.session.on(solace.SessionEventCode.CONNECTING, function (sessionEvent) {
-            replier.log('Connecting...');
-            replier.active = false;
-        });
         replier.session.on(solace.SessionEventCode.DISCONNECTED, function (sessionEvent) {
             replier.log('Disconnected.');
             replier.active = false;

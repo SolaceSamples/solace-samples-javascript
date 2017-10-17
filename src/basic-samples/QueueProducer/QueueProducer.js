@@ -82,9 +82,6 @@ var QueueProducer = function (queueName) {
         producer.session.on(solace.SessionEventCode.UP_NOTICE, function (sessionEvent) {
             producer.log('=== Successfully connected and ready to send messages. ===');
         });
-        producer.session.on(solace.SessionEventCode.CONNECTING, (sessionEvent) => {
-            producer.log('Connecting...');
-        });
         producer.session.on(solace.SessionEventCode.DISCONNECTED, (sessionEvent) => {
             producer.log('Disconnected.');
             if (producer.session !== null) {

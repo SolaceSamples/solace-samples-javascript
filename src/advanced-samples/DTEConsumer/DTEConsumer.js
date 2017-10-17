@@ -87,10 +87,6 @@ var DTEConsumer = function (topicEndpointName, topicName) {
         consumer.session.on(solace.SessionEventCode.UP_NOTICE, function (sessionEvent) {
             consumer.log('=== Successfully connected and ready to start the DTE message consumer. ===');
         });
-        consumer.session.on(solace.SessionEventCode.CONNECTING, function (sessionEvent) {
-            consumer.log('Connecting...');
-            consumer.consuming = false;
-        });
         consumer.session.on(solace.SessionEventCode.DISCONNECTED, function (sessionEvent) {
             consumer.log('Disconnected.');
             consumer.consuming = false;

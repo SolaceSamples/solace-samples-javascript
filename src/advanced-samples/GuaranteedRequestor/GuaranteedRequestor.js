@@ -79,9 +79,6 @@ var GuaranteedRequestor = function (requestQueueName) {
         requestor.session.on(solace.SessionEventCode.UP_NOTICE, function (sessionEvent) {
             requestor.log('=== Successfully connected and ready to send requests. ===');
         });
-        requestor.session.on(solace.SessionEventCode.CONNECTING, (sessionEvent) => {
-            requestor.log('Connecting...');
-        });
         requestor.session.on(solace.SessionEventCode.DISCONNECTED, (sessionEvent) => {
             requestor.log('Disconnected.');
             if (requestor.session !== null) {
