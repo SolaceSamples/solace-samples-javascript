@@ -28,7 +28,10 @@
     <head>
         <title>Solace Systems Web Messaging API for JavaScript, Publish/Subscribe tutorial - Topic Publisher</title>
         <meta charset="utf-8"/>
-
+        
+        <link rel="stylesheet" type="text/css" href="../../css/pure.css"></link>
+        <link rel="stylesheet" type="text/css" href="../../css/samples.css"></link>
+        
         <!-- Load Solace Systems Web Messaging API for JavaScript -->
         <script src="../../../lib/solclient-debug.js"></script>
 
@@ -57,10 +60,23 @@
         </script>
     </head>
     <body>
-        <h1>Solace Systems Web Messaging API for JavaScript</h1>
+      <div class="banner">
+        <div class="banner-interior">
+          <span class="logo">
+            <a href="http://dev.solace.com/">
+              <img src="images/solace-logo-white.png"/>
+            </a>
+          </span>
+          <div class="banner-heading">
+            Solace Systems Web Messaging API for JavaScript
+          </div>
+        </div>
+      </div>
+
+      <div class="doc-body">
         <h2>Publish/Subscribe Tutorial</h2>
         <h3>Topic Publisher</h3>
-        <form>
+        <form class="pure-form">
           <table>
             <tr>
               <td align="left">Solace router host:</td>
@@ -88,6 +104,8 @@
             <button id="publish">Publish Message</button>
         </p>
         <textarea id="log" rows="20" cols="90" autofocus></textarea>
+
+      </div>
     </body>
 </html>
 
