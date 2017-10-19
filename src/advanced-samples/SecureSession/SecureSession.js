@@ -18,7 +18,7 @@
  */
 
 /**
- * Solace Systems Web Messaging API for JavaScript
+ * Solace Web Messaging API for JavaScript
  * Secure Session tutorial - Topic Subscriber
  * Demonstrates using ssl to connect to the message router
  */

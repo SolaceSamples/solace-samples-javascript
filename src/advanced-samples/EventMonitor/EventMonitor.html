@@ -8,7 +8,7 @@
     "License"); you may not use this file except in compliance
     with the License.  You may obtain a copy of the License at
     
-      http://www.apache.org/licenses/LICENSE-2.0
+    http://www.apache.org/licenses/LICENSE-2.0
     
     Unless required by applicable law or agreed to in writing,
     software distributed under the License is distributed on an
@@ -16,80 +16,109 @@
     KIND, either express or implied.  See the License for the
     specific language governing permissions and limitations
     under the License.
--->
+  -->
 
 <!--
-    Solace Systems Web Messaging API for JavaScript
+    Solace Web Messaging API for JavaScript
     Event Monitor tutorial - Event Subscriber
     Demonstrates subscribing to the router event topic for Client Connect events
--->
+  -->
 
 <html lang="en">
-    <head>
-        <title>Solace Systems Web Messaging API for JavaScript Publish/Subscribe tutorial - Topic Subscriber</title>
-        <meta charset="utf-8"/>
+  <head>
+    <title>Solace Web Messaging API for JavaScript Publish/Subscribe tutorial - Topic Subscriber</title>
+    <meta charset="utf-8"/>
 
-        <!-- Load Solace Systems Web Messaging API for JavaScript -->
-        <script src="../../../lib/solclient-debug.js"></script>
+    <link rel="stylesheet" type="text/css" href="../../css/pure.css"></link>
+    <link rel="stylesheet" type="text/css" href="../../css/samples.css"></link>
+    
+    <!-- Load Solace Web Messaging API for JavaScript -->
+    <script src="../../../lib/solclient-debug.js"></script>
 
-        <!-- Load the Event Monitor tutorial -->
-        <script src="EventMonitor.js"></script>
+    <!-- Load the Event Monitor tutorial -->
+    <script src="EventMonitor.js"></script>
 
-        <!-- Execute the Event Monitor tutorial -->
-        <script>
-            window.onload = function () {
-                // Initialize factory with the most recent API defaults
-                var factoryProps = new solace.SolclientFactoryProperties();
-                factoryProps.profile = solace.SolclientFactoryProfiles.version10;
-                solace.SolclientFactory.init(factoryProps);
+    <!-- Execute the Event Monitor tutorial -->
+    <script>
+      window.onload = function () {
+      // Initialize factory with the most recent API defaults
+      var factoryProps = new solace.SolclientFactoryProperties();
+      factoryProps.profile = solace.SolclientFactoryProfiles.version10;
+      solace.SolclientFactory.init(factoryProps);
 
-                // enable logging to JavaScript console at WARN level
-                // NOTICE: works only with "solclient-debug.js"
-                solace.SolclientFactory.setLogLevel(solace.LogLevel.WARN);
+      // enable logging to JavaScript console at WARN level
+      // NOTICE: works only with "solclient-debug.js"
+      solace.SolclientFactory.setLogLevel(solace.LogLevel.WARN);
 
-                // create the subscriber, specifying name of the subscription topic
-                var subscriber = new EventSubscriber('#LOG/INFO/CLIENT/*/CLIENT_CLIENT_CONNECT/>');
-                // assign buttons to the subscriber functions
-                document.getElementById("connect").addEventListener("click", subscriber.connect);
-                document.getElementById("disconnect").addEventListener("click", subscriber.disconnect);
-                document.getElementById("subscribe").addEventListener("click", subscriber.subscribe);
-                document.getElementById("unsubscribe").addEventListener("click", subscriber.unsubscribe);
-            };
-        </script>
-    </head>
-    <body>
-        <h1>Solace Systems Web Messaging API for JavaScript</h1>
-        <h2>Event Monitor tutorial</h2>
-        <h3>Event Subscriber to router event topic "Client Connect" events</h3>
-        <form>
-          <table>
-            <tr>
-              <td align="left">Solace router host:</td>
-              <td align="left"><input type = "text" id = "host" value = "XXX.XXX.XXX.XXX:80" /></td>
-            </tr>
-            <tr>
-              <td align="left">Message-vpn:</td>
-              <td align="left"><input type = "text" id = "message-vpn" value = "default" /></td>
-            </tr>
-            <tr>
-              <td align="left">Username:</td>
-              <td align="left"><input type = "text" id = "username" value = "myusername" /></td>
-            </tr>
-            <tr>
-              <td align="left">Password:</td>
-              <td align="left"><input type = "text" id = "password" value = "mypassword" /></td>
-            </tr>
-          </table>
-        </form>
+      // create the subscriber, specifying name of the subscription topic
+      var subscriber = new EventSubscriber('#LOG/INFO/CLIENT/*/CLIENT_CLIENT_CONNECT/>');
+      // assign buttons to the subscriber functions
+      document.getElementById("connect").addEventListener("click", subscriber.connect);
+      document.getElementById("disconnect").addEventListener("click", subscriber.disconnect);
+      document.getElementById("subscribe").addEventListener("click", subscriber.subscribe);
+      document.getElementById("unsubscribe").addEventListener("click", subscriber.unsubscribe);
+      };
+    </script>
+  </head>
+  <body>
+
+    <div class="banner">
+      <div class="banner-interior">
+        <span class="logo">
+          <a href="http://dev.solace.com/">
+            <img src="../../images/solace-logo-white.png"/>
+          </a>
+        </span>
+        <div class="banner-heading">
+          Solace Web Messaging API for JavaScript
+        </div>
+      </div>
+    </div>
+
+    <div class="doc-body">
+      
+      <h2>Event Monitor tutorial</h2>
+      <h3>Event Subscriber to router event topic "Client Connect" events</h3>
+      <form class="pure-form pure-form-aligned">
+        <fieldset>
+
+          <div class="pure-control-group">
+            <label for="host">Solace router host</label>
+            <input id="host" type="text" placeholder="Hostname">
+          </div>
+
+          <div class="pure-control-group">
+            <label for="message-vpn">Message-vpn</label>
+            <input id="message-vpn" type="text" placeholder="Message VPN" value="default">
+          </div>
+
+          <div class="pure-control-group">
+            <label for="username">Username</label>
+            <input id="username" type="text" placeholder="Username">
+          </div>
+
+          <div class="pure-control-group">
+            <label for="password">Password</label>
+            <input id="password" type="password" placeholder="Password">
+          </div>
+
+        </fieldset>
         <p>
-            <button id="connect">Connect</button>
-            <button id="disconnect">Disconnect</button>
+          <button type="button" class="pure-button pure-button-primary" id="connect">Connect</button>
+          <button type="button" class="pure-button button-error" id="disconnect">Disconnect</button>
         </p>
         <p>
-            <button id="subscribe">Subscribe</button>
-            <button id="unsubscribe">Unsubscribe</button>
+          <button type="button" class="pure-button pure-button-primary" id="subscribe">Subscribe</button>
+          <button type="button" class="pure-button button-error" id="unsubscribe">Unsubscribe</button>
         </p>
+        
         <textarea id="log" rows="20" cols="90" autofocus></textarea>
-    </body>
+        
+      </form>
+
+    </div>
+    
+  </body>
+  
 </html>
 

@@ -18,7 +18,7 @@
  */
 
 /**
- * Solace Systems Web Messaging API for JavaScript
+ * Solace Web Messaging API for JavaScript
  * RequestReply tutorial - Basic Replier
  * Demonstrates sending a request and receiving a reply
  */

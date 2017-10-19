@@ -18,7 +18,7 @@
  */
 
 /**
- * Solace Systems Web Messaging API for JavaScript
+ * Solace Web Messaging API for JavaScript
  * NoLocal tutorial
  * Demonstrates the use of the NO_LOCAL Session and Flow properties.
  *

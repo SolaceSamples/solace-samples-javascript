@@ -18,7 +18,7 @@
  */
 
 /**
- * Solace Systems Web Messaging API for JavaScript
+ * Solace Web Messaging API for JavaScript
  * PublishSubscribe tutorial - Topic Publisher
  * Demonstrates publishing direct messages to a topic
  */
@@ -76,7 +76,7 @@ var TopicPublisher = function (topicName) {
         try {
             publisher.session = solace.SolclientFactory.createSession(sessionProperties);
         } catch (error) {
-            producer.log(error.toString());
+            publisher.log(error.toString());
         }
         // define session event handlers
         publisher.session.on(solace.SessionEventCode.UP_NOTICE, function (sessionEvent) {

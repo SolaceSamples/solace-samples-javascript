@@ -18,7 +18,7 @@
  */
 
 /**
- * Solace Systems Web Messaging API for JavaScript
+ * Solace Web Messaging API for JavaScript
  * Event Monitor tutorial - Event Subscriber
  * Demonstrates subscribing to the router event topic for Client
  * Connect events

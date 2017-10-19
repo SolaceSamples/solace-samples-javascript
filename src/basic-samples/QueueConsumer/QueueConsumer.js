@@ -18,7 +18,7 @@
  */
 
 /**
- * Solace Systems Web Messaging API for JavaScript
+ * Solace Web Messaging API for JavaScript
  * Persistence with Queues tutorial - Queue Consumer
  * Demonstrates receiving persistent messages from a queue
  */

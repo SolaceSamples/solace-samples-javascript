@@ -18,7 +18,7 @@
  */
 
 /**
- * Solace Systems Web Messaging API for JavaScript
+ * Solace Web Messaging API for JavaScript
  * PublishSubscribe tutorial - Topic Subscriber
  * Demonstrates subscribing to a topic for direct messages and receiving messages
  */

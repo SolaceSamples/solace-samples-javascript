@@ -18,7 +18,7 @@
  */
 
 /**
- * Solace Systems Web Messaging API for JavaScript
+ * Solace Web Messaging API for JavaScript
  * Confirmed Delivery tutorial
  * Demonstrates handling persistent message acknowledgements on message send
  */

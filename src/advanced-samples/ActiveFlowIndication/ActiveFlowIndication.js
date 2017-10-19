@@ -18,7 +18,7 @@
  */
 
 /**
- * Solace Systems Web Messaging API for JavaScript
+ * Solace Web Messaging API for JavaScript
  * Active Flow Indication - Consumer
  * Demonstrates active flow notification to multiple flows bound to an exclusive queue
  */
