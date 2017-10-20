@@ -18,7 +18,7 @@
  */
 
 /**
- * Solace Systems Web Messaging API for JavaScript
+ * Solace Web Messaging API for JavaScript
  * Durable Topic Endpoint Subscriber tutorial - DTE Consumer
  * Demonstrates receiving persistent messages from a DTE
  */

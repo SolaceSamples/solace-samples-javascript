@@ -18,7 +18,7 @@
  */
 
 /**
- * Solace Systems Web Messaging API for JavaScript
+ * Solace Web Messaging API for JavaScript
  * Client Ack tutorial - Queue Consumer
  * Demonstrates acknowledging persistent messages by the application
  */

@@ -18,7 +18,7 @@
  */
 
 /**
- * Solace Systems Web Messaging API for JavaScript
+ * Solace Web Messaging API for JavaScript
  * Guaranteed Request/Reply tutorial - Guaranteed Requestor
  * Demonstrates how to send a guaranteed request message and
  * waits to receive a reply message as a response.
