@@ -72,24 +72,36 @@ var TopicPublisher = function (topicName) {
             publisher.log('Already connected and ready to publish messages.');
         } else {
             var host = document.getElementById('host').value;
-            if (host) {
-                publisher.connectToSolace(host);
+            var vpnname = document.getElementById('vpnname').value;
+            var username = document.getElementById('username').value;
+            var password = document.getElementById('password').value;
+            if (host && vpnname && username) {
+                publisher.connectToSolace(host, vpnname, username, password);
             } else {
                 publisher.log('Cannot connect: please specify the Solace router web transport URL.');
             }
         }
     };
 
-    publisher.connectToSolace = function (host) {
+    publisher.connectToSolace = function (host, vpnname, username, password) {
         publisher.log('Connecting to Solace router web transport URL ' + host + '.');
         var sessionProperties = new solace.SessionProperties();
-        sessionProperties.url = 'ws://' + host;
+        //Adds 'ws://' prefix to host if missing
+        if (host.lastIndexOf('ws://', 0) === 0) { 
+            sessionProperties.url = host;
+        } else {
+            sessionProperties.url = 'ws://' + host;
+        }
         // NOTICE: the Solace router VPN name
-        sessionProperties.vpnName = 'default';
+        sessionProperties.vpnName = vpnname;
         publisher.log('Solace router VPN name: ' + sessionProperties.vpnName);
         // NOTICE: the client username
-        sessionProperties.userName = 'tutorial';
+        sessionProperties.userName = username;
         publisher.log('Client username: ' + sessionProperties.userName);
+        //NOTICE: the client password
+        if (password) {
+            sessionProperties.password = password;
+        }
         publisher.session = solace.SolclientFactory.createSession(
             sessionProperties,
             new solace.MessageRxCBInfo(function (session, message) {
