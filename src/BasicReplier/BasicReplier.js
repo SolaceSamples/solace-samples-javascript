@@ -103,24 +103,36 @@ var BasicReplier = function (topicName) {
             replier.log('Already connected and ready to subscribe to request topic.');
         } else {
             var host = document.getElementById('host').value;
-            if (host) {
-                replier.connectToSolace(host);
+            var vpnname = document.getElementById('vpnname').value;
+            var username = document.getElementById('username').value;
+            var password = document.getElementById('password').value;
+            if (host && vpnname && username) {
+                replier.connectToSolace(host, vpnname, username, password);
             } else {
                 replier.log('Cannot connect: please specify the Solace message router web transport URL.');
             }
         }
     };
 
-    replier.connectToSolace = function (host) {
+    replier.connectToSolace = function (host, vpnname, username, password) {
         replier.log('Connecting to Solace message router web transport URL ' + host + '.');
         var sessionProperties = new solace.SessionProperties();
-        sessionProperties.url = 'ws://' + host;
-        // NOTICE: the Solace message router VPN name
-        sessionProperties.vpnName = 'default';
-        replier.log('Solace message router VPN name: ' + sessionProperties.vpnName);
+        //Adds 'ws://' prefix to host if missing
+        if (host.lastIndexOf('ws://', 0) === 0) { 
+            sessionProperties.url = host;
+        } else {
+            sessionProperties.url = 'ws://' + host;
+        }
+        // NOTICE: the Solace router VPN name
+        sessionProperties.vpnName = vpnname;
+        replier.log('Solace router VPN name: ' + sessionProperties.vpnName);
         // NOTICE: the client username
-        sessionProperties.userName = 'tutorial';
+        sessionProperties.userName = username;
         replier.log('Client username: ' + sessionProperties.userName);
+        //NOTICE: the client password
+        if (password) {
+            sessionProperties.password = password;
+        }
         replier.session = solace.SolclientFactory.createSession(
             sessionProperties,
             new solace.MessageRxCBInfo(function (session, message) {

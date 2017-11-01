@@ -56,8 +56,25 @@
         <h1>Solace Systems Web Messaging API for JavaScript</h1>
         <h2>PublishSubscribe Tutorial</h2>
         <h3>Topic Publisher</h3>
+        <table>
+            <tr>
+                <td><label>Host: </label></td>
+                <td><input size="35" type = "text" id = "host" value = "<url>:<port>" /></td>
+            </tr>
+            <tr>
+                <td><label>Vpn Name: </label></td>
+                <td><input size="35" type = "text" id = "vpnname" value = "default" /></td>
+            </tr>
+            <tr>
+                <td><label>Username: </label></td>
+                <td><input size="35" type = "text" id = "username" value = "default" /></td>
+            </tr>
+            <tr>
+                <td><label>Password: </label></td>
+                <td><input size="35" type = "text" id = "password"/></td>
+            </tr>
+        </table>
         <p>
-            <label>Solace router web transport URL: </label><input type = "text" id = "host" value = "XXX.XXX.XXX.XXX:80" />
             <button id="connect">Connect</button>
             <button id="disconnect">Disconnect</button>
         </p>

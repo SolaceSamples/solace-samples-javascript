@@ -3,6 +3,15 @@ layout: tutorials
 title: Request/Reply
 summary: Learn how to set up request/reply messaging.
 icon: I_dev_R+R.svg
+links:
+    - label: BasicRequestor.html
+      link: /blob/master/src/BasicRequestor/BasicRequestor.html
+    - label: BasicRequestor.js
+      link: /blob/master/src/BasicRequestor/BasicRequestor.js
+    - label: BasicReplier.html
+      link: /blob/master/src/BasicReplier/BasicReplier.html
+    - label: BasicReplier.js
+      link: /blob/master/src/BasicReplier/BasicReplier.js
 ---
 
 This tutorial outlines both roles in the request-response message exchange pattern. It will show you how to act as the client by creating a request, sending it and waiting for the response. It will also show you how to act as the server by receiving incoming requests, creating a reply and sending it back to the client. It builds on the basic concepts introduced in [publish/subscribe tutorial]({{ site.baseurl }}/publish-subscribe).
@@ -12,11 +21,15 @@ This tutorial outlines both roles in the request-response message exchange patte
 This tutorial assumes the following:
 
 *   You are familiar with Solace [core concepts]({{ site.docs-core-concepts }}){:target="_top"}.
-*   You have access to a running Solace message router with the following configuration:
-*   Enabled message VPN
-*   Enabled client username
+*   You have access to Solace messaging with the following configuration details:
+    *   Connectivity information for a Solace message-VPN
+    *   Enabled client username and password
 
-One simple way to get access to a Solace message router is to start a Solace VMR load [as outlined here]({{ site.docs-vmr-setup }}){:target="_top"}. By default the Solace VMR will run with the “default” message VPN configured and ready for messaging. Going forward, this tutorial assumes that you are using the Solace VMR. If you are using a different Solace message router configuration, adapt the instructions to match your configuration.
+{% if jekyll.environment == 'solaceCloud' %}
+One simple way to get access to Solace messaging quickly is to create a messaging service in Solace Cloud [as outlined here]({{ site.links-solaceCloud-setup}}){:target="_top"}. You can find other ways to get access to Solace messaging on the [home page]({{ site.baseurl }}/) of these tutorials.
+{% else %}
+One simple way to get access to a Solace message router is to start a Solace VMR load [as outlined here]({{ site.docs-vmr-setup }}){:target="_top"}. By default the Solace VMR will with the “default” message VPN configured and ready for guaranteed messaging. Going forward, this tutorial assumes that you are using the Solace VMR. If you are using a different Solace message router configuration adapt the tutorial appropriately to match your configuration.
+{% endif %}
 
 ## Goals
 
@@ -43,35 +56,12 @@ For request-reply messaging to be successful it must be possible for the request
 
 For direct messages however, this is simplified through the use of the `Requestor` object as shown in this sample.
 
-## Obtaining the Solace API
-
-This tutorial depends on you having the Solace Systems Web Messaging API for JavaScript downloaded and available. The Solace Systems Web Messaging API for JavaScript distribution package can be [downloaded here]({{ site.links-downloads }}){:target="_top"}. The Web Messaging API for JavaScript is distributed as a zip file containing the required JavaScript files, API documentation, and examples. The instructions in this tutorial assume you have downloaded the Web Messaging API for JavaScript library and unpacked it to a known location.
-
-## Loading Solace Systems Web Messaging API for JavaScript
-
-To load the Solace Systems Web Messaging API for JavaScript on your HTML page simply include the `lib/solclient.js` file from the distribution.
-
-~~~HTML
-<head>
-    <script src="lib/solclient.js"></script>
-</head>
-~~~
-
-Use the debug version of the API in `lib/solclient-debug.js` file instead, if you’re planning to see console log messages and/or debug it.
-
-~~~HTML
-<head>
-    <script src="lib/solclient-debug.js"></script>
-</head>
-~~~
-
-If the debug version is used, it is necessary to initialize `solace.SolclientFactory` with required level of logging like so:
-
-~~~javascript
-var factoryProps = new solace.SolclientFactoryProperties();
-factoryProps.logLevel = solace.LogLevel.INFO;
-solace.SolclientFactory.init(factoryProps);
-~~~
+{% if jekyll.environment == 'solaceCloud' %}
+    {% include solaceMessaging-cloud.md %}
+{% else %}
+    {% include solaceMessaging.md %}
+{% endif %}  
+{% include solaceApi.md %}
 
 ## Connecting to the Solace message router
 
@@ -90,8 +80,9 @@ The following is an example of session creating and connecting to the Solace mes
 ~~~javascript
 var sessionProperties = new solace.SessionProperties();
 sessionProperties.url = 'ws://' + host;
-sessionProperties.vpnName = 'default';
-sessionProperties.userName = 'tutorial';
+sessionProperties.vpnName = vpnname;
+sessionProperties.userName = username;
+sessionProperties.password = password;
 requestor.session = solace.SolclientFactory.createSession(
     sessionProperties,
     new solace.MessageRxCBInfo(function (session, message) {
@@ -263,10 +254,11 @@ requestor.requestFailedCb = function (session, event) {
 
 Combining the example source code shown above results in the following source code files:
 
-*   [BasicRequestor.html]({{ site.repository }}/blob/master/src/BasicRequestor/BasicRequestor.html)
-*   [BasicRequestor.js]({{ site.repository }}/blob/master/src/BasicRequestor/BasicRequestor.js)
-*   [BasicReplier.html]({{ site.repository }}/blob/master/src/BasicReplier/BasicReplier.html)
-*   [BasicReplier.js]({{ site.repository }}/blob/master/src/BasicReplier/BasicReplier.js)
+<ul>
+{% for item in page.links %}
+<li><a href="{{ site.repository }}{{ item.link }}" target="_blank">{{ item.label }}</a></li>
+{% endfor %}
+</ul>
 
 ### Running samples
 
@@ -293,7 +285,7 @@ document.getElementById("unsubscribe").addEventListener("click", replier.unsubsc
 
 ### Sample Output
 
-First open _BasicReplier/BasicReplier.html_ page in the browser and connect to a Solace message router by specifying the router’s URL and clicking “Connect” button.
+First open _BasicReplier/BasicReplier.html_ page in the browser and connect to a Solace message router by specifying the router’s connection properties and clicking “Connect” button.
 
 The following is a screenshot of the tutorial’s _BasicReplier/BasicReplier.html_ web page with the JavaScript debug console open in the Firefox browser. It captures the page after it was loaded and the “Connect” button was clicked.
 
@@ -305,7 +297,7 @@ The following is a screenshot of the tutorial’s _BasicReplier/BasicReplier.htm
 
 ![]({{ site.baseurl }}/images/javascript-request-reply_2.png)
 
-Now, open _BasicRequestor/BasicRequestor.html_ page in the browser and connect to the same Solace message router as the _BasicReplier_ specifying the router’s URL and clicking “Connect” button.
+Now, open _BasicRequestor/BasicRequestor.html_ page in the browser and connect to the same Solace message router as the _BasicReplier_ specifying the router’s connection properties and clicking “Connect” button.
 
 The following is a screenshot of the tutorial’s _BasicRequestor/BasicRequestor.html_ web page with the JavaScript debug console open in the Firefox browser. It captures the page after it was loaded and the “Connect” button was clicked.
 

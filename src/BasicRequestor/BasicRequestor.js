@@ -72,24 +72,36 @@ var BasicRequestor = function (topicName) {
             requestor.log('Already connected and ready to send requests.');
         } else {
             var host = document.getElementById('host').value;
-            if (host) {
-                requestor.connectToSolace(host);
+            var vpnname = document.getElementById('vpnname').value;
+            var username = document.getElementById('username').value;
+            var password = document.getElementById('password').value;
+            if (host, vpnname, username) {
+                requestor.connectToSolace(host, vpnname, username, password);
             } else {
                 requestor.log('Cannot connect: please specify the Solace message router web transport URL.');
             }
         }
     };
 
-    requestor.connectToSolace = function (host) {
+    requestor.connectToSolace = function (host, vpnname, username, password) {
         requestor.log('Connecting to Solace message router web transport URL ' + host + '.');
         var sessionProperties = new solace.SessionProperties();
-        sessionProperties.url = 'ws://' + host;
-        // NOTICE: the Solace message router VPN name
-        sessionProperties.vpnName = 'default';
-        requestor.log('Solace message router VPN name: ' + sessionProperties.vpnName);
+        //Adds 'ws://' prefix to host if missing
+        if (host.lastIndexOf('ws://', 0) === 0) { 
+            sessionProperties.url = host;
+        } else {
+            sessionProperties.url = 'ws://' + host;
+        }
+        // NOTICE: the Solace router VPN name
+        sessionProperties.vpnName = vpnname;
+        requestor.log('Solace router VPN name: ' + sessionProperties.vpnName);
         // NOTICE: the client username
-        sessionProperties.userName = 'tutorial';
+        sessionProperties.userName = username;
         requestor.log('Client username: ' + sessionProperties.userName);
+        //NOTICE: the client password
+        if (password) {
+            sessionProperties.password = password;
+        }
         requestor.session = solace.SolclientFactory.createSession(
             sessionProperties,
             new solace.MessageRxCBInfo(function (session, request) {
