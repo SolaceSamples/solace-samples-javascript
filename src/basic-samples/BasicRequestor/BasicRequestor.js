@@ -19,7 +19,7 @@
 
 /**
  * Solace Web Messaging API for JavaScript
- * RequestReply tutorial - Basic Requestor
+ * Request/Reply tutorial - Basic Requestor
  * Demonstrates sending a request and receiving a reply
  */
 
@@ -50,43 +50,53 @@ var BasicRequestor = function (topicName) {
     requestor.connect = function () {
         if (requestor.session !== null) {
             requestor.log('Already connected and ready to send requests.');
-        } else {
-            var host = document.getElementById('host').value;
-            var username = document.getElementById('username').value;
-            var password = document.getElementById('password').value;
-            var vpn = document.getElementById('message-vpn').value;
-            if (host && vpn && username && password) {
-                requestor.connectToSolace(host, username, password, vpn);
-            } else {
-                requestor.log('Cannot connect: please specify all the Solace message router properties.');
-            }
+            return;
         }
-    };
-
-    requestor.connectToSolace = function (host, username, password, vpn) {
-        const sessionProperties = new solace.SessionProperties();
-        sessionProperties.url = 'ws://' + host;
-        requestor.log('Connecting to Solace message router using WebSocket transport url ws://' + host);
-        sessionProperties.vpnName = vpn;
-        requestor.log('Solace message router VPN name: ' + sessionProperties.vpnName);
-                                                                                                        
-        sessionProperties.userName = username;
-        requestor.log('Client username: ' + sessionProperties.userName);
-        sessionProperties.password = password;
+        var hosturl = document.getElementById('hosturl').value;
+        requestor.log('Connecting to Solace message router using url: ' + hosturl);
+        var username = document.getElementById('username').value;
+        requestor.log('Client username: ' + username);
+        var pass = document.getElementById('password').value;
+        var vpn = document.getElementById('message-vpn').value;
+        requestor.log('Solace message router VPN name: ' + vpn);
+        if (!hosturl || !username || !pass || !vpn) {
+            requestor.log('Cannot connect: please specify all the Solace message router properties.');
+            return;
+        }
         // create session
-        requestor.session = solace.SolclientFactory.createSession(sessionProperties);
+        try {
+            requestor.session = solace.SolclientFactory.createSession({
+                // solace.SessionProperties
+                url:      hosturl,
+                vpnName:  vpn,
+                userName: username,
+                password: pass,
+            });
+        } catch (error) {
+            requestor.log(error.toString());
+        }
         // define session event listeners
         requestor.session.on(solace.SessionEventCode.UP_NOTICE, function (sessionEvent) {
             requestor.log('=== Successfully connected and ready to send requests. ===');
         });
-        requestor.session.on(solace.SessionEventCode.DISCONNECTED, (sessionEvent) => {
+        requestor.session.on(solace.SessionEventCode.DISCONNECTED, function (sessionEvent) {
             requestor.log('Disconnected.');
             if (requestor.session !== null) {
                 requestor.session.dispose();
                 requestor.session = null;
             }
         });
-        // connect the session
+        // if secure connection, first load iframe so the browser can provide a client-certificate
+        if (hosturl.lastIndexOf('wss://', 0) === 0 || hosturl.lastIndexOf('https://', 0) === 0) {
+            var urlNoProto = hosturl.split('/').slice(2).join('/'); // remove protocol prefix
+            document.getElementById('iframe').src = 'https://' + urlNoProto + '/crossdomain.xml';
+        } else {
+            requestor.connectToSolace();   // otherwise proceed
+        }
+    };
+
+    // Actually connects the session
+    requestor.connectToSolace = function () {
         try {
             requestor.session.connect();
         } catch (error) {
@@ -100,7 +110,7 @@ var BasicRequestor = function (topicName) {
             var requestText = 'Sample Request';
             var request = solace.SolclientFactory.createMessage();
             requestor.log('Sending request "' + requestText + '" to topic "' + requestor.topicName + '"...');
-            request.setDestination(solace.SolclientFactory.createTopic(requestor.topicName));
+            request.setDestination(solace.SolclientFactory.createTopicDestination(requestor.topicName));
             request.setSdtContainer(solace.SDTField.create(solace.SDTFieldType.STRING, requestText));
             request.setDeliveryMode(solace.MessageDeliveryModeType.DIRECT);
             try {

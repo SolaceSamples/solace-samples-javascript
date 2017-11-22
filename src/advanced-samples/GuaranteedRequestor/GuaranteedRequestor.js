@@ -27,11 +27,11 @@
 /*jslint es6 browser devel:true*/
 /*global solace*/
 
-var GuaranteedRequestor = function (requestQueueName) {
+var GuaranteedRequestor = function (requestTopicName) {
     'use strict';
     var requestor = {};
     requestor.session = null;
-    requestor.requestQueueName = requestQueueName;
+    requestor.requestTopicName = requestTopicName;
     requestor.correlationID = null;
 
     // Logger
@@ -45,48 +45,72 @@ var GuaranteedRequestor = function (requestQueueName) {
         logTextArea.scrollTop = logTextArea.scrollHeight;
     };
 
-    requestor.log('\n*** requestor to topic "' + requestor.topicName + '" is ready to connect ***');
+    requestor.log('\n*** requestor to topic "' + requestor.requestTopicName + '" is ready to connect ***');
 
     // Establishes connection to Solace message router
-    requestor.connect = function (host, username, password, vpn) {
+    requestor.connect = function () {
         if (requestor.session !== null) {
-            requestor.log('Already connected and ready to send requests.');
-        } else {
-            var host = document.getElementById('host').value;
-            var username = document.getElementById('username').value;
-            var password = document.getElementById('password').value;
-            var vpn = document.getElementById('message-vpn').value;
-            if (host && vpn && username && password) {
-                requestor.connectToSolace(host, username, password, vpn);
-            } else {
-                requestor.log('Cannot connect: please specify all the Solace message router properties.');
-            }
+            return;
+                                                           
+                                                                     
+                                                                     
+                                                                   
+                                                     
+                                                                        
+                    
+                                                                                                          
+             
         }
-    };
+        var hosturl = document.getElementById('hosturl').value;
 
-    requestor.connectToSolace = function (host, username, password, vpn) {
-        const sessionProperties = new solace.SessionProperties();
-        sessionProperties.url = 'ws://' + host;
-        requestor.log('Connecting to Solace message router using WebSocket transport url ws://' + host);
-        sessionProperties.vpnName = vpn;
-        requestor.log('Solace message router VPN name: ' + sessionProperties.vpnName);
-        sessionProperties.userName = username;
-        requestor.log('Client username: ' + sessionProperties.userName);
-        sessionProperties.password = password;
+                                                                         
+                                                                 
+                                    
+        requestor.log('Connecting to Solace message router using url: ' + hosturl);
+        var username = document.getElementById('username').value;
+        requestor.log('Client username: ' + username);
+        var pass = document.getElementById('password').value;
+        var vpn = document.getElementById('message-vpn').value;
+        requestor.log('Solace message router VPN name: ' + vpn);
+        if (!hosturl || !username || !pass || !vpn) {
+                    
+            requestor.log('Cannot connect: please specify all the Solace message router properties.');
+            return;
+        }
         // create session
-        requestor.session = solace.SolclientFactory.createSession(sessionProperties);
+        try {
+            requestor.session = solace.SolclientFactory.createSession({
+                // solace.SessionProperties
+                url:      hosturl,
+                vpnName:  vpn,
+                userName: username,
+                password: pass,
+            });
+        } catch (error) {
+            requestor.log(error.toString());
+        }
         // define session event listeners
         requestor.session.on(solace.SessionEventCode.UP_NOTICE, function (sessionEvent) {
             requestor.log('=== Successfully connected and ready to send requests. ===');
         });
-        requestor.session.on(solace.SessionEventCode.DISCONNECTED, (sessionEvent) => {
+        requestor.session.on(solace.SessionEventCode.DISCONNECTED, function (sessionEvent) {
             requestor.log('Disconnected.');
             if (requestor.session !== null) {
                 requestor.session.dispose();
                 requestor.session = null;
             }
         });
-        // connect the session
+        // if secure connection, first load iframe so the browser can provide a client-certificate
+        if (hosturl.lastIndexOf('wss://', 0) === 0 || hosturl.lastIndexOf('https://', 0) === 0) {
+            var urlNoProto = hosturl.split('/').slice(2).join('/'); // remove protocol prefix
+            document.getElementById('iframe').src = 'https://' + urlNoProto + '/crossdomain.xml';
+        } else {
+            requestor.connectToSolace();   // otherwise proceed
+        }
+    };
+
+    // Actually connects the session
+    requestor.connectToSolace = function () {
         try {
             requestor.session.connect();
         } catch (error) {
@@ -98,36 +122,34 @@ var GuaranteedRequestor = function (requestQueueName) {
     requestor.request = function () {
         if (requestor.session !== null) {
             // creates a temporary queue to listen to responses
-            var replyToQueue = requestor.session.createTemporaryQueue();
-            // creates a flow to this queue
-            var flow = requestor.session.createSubscriberFlow({
-                endpoint: {destination: replyToQueue,
-                    durable: solace.EndpointDurability.NON_DURABLE_GUARANTEED,
-                    permissions: solace.EndpointPermissions.DELETE,}
+            const replyMessageConsumer = requestor.session.createMessageConsumer({
+                queueDescriptor: { type: solace.QueueType.QUEUE, durable: false },
             });
-            // send the request when the listening flow is up
-            flow.on(solace.FlowEventName.UP, function onMessage(message) {
+            // send the request when the listening message consumer is up
+            replyMessageConsumer.on(solace.MessageConsumerEventName.UP, function () {
                 var msg = solace.SolclientFactory.createMessage();
                 const requestText = "Sample Request";
-                requestor.log('Sending request "' + requestText + '" to request queue "' + requestor.requestQueueName + '"...');
-                msg.setDestination(new solace.Destination(requestor.requestQueueName, solace.DestinationType.QUEUE));
+                requestor.log('Sending request "' + requestText + '" to request topic "' + requestor.requestTopicName + '"...');
+                msg.setDestination(solace.SolclientFactory.createTopicDestination(requestor.requestTopicName));
                 msg.setBinaryAttachment(requestText);
-                msg.setReplyTo(replyToQueue);
+                msg.setReplyTo(replyMessageConsumer.getDestination());
                 requestor.correlationID = 'MyCorrelationID'
                 msg.setCorrelationId(requestor.correlationID);
                 msg.setDeliveryMode(solace.MessageDeliveryModeType.PERSISTENT);
                 requestor.session.send(msg);
             });
             // process the response received at the replyToQueue
-            flow.on(solace.FlowEventName.MESSAGE, function onMessage(message) {
+            replyMessageConsumer.on(solace.MessageConsumerEventName.MESSAGE, function onMessage(message) {
                 if (message.getCorrelationId() === requestor.correlationID) {
-                    requestor.log('Received reply: "' + message.getBinaryAttachment() + '", details:\n' + message.dump());
+                    requestor.log('Received reply: "' + message.getBinaryAttachment() +
+                        '", details:\n' + message.dump());
                 } else {
-                    requestor.log(`Received reply but correlation ID didn't match: "` + message.getBinaryAttachment() +
-                    '",' + ' details:\n' + message.dump());
+                    requestor.log("Received reply but correlation ID didn't match: " +
+                        '"' +  message.getBinaryAttachment() + '" details:\n' + message.dump());
                 }
+                requestor.exit();
             });
-            flow.connect();
+            replyMessageConsumer.connect();
         } else {
             requestor.log('Cannot send request because not connected to Solace message router.');
         }

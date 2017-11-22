@@ -50,38 +50,36 @@ var QueueConsumer = function (queueName) {
     consumer.log('\n*** Consumer to queue "' + consumer.queueName + '" is ready to connect ***');
 
     // Establishes connection to Solace message router
-    consumer.connect = function (argv) {
+    consumer.connect = function () {
         if (consumer.session !== null) {
             consumer.log('Already connected and ready to consume messages.');
-        } else {
-            var host = document.getElementById('host').value;
-            var username = document.getElementById('username').value;
-            var password = document.getElementById('password').value;
-            var vpn = document.getElementById('message-vpn').value;
-            if (host && vpn && username && password) {
-                consumer.connectToSolace(host, username, password, vpn);
-            } else {
-                consumer.log('Cannot connect: please specify all the Solace message router properties.');
-            }
+            return;
         }
-    };
-
-    consumer.connectToSolace = function (host, username, password, vpn) {
-        const sessionProperties = new solace.SessionProperties();
-        sessionProperties.url = 'ws://' + host;
-        consumer.log('Connecting to Solace message router using WebSocket transport url ws://' + host);
-        sessionProperties.vpnName = vpn;
-        consumer.log('Solace message router VPN name: ' + sessionProperties.vpnName);
-        sessionProperties.userName = username;
-        consumer.log('Client username: ' + sessionProperties.userName);
-        sessionProperties.password = password;
+        var hosturl = document.getElementById('hosturl').value;
+        consumer.log('Connecting to Solace message router using url: ' + hosturl);
+        var username = document.getElementById('username').value;
+        consumer.log('Client username: ' + username);
+        var pass = document.getElementById('password').value;
+        var vpn = document.getElementById('message-vpn').value;
+        consumer.log('Solace message router VPN name: ' + vpn);
+        if (!hosturl || !username || !pass || !vpn) {
+                    
+            consumer.log('Cannot connect: please specify all the Solace message router properties.');
+            return;
+        }
         // create session
         try {
-            consumer.session = solace.SolclientFactory.createSession(sessionProperties);
+            consumer.session = solace.SolclientFactory.createSession({
+                // solace.SessionProperties
+                url:      hosturl,
+                vpnName:  vpn,
+                userName: username,
+                password: pass,
+            });
         } catch (error) {
             consumer.log(error.toString());
         }
-        // define session event handlers
+        // define session event listeners
         consumer.session.on(solace.SessionEventCode.UP_NOTICE, function (sessionEvent) {
             consumer.log('=== Successfully connected and ready to start the message consumer. ===');
         });
@@ -93,7 +91,17 @@ var QueueConsumer = function (queueName) {
                 consumer.session = null;
             }
         });
-        // connect the session
+        // if secure connection, first load iframe so the browser can provide a client-certificate
+        if (hosturl.lastIndexOf('wss://', 0) === 0 || hosturl.lastIndexOf('https://', 0) === 0) {
+            var urlNoProto = hosturl.split('/').slice(2).join('/'); // remove protocol prefix
+            document.getElementById('iframe').src = 'https://' + urlNoProto + '/crossdomain.xml';
+        } else {
+            consumer.connectToSolace();   // otherwise proceed
+        }
+    };
+
+    // Actually connects the session
+    consumer.connectToSolace = function () {
         try {
             consumer.session.connect();
         } catch (error) {
@@ -109,32 +117,33 @@ var QueueConsumer = function (queueName) {
             } else {
                 consumer.log('Starting consumer for queue: ' + consumer.queueName);
                 try {
-                    // Create a flow
-                    consumer.flow = consumer.session.createSubscriberFlow(new solace.SubscriberFlowProperties({
-                        endpoint: {
-                            destination: consumer.queueDestination,
-                        },
-                    }));
+                    // Create a message consumer
+                    consumer.messageConsumer = consumer.session.createMessageConsumer({
+                        queueDescriptor: { name: consumer.queueName, type: solace.QueueType.QUEUE },
+                    });
+                          
+                        
                     // Define flow event listeners
-                    consumer.flow.on(solace.FlowEventName.UP, function () {
+                    consumer.messageConsumer.on(solace.MessageConsumerEventName.UP, function () {
                         consumer.consuming = true;
                         consumer.log('=== Ready to receive messages. ===');
                     });
-                    consumer.flow.on(solace.FlowEventName.BIND_FAILED_ERROR, function () {
+                    consumer.messageConsumer.on(solace.MessageConsumerEventName.CONNECT_FAILED_ERROR, function () {
                         consumer.consuming = false;
-                        consumer.log("=== Error: the flow couldn't bind to queue " + consumer.queueName + " ===");
+                        consumer.log('=== Error: the flow could not bind to queue "' + consumer.queueName +
+                            '" ===\n   Ensure the queue exists on the message router vpn');
                     });
-                    consumer.flow.on(solace.FlowEventName.DOWN, function () {
+                    consumer.messageConsumer.on(solace.MessageConsumerEventName.DOWN, function () {
                         consumer.consuming = false;
                         consumer.log('=== An error happened, the flow is down ===');
                     });
-                    // Define flow message event listener
-                    consumer.flow.on(solace.FlowEventName.MESSAGE, function (message) {
+                    // Define message event listener
+                    consumer.messageConsumer.on(solace.MessageConsumerEventName.MESSAGE, function (message) {
                         consumer.log('Received message: "' + message.getBinaryAttachment() + '",' +
                             ' details:\n' + message.dump());
                     });
                     // Connect the flow
-                    consumer.flow.connect();
+                    consumer.messageConsumer.connect();
                 } catch (error) {
                     consumer.log(error.toString());
                 }
@@ -159,8 +168,8 @@ var QueueConsumer = function (queueName) {
                 consumer.consuming = false;
                 consumer.log('Disconnecting consumption from queue: ' + consumer.queueName);
                 try {
-                    consumer.flow.disconnect();
-                    consumer.flow.dispose();
+                    consumer.messageConsumer.disconnect();
+                    consumer.messageConsumer.dispose();
                 } catch (error) {
                     consumer.log(error.toString());
                 }

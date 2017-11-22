@@ -27,17 +27,17 @@
 /*global solace*/
 
 var TopicSubscriber = function (topicName) {
-    "use strict";
+    'use strict';
     var subscriber = {};
     subscriber.session = null;
     subscriber.topicName = topicName;
     subscriber.subscribed = false;
-    subscriber.iframeRequested = false;
 
     // Logger
     subscriber.log = function (line) {
         var now = new Date();
-        var time = [('0' + now.getHours()).slice(-2), ('0' + now.getMinutes()).slice(-2), ('0' + now.getSeconds()).slice(-2)];
+        var time = [('0' + now.getHours()).slice(-2), ('0' + now.getMinutes()).slice(-2),
+            ('0' + now.getSeconds()).slice(-2)];
         var timestamp = '[' + time.join(':') + '] ';
         console.log(timestamp + line);
         var logTextArea = document.getElementById('log');
@@ -51,49 +51,34 @@ var TopicSubscriber = function (topicName) {
     subscriber.connect = function () {
         if (subscriber.session !== null) {
             subscriber.log('Already connected and ready to subscribe.');
-        } else {
-            var host = document.getElementById('host').value;
-            var username = document.getElementById('username').value;
-            var password = document.getElementById('password').value;
-            var vpn = document.getElementById('message-vpn').value;
-            if (host && vpn && username && password) {
-                subscriber.connectToSolace(host, username, password, vpn);
-            } else {
-                subscriber.log('Cannot connect: please specify all the Solace message router properties.');
-            }
+            return;
         }
-    };
-
-    subscriber.connectToSolace = function (host, username, password, vpn) {
-        var sessionProperties = new solace.SessionProperties();
-        sessionProperties.url = 'wss://' + host;
-        subscriber.log('Connecting to Solace message router using WebSocket transport url wss://' + host);
-        sessionProperties.vpnName = vpn;
-        subscriber.log('Solace message router VPN name: ' + sessionProperties.vpnName);
-        sessionProperties.userName = username;
-        subscriber.log('Client username: ' + sessionProperties.userName);
-        sessionProperties.password = password;
-        // set client certificate authentication
-        // sessionProperties.authenticationScheme = solace.AuthenticationScheme.BASIC;
-        sessionProperties.connectTimeoutInMsecs = 25000;
-        // trigger the browser to prompt for client certificate selection
-        document.getElementById('iframe').src = 'https://' + host + '/crossdomain.xml';
-        subscriber.iframeRequested = true;
+        var hosturl = document.getElementById('hosturl').value;
+        subscriber.log('Connecting to Solace message router using url: ' + hosturl);
+        var username = document.getElementById('username').value;
+        subscriber.log('Client username: ' + username);
+        var pass = document.getElementById('password').value;
+        var vpn = document.getElementById('message-vpn').value;
+        subscriber.log('Solace message router VPN name: ' + vpn);
+        if (!hosturl || !username || !pass || !vpn) {
+            subscriber.log('Cannot connect: please specify all the Solace message router properties.');
+            return;
+        }
         // create session
         try {
-            subscriber.session = solace.SolclientFactory.createSession(sessionProperties);
+            subscriber.session = solace.SolclientFactory.createSession({
+                // solace.SessionProperties
+                url:      hosturl,
+                vpnName:  vpn,
+                userName: username,
+                password: pass,
+                // set basic authentication
+                authenticationScheme: solace.AuthenticationScheme.BASIC,
+            });
         } catch (error) {
             producer.log(error.toString());
         }
-        // stop here, iframe loaded is a pre-requisite for completion of connect
-    };
-
-    subscriber.iframeLoaded = function () {
-        if (!subscriber.iframeRequested) {
-            return;
-        }
-        subscriber.log('Loaded the iframe.');
-        // define session event handlers
+        // define session event listeners
         subscriber.session.on(solace.SessionEventCode.UP_NOTICE, function (sessionEvent) {
             subscriber.log('=== Successfully connected and ready to subscribe. ===');
         });
@@ -118,11 +103,22 @@ var TopicSubscriber = function (topicName) {
                 subscriber.log('=== Ready to receive messages. ===');
             }
         });
-        // define message event handler
+        // define message event listener
         subscriber.session.on(solace.SessionEventCode.MESSAGE, function (message) {
-            subscriber.log('Received message: "' + message.getBinaryAttachment() + '", details:\n' + message.dump());
+            subscriber.log('Received message: "' + message.getBinaryAttachment() + '", details:\n' +
+                message.dump());
         });
-        // connect the session
+        // if secure connection, first load iframe so the browser can provide a client-certificate
+        if (hosturl.lastIndexOf('wss://', 0) === 0 || hosturl.lastIndexOf('https://', 0) === 0) {
+            var urlNoProto = hosturl.split('/').slice(2).join('/'); // remove protocol prefix
+            document.getElementById('iframe').src = 'https://' + urlNoProto + '/crossdomain.xml';
+        } else {
+            subscriber.connectToSolace();   // otherwise proceed
+        }
+    };
+
+    // Actually connects the session
+    subscriber.connectToSolace = function () {
         try {
             subscriber.session.connect();
         } catch (error) {
@@ -144,16 +140,17 @@ var TopicSubscriber = function (topicName) {
         }
     };
 
-    // Subscribes to topic on Solace Router
+    // Subscribes to topic on Solace message router
     subscriber.subscribe = function () {
         if (subscriber.session !== null) {
             if (subscriber.subscribed) {
-                subscriber.log('Already subscribed to "' + subscriber.topicName + '" and ready to receive messages.');
+                subscriber.log('Already subscribed to "' + subscriber.topicName
+                    + '" and ready to receive messages.');
             } else {
                 subscriber.log('Subscribing to topic: ' + subscriber.topicName);
                 try {
                     subscriber.session.subscribe(
-                        solace.SolclientFactory.createTopic(subscriber.topicName),
+                        solace.SolclientFactory.createTopicDestination(subscriber.topicName),
                         true, // generate confirmation when subscription is added successfully
                         subscriber.topicName, // use topic name as correlation key
                         10000 // 10 seconds timeout for this operation
@@ -163,18 +160,18 @@ var TopicSubscriber = function (topicName) {
                 }
             }
         } else {
-            subscriber.log('Cannot subscribe because not connected to Solace router.');
+            subscriber.log('Cannot subscribe because not connected to Solace message router.');
         }
     };
 
-    // Unsubscribes from topic on Solace Router
+    // Unsubscribes from topic on Solace message router
     subscriber.unsubscribe = function () {
         if (subscriber.session !== null) {
             if (subscriber.subscribed) {
                 subscriber.log('Unsubscribing from topic: ' + subscriber.topicName);
                 try {
                     subscriber.session.unsubscribe(
-                        solace.SolclientFactory.createTopic(subscriber.topicName),
+                        solace.SolclientFactory.createTopicDestination(subscriber.topicName),
                         true, // generate confirmation when subscription is removed successfully
                         subscriber.topicName, // use topic name as correlation key
                         10000 // 10 seconds timeout for this operation
@@ -183,10 +180,11 @@ var TopicSubscriber = function (topicName) {
                     subscriber.log(error.toString());
                 }
             } else {
-                subscriber.log('Cannot unsubscribe because not subscribed to the topic "' + subscriber.topicName + '"');
+                subscriber.log('Cannot unsubscribe because not subscribed to the topic "'
+                    + subscriber.topicName + '"');
             }
         } else {
-            subscriber.log('Cannot unsubscribe because not connected to Solace router.');
+            subscriber.log('Cannot unsubscribe because not connected to Solace message router.');
         }
     };
 

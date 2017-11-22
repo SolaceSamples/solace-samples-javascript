@@ -47,49 +47,56 @@ var QueueProducer = function (queueName) {
     producer.log('\n*** Producer to queue "' + producer.queueName + '" is ready to connect ***');
 
     // Establishes connection to Solace message router by its hostname
-    producer.connect = function (host, username, password, vpn) {
+    producer.connect = function () {
         if (producer.session !== null) {
             producer.log('Already connected and ready to send messages.');
-        } else {
-            var host = document.getElementById('host').value;
-            var username = document.getElementById('username').value;
-            var password = document.getElementById('password').value;
-            var vpn = document.getElementById('message-vpn').value;
-            if (host && vpn && username && password) {
-                producer.connectToSolace(host, username, password, vpn);
-            } else {
-                producer.log('Cannot connect: please specify all the Solace message router properties.');
-            }
+            return;
         }
-    };
-
-    producer.connectToSolace = function (host, username, password, vpn) {
-        const sessionProperties = new solace.SessionProperties();
-        sessionProperties.url = 'ws://' + host;
-        producer.log('Connecting to Solace message router using WebSocket transport url ws://' + host);
-        sessionProperties.vpnName = vpn;
-        producer.log('Solace message router VPN name: ' + sessionProperties.vpnName);
-        sessionProperties.userName = username;
-        producer.log('Client username: ' + sessionProperties.userName);
-        sessionProperties.password = password;
+        var hosturl = document.getElementById('hosturl').value;
+        producer.log('Connecting to Solace message router using url: ' + hosturl);
+        var username = document.getElementById('username').value;
+        producer.log('Client username: ' + username);
+        var pass = document.getElementById('password').value;
+        var vpn = document.getElementById('message-vpn').value;
+        producer.log('Solace message router VPN name: ' + vpn);
+        if (!hosturl || !username || !pass || !vpn) {
+            producer.log('Cannot connect: please specify all the Solace message router properties.');
+            return;
+        }
         // create session
         try {
-            producer.session = solace.SolclientFactory.createSession(sessionProperties);
+            producer.session = solace.SolclientFactory.createSession({
+                // solace.SessionProperties
+                url:      hosturl,
+                vpnName:  vpn,
+                userName: username,
+                password: pass,
+            });
         } catch (error) {
             producer.log(error.toString());
         }
-        // define session event handlers
+        // define session event listeners
         producer.session.on(solace.SessionEventCode.UP_NOTICE, function (sessionEvent) {
             producer.log('=== Successfully connected and ready to send messages. ===');
         });
-        producer.session.on(solace.SessionEventCode.DISCONNECTED, (sessionEvent) => {
+        producer.session.on(solace.SessionEventCode.DISCONNECTED, function (sessionEvent) {
             producer.log('Disconnected.');
             if (producer.session !== null) {
                 producer.session.dispose();
                 producer.session = null;
             }
         });
-        // connect the session
+        // if secure connection, first load iframe so the browser can provide a client-certificate
+        if (hosturl.lastIndexOf('wss://', 0) === 0 || hosturl.lastIndexOf('https://', 0) === 0) {
+            var urlNoProto = hosturl.split('/').slice(2).join('/'); // remove protocol prefix
+            document.getElementById('iframe').src = 'https://' + urlNoProto + '/crossdomain.xml';
+        } else {
+            producer.connectToSolace();   // otherwise proceed
+        }
+    };
+
+    // Actually connects the session
+    producer.connectToSolace = function () {
         try {
             producer.session.connect();
         } catch (error) {
@@ -103,7 +110,7 @@ var QueueProducer = function (queueName) {
             var messageText = 'Sample Message';
             var message = solace.SolclientFactory.createMessage();
             producer.log('Sending message "' + messageText + '" to queue "' + producer.queueName + '"...');
-            message.setDestination(new solace.Destination(producer.queueName, solace.DestinationType.QUEUE));
+            message.setDestination(solace.SolclientFactory.createDurableQueueDestination(producer.queueName));
             message.setBinaryAttachment(messageText);
             message.setDeliveryMode(solace.MessageDeliveryModeType.PERSISTENT);
             try {

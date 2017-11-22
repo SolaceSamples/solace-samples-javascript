@@ -27,45 +27,55 @@
 <html lang="en">
   <head>
     <title>Solace Web Messaging API for JavaScript, Request/Reply tutorial - Basic Requestor</title>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge;" />
     <meta charset="utf-8"/>
 
-    <link rel="stylesheet" type="text/css" href="../../css/pure.css"></link>
-    <link rel="stylesheet" type="text/css" href="../../css/samples.css"></link>
+    <link rel="stylesheet" type="text/css" href="../../resources/css/pure.css"></link>
+    <link rel="stylesheet" type="text/css" href="../../resources/css/samples.css"></link>
     
     <!-- Load Solace Web Messaging API for JavaScript -->
-    <script src="../../../lib/solclient-debug.js"></script>
+    <script src="../../../lib/solclientjs-debug.js"></script>
 
     <!-- Load the RequestReply Guaranteed Requestor tutorial -->
     <script src="GuaranteedRequestor.js"></script>
 
     <!-- Execute the RequestReply Basic Requestor tutorial -->
     <script>
+      var requestor = null;
       window.onload = function () {
-      // Initialize factory with the most recent API defaults
-      var factoryProps = new solace.SolclientFactoryProperties();
-      factoryProps.profile = solace.SolclientFactoryProfiles.version10;
-      solace.SolclientFactory.init(factoryProps);
+        // Initialize factory with the most recent API defaults
+        var factoryProps = new solace.SolclientFactoryProperties();
+        factoryProps.profile = solace.SolclientFactoryProfiles.version10;
+        solace.SolclientFactory.init(factoryProps);
 
-      // enable logging to JavaScript console at WARN level
-      // NOTICE: works only with "solclient-debug.js"
-      solace.SolclientFactory.setLogLevel(solace.LogLevel.WARN);
+        // enable logging to JavaScript console at WARN level
+        // NOTICE: works only with "solclientjs-debug.js"
+        solace.SolclientFactory.setLogLevel(solace.LogLevel.WARN);
 
-      // create the requestor, specifying name of the request topic
-      var requestor = new GuaranteedRequestor('tutorial/queue');
-      // assign buttons to the requestor functions
-      document.getElementById("connect").addEventListener("click", requestor.connect);
-      document.getElementById("disconnect").addEventListener("click", requestor.disconnect);
-      document.getElementById("request").addEventListener("click", requestor.request);
+        // create the requestor, specifying name of the request topic
+        requestor = new GuaranteedRequestor('tutorial/requesttopic');
+        // assign buttons to the requestor functions
+        document.getElementById("connect").addEventListener("click", requestor.connect);
+        document.getElementById("disconnect").addEventListener("click", requestor.disconnect);
+        document.getElementById("request").addEventListener("click", requestor.request);
+      };
+      function iframeloaded(){
+        if (requestor) {
+          requestor.connectToSolace();
+        }
       };
     </script>
   </head>
 
   <body>
+    <!-- used to prompt selection of client certificate -->
+    <iframe id="iframe" src="" onload="iframeloaded()" hidden></iframe>
+
     <div class="banner">
       <div class="banner-interior">
         <span class="logo">
           <a href="http://dev.solace.com/">
-            <img src="../../images/solace-logo-white.png"/>
+            <img src="../../resources/images/solace-logo-white.png"/>
           </a>
         </span>
         <div class="banner-heading">
@@ -82,8 +92,8 @@
         <fieldset>
 
           <div class="pure-control-group">
-            <label for="host">Solace router host</label>
-            <input id="host" type="text" placeholder="Hostname">
+            <label for="hosturl">Solace router host url</label>
+            <input id="hosturl" type="text" placeholder="Host url">
           </div>
 
           <div class="pure-control-group">

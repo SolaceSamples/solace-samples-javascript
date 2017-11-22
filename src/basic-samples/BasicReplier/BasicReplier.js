@@ -51,30 +51,32 @@ var BasicReplier = function (topicName) {
     replier.connect = function () {
         if (replier.session !== null) {
             replier.log('Already connected and ready to subscribe to request topic.');
-        } else {
-            var host = document.getElementById('host').value;
-            var username = document.getElementById('username').value;
-            var password = document.getElementById('password').value;
-            var vpn = document.getElementById('message-vpn').value;
-            if (host && vpn && username && password) {
-                replier.connectToSolace(host, username, password, vpn);
-            } else {
-                replier.log('Cannot connect: please specify all the Solace message router properties.');
-            }
+            return;
         }
-    };
-
-    replier.connectToSolace = function (host, username, password, vpn) {
-        const sessionProperties = new solace.SessionProperties();
-        sessionProperties.url = 'ws://' + host;
-        replier.log('Connecting to Solace message router using WebSocket transport url ws://' + host);
-        sessionProperties.vpnName = vpn;
-        replier.log('Solace message router VPN name: ' + sessionProperties.vpnName);
-        sessionProperties.userName = username;
-        replier.log('Client username: ' + sessionProperties.userName);
-        sessionProperties.password = password;
+        var hosturl = document.getElementById('hosturl').value;
+        replier.log('Connecting to Solace message router using url: ' + hosturl);
+        var username = document.getElementById('username').value;
+        replier.log('Client username: ' + username);
+        var pass = document.getElementById('password').value;
+        var vpn = document.getElementById('message-vpn').value;
+        replier.log('Solace message router VPN name: ' + vpn);
+        if (!hosturl || !username || !pass || !vpn) {
+                    
+            replier.log('Cannot connect: please specify all the Solace message router properties.');
+            return;
+        }
         // create session
-        replier.session = solace.SolclientFactory.createSession(sessionProperties);
+        try {
+            replier.session = solace.SolclientFactory.createSession({
+                // solace.SessionProperties
+                url:      hosturl,
+                vpnName:  vpn,
+                userName: username,
+                password: pass,
+            });
+        } catch (error) {
+            replier.log(error.toString());
+        }
         // define session event listeners
         replier.session.on(solace.SessionEventCode.UP_NOTICE, function (sessionEvent) {
             replier.log('=== Successfully connected and ready to subscribe to request topic. ===');
@@ -101,14 +103,24 @@ var BasicReplier = function (topicName) {
             }
         });
         // define message event listener
-        replier.session.on(solace.SessionEventCode.MESSAGE, (message) => {
+        replier.session.on(solace.SessionEventCode.MESSAGE, function (message) {
             try {
                 replier.reply(message);
             } catch (error) {
                 replier.log(error.toString());
             }
         });
-        // connect the session
+        // if secure connection, first load iframe so the browser can provide a client-certificate
+        if (hosturl.lastIndexOf('wss://', 0) === 0 || hosturl.lastIndexOf('https://', 0) === 0) {
+            var urlNoProto = hosturl.split('/').slice(2).join('/'); // remove protocol prefix
+            document.getElementById('iframe').src = 'https://' + urlNoProto + '/crossdomain.xml';
+        } else {
+            replier.connectToSolace();   // otherwise proceed
+        }
+    };
+
+    // Actually connects the session
+    replier.connectToSolace = function () {
         try {
             replier.session.connect();
         } catch (error) {
@@ -125,7 +137,7 @@ var BasicReplier = function (topicName) {
                 replier.log('Subscribing to topic: ' + replier.topicName);
                 try {
                     replier.session.subscribe(
-                        solace.SolclientFactory.createTopic(replier.topicName),
+                        solace.SolclientFactory.createTopicDestination(replier.topicName),
                         true, // generate confirmation when subscription is added successfully
                         replier.topicName, // use topic name as correlation key
                         10000 // 10 seconds timeout for this operation
@@ -146,7 +158,7 @@ var BasicReplier = function (topicName) {
                 replier.log('Unsubscribing from topic: ' + replier.topicName);
                 try {
                     replier.session.unsubscribe(
-                        solace.SolclientFactory.createTopic(replier.topicName),
+                        solace.SolclientFactory.createTopicDestination(replier.topicName),
                         true, // generate confirmation when subscription is removed successfully
                         replier.topicName, // use topic name as correlation key
                         10000 // 10 seconds timeout for this operation
