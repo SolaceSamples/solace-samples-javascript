@@ -53,7 +53,7 @@
         solace.SolclientFactory.setLogLevel(solace.LogLevel.WARN);
 
         // create the subscriber, specifying name of the subscription topic
-        subscriber = new EventSubscriber('#LOG/INFO/CLIENT/*/CLIENT_CLIENT_CONNECT/>');
+        subscriber = new EventSubscriber();
         // assign buttons to the subscriber functions
         document.getElementById("connect").addEventListener("click", subscriber.connect);
         document.getElementById("disconnect").addEventListener("click", subscriber.disconnect);

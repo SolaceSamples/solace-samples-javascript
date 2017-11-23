@@ -27,11 +27,11 @@
 /*jslint es6 browser devel:true*/
 /*global solace*/
 
-var EventSubscriber = function (topicName) {
+var EventSubscriber = function () {
     'use strict';
     var subscriber = {};
     subscriber.session = null;
-    subscriber.topicName = topicName;
+    subscriber.topicName = null;
     subscriber.subscribed = false;
 
     // Logger
@@ -46,7 +46,7 @@ var EventSubscriber = function (topicName) {
         logTextArea.scrollTop = logTextArea.scrollHeight;
     };
 
-    subscriber.log('\n*** Subscriber to topic "' + subscriber.topicName + '" is ready to connect ***');
+    subscriber.log('\n*** Event Monitor is ready to connect ***');
 
     // Establishes connection to Solace message router
     subscriber.connect = function () {
@@ -131,6 +131,8 @@ var EventSubscriber = function (topicName) {
             if (subscriber.subscribed) {
                 subscriber.log('Already subscribed to "' + subscriber.topicName + '" and ready to receive messages.');
             } else {
+                var routername = subscriber.session.getCapability(solace.CapabilityType.PEER_ROUTER_NAME).getValue();
+                subscriber.topicName = '#LOG/INFO/CLIENT/' + routername + '/CLIENT_CLIENT_CONNECT/>';
                 subscriber.log('Subscribing to topic: ' + subscriber.topicName);
                 try {
                     subscriber.session.subscribe(
