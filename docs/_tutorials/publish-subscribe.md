@@ -93,7 +93,7 @@ Use the debug version of the API in `lib/solclient-debug.js` file instead, if yo
 </head>
 ~~~
 
-The first step to use the API is to initialize the `SolclientFactory`, which is the first entry point to the API. Use the latest `version10` default settings profile to unlock all Solace Node.js API features.
+Then initialize the `SolclientFactory`, which is the first entry point to the API. Add the following to initialize with the latest `version10` behavior profile to run with the default property values that Solace recommends at the time of the version 10 release.
 
 ```javascript
 var factoryProps = new solace.SolclientFactoryProperties();

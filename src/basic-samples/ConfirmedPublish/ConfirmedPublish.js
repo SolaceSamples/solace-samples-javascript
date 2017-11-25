@@ -31,8 +31,7 @@ var QueueProducer = function (queueName) {
     var producer = {};
     producer.session = null;
     producer.queueName = queueName;
-    producer.messageCount = 10;
-
+    producer.numOfMessages = 10;
     // Logger
     producer.log = function (line) {
         var now = new Date();
@@ -73,16 +72,20 @@ var QueueProducer = function (queueName) {
                 vpnName:  vpn,
                 userName: username,
                 password: pass,
+                publisherProperties: {
+                    acknowledgeMode: solace.MessagePublisherAcknowledgeMode.PER_MESSAGE,
+                },
             });
         } catch (error) {
             producer.log(error.toString());
         }
-        // define session event handlers
+        // define session event listeners
         producer.session.on(solace.SessionEventCode.UP_NOTICE, function (sessionEvent) {
             producer.log('=== Successfully connected and ready to send messages. ===');
         });
         producer.session.on(solace.SessionEventCode.ACKNOWLEDGED_MESSAGE, function (sessionEvent) {
-            producer.log('Delivery of message with correlation key = ' + JSON.stringify(sessionEvent.correlationKey) + ' confirmed.');
+            producer.log('Delivery of message with correlation key = ' +
+                JSON.stringify(sessionEvent.correlationKey) + ' confirmed.');
         });
         producer.session.on(solace.SessionEventCode.REJECTED_MESSAGE_ERROR, function (sessionEvent) {
             producer.log('Delivery of message with correlation key = ' + JSON.stringify(sessionEvent.correlationKey) +
@@ -115,7 +118,7 @@ var QueueProducer = function (queueName) {
 
     producer.sendMessages = function () {
         if (producer.session !== null) {
-            for (var i = 1; i <= producer.messageCount; i++) {
+            for (var i = 1; i <= producer.numOfMessages; i++) {
                 producer.sendMessage(i);
             }
         } else {
