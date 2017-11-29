@@ -19,7 +19,7 @@
 
 /**
  * Solace Web Messaging API for JavaScript
- * Durable Topic Endpoint Subscriber tutorial - DTE Consumer
+ * Durable Topic Endpoint consumer tutorial - DTE Consumer
  * Demonstrates receiving persistent messages from a DTE
  */
 
@@ -97,6 +97,10 @@ var DTEConsumer = function (topicEndpointName, topicName) {
         consumer.session.on(solace.SessionEventCode.UP_NOTICE, function (sessionEvent) {
             consumer.log('=== Successfully connected and ready to start the message consumer. ===');
         });
+        consumer.session.on(solace.SessionEventCode.CONNECT_FAILED_ERROR, function (sessionEvent) {
+            consumer.log('Connection failed to the message router: ' + sessionEvent.infoStr +
+                ' - check correct parameter values and connectivity!');
+        });
         consumer.session.on(solace.SessionEventCode.DISCONNECTED, function (sessionEvent) {
             consumer.log('Disconnected.');
             consumer.consuming = false;
@@ -138,28 +142,27 @@ var DTEConsumer = function (topicEndpointName, topicName) {
                         topicEndpointSubscription: consumer.topicName,
                         queueDescriptor: { name: consumer.topicEndpointName, type: solace.QueueType.TOPIC_ENDPOINT }
                     });
-                          
-                        
-                    // Define flow event listeners
+                    // Define message consumer event listeners
                     consumer.messageConsumer.on(solace.MessageConsumerEventName.UP, function () {
                         consumer.consuming = true;
                         consumer.log('=== Ready to receive messages. ===');
                     });
                     consumer.messageConsumer.on(solace.MessageConsumerEventName.CONNECT_FAILED_ERROR, function () {
                         consumer.consuming = false;
-                        consumer.log('=== Error: the flow could not bind to DTE "' + consumer.topicEndpointName +
-                            '" ===\n   Ensure the Durable Topic Endpoint exists on the message router vpn');
+                        consumer.log('=== Error: the message consumer could not bind to DTE "' +
+                            consumer.topicEndpointName +
+                            '" ===\n   Ensure this Durable Topic Endpoint exists on the message router vpn');
                     });
                     consumer.messageConsumer.on(solace.MessageConsumerEventName.DOWN, function () {
                         consumer.consuming = false;
-                        consumer.log('=== An error happened, the flow is down ===');
+                        consumer.log('=== An error happened, the message consumer is down ===');
                     });
                     // Define message event listener
                     consumer.messageConsumer.on(solace.MessageConsumerEventName.MESSAGE, function (message) {
                         consumer.log('Received message: "' + message.getBinaryAttachment() + '",' +
                             ' details:\n' + message.dump());
                     });
-                    // Connect the flow
+                    // Connect the message consumer
                     consumer.messageConsumer.connect();
                 } catch (error) {
                     consumer.log(error.toString());

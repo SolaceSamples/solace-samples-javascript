@@ -53,7 +53,7 @@
         solace.SolclientFactory.setLogLevel(solace.LogLevel.WARN);
 
         // create the subscriber, specifying name of the subscription topic
-        subscriber = new TopicSubscriber('tutorial/topic');
+        subscriber = new SecureTopicSubscriber('tutorial/topic');
         // assign buttons to the subscriber functions
         document.getElementById("connect").addEventListener("click", subscriber.connect);
         document.getElementById("disconnect").addEventListener("click", subscriber.disconnect);
@@ -94,7 +94,7 @@
 
           <div class="pure-control-group">
             <label for="hosturl">Solace router host url</label>
-            <input id="hosturl" type="text" placeholder="Host url">
+            <input id="hosturl" type="text" placeholder="<protocol://host[:port]>">
           </div>
 
           <div class="pure-control-group">

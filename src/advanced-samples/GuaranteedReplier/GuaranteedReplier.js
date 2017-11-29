@@ -81,6 +81,10 @@ var GuaranteedReplier = function (requestTopicName) {
         replier.session.on(solace.SessionEventCode.UP_NOTICE, function (sessionEvent) {
             replier.log('=== Successfully connected and ready to consume messages sent to request topic ===');
         });
+        replier.session.on(solace.SessionEventCode.CONNECT_FAILED_ERROR, function (sessionEvent) {
+            replier.log('Connection failed to the message router: ' + sessionEvent.infoStr +
+                ' - check correct parameter values and connectivity!');
+        });
         replier.session.on(solace.SessionEventCode.DISCONNECTED, function (sessionEvent) {
             replier.log('Disconnected.');
             replier.active = false;
@@ -155,14 +159,6 @@ var GuaranteedReplier = function (requestTopicName) {
         } else {
             replier.log('Cannot reply: not connected to Solace message router.');
         }
-    };
-
-    replier.exit = function () {
-        replier.stopService();
-        replier.disconnect();
-        setTimeout(function () {
-            process.exit();
-        }, 2000); // wait for 2 seconds to finish
     };
 
     // Stops the replier service on Solace message router

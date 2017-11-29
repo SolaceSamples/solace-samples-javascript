@@ -79,6 +79,10 @@ var QueueProducer = function (queueName) {
         producer.session.on(solace.SessionEventCode.UP_NOTICE, function (sessionEvent) {
             producer.log('=== Successfully connected and ready to send messages. ===');
         });
+        producer.session.on(solace.SessionEventCode.CONNECT_FAILED_ERROR, function (sessionEvent) {
+            producer.log('Connection failed to the message router: ' + sessionEvent.infoStr +
+                ' - check correct parameter values and connectivity!');
+        });
         producer.session.on(solace.SessionEventCode.DISCONNECTED, function (sessionEvent) {
             producer.log('Disconnected.');
             if (producer.session !== null) {
@@ -122,13 +126,6 @@ var QueueProducer = function (queueName) {
         } else {
             producer.log('Cannot send messages because not connected to Solace message router.');
         }
-    };
-
-    producer.exit = function () {
-        producer.disconnect();
-        setTimeout(function () {
-            process.exit();
-        }, 1000); // wait for 1 second to finish
     };
 
     // Gracefully disconnects from Solace message router

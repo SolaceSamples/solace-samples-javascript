@@ -79,6 +79,10 @@ var BasicRequestor = function (topicName) {
         requestor.session.on(solace.SessionEventCode.UP_NOTICE, function (sessionEvent) {
             requestor.log('=== Successfully connected and ready to send requests. ===');
         });
+        requestor.session.on(solace.SessionEventCode.CONNECT_FAILED_ERROR, function (sessionEvent) {
+            requestor.log('Connection failed to the message router: ' + sessionEvent.infoStr +
+                ' - check correct parameter values and connectivity!');
+        });
         requestor.session.on(solace.SessionEventCode.DISCONNECTED, function (sessionEvent) {
             requestor.log('Disconnected.');
             if (requestor.session !== null) {

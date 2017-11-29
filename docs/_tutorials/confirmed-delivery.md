@@ -17,13 +17,15 @@ This tutorial builds on the basic concepts introduced in [Persistence with Queue
 This tutorial assumes the following:
 
 *   You are familiar with Solace [core concepts]({{ site.docs-core-concepts }}){:target="_top"}.
-*   You have access to a running Solace message router with the following configuration:
-    *   Enabled message VPN
-    *   Enabled client username
+*   You have access to Solace messaging with the following configuration details:
+    *   Connectivity information for a Solace message-VPN
+    *   Enabled client username and password
 
-One simple way to get access to a Solace message router is to start a Solace VMR load [as outlined here]({{ site.docs-vmr-setup }}){:target="_top"}. By default the Solace VMR will run with the “default” message VPN configured and ready for messaging. Going forward, this tutorial assumes that you are using the Solace VMR. If you are using a different Solace message router configuration, adapt the instructions to match your configuration.
-
-The build instructions in this tutorial assume you are using a Linux shell. If your environment differs, adapt the instructions.
+{% if jekyll.environment == 'solaceCloud' %}
+One simple way to get access to Solace messaging quickly is to create a messaging service in Solace Cloud [as outlined here]({{ site.links-solaceCloud-setup}}){:target="_top"}. You can find other ways to get access to Solace messaging below.
+{% else %}
+One simple way to get access to a Solace message router is to start a Solace VMR load [as outlined here]({{ site.docs-vmr-setup }}){:target="_top"}. By default the Solace VMR will with the “default” message VPN configured and ready for guaranteed messaging. Going forward, this tutorial assumes that you are using the Solace VMR. If you are using a different Solace message router configuration adapt the tutorial appropriately to match your configuration.
+{% endif %}
 
 ## Goals
 
@@ -31,9 +33,16 @@ The goal of this tutorial is to understand the following:
 
 *  How to properly handle guaranteed message acknowledgements on message send.
 
+{% if jekyll.environment == 'solaceCloud' %}
+    {% include solaceMessaging-cloud.md %}
+{% else %}
+    {% include solaceMessaging.md %}
+{% endif %}  
+{% include solaceApi.md %}
+
 ## Overview
 
-In order to send guaranteed messages to a Solace message router with no chance of message loss, it is absolutely necessary to properly process the acknowledgements that come back from the Solace message router. These acknowledgements will let you know if the message was accepted by the Solace message router or if it was rejected. If it is rejected, the acknowledgement will also contain exact details of why it was rejected. For example, you may not have permission to send guaranteed messages or queue destination may not exist etc.
+In order to send guaranteed messages to a Solace message router with no chance of message loss, it is absolutely necessary to properly process the acknowledgements that come back from the Solace message router. These acknowledgements will let you know if the message was accepted by the Solace message router or if it was rejected. If it was rejected, the acknowledgement will also contain exact details of why. For example, you may not have permission to send guaranteed messages or the queue destination may not exist etc.
 
 In order to properly handle message acknowledgements it is also important to know which message is being acknowledged. In other words, applications often need some application context along with the acknowledgement from the Solace message router to properly process the business logic on their end. The Solace Node.js API enables this through emitting a session event called `ACKNOWLEDGED_MESSAGE` when a message is successfully acknowledged. Similarly, the session event `REJECTED_MESSAGE_ERROR` is emitted in case of an error.
 This allows applications to attach a correlation object on message send and this correlation object is then passed to the event listeners implemented for above events. This allows applications to easily pass the application context to the acknowledgement, enabling proper correlation of messages sent and acknowledgements received.
@@ -46,45 +55,6 @@ const correlationKey = {
     id: sequenceNr,
 };
 ```
-
-## Solace message router properties
-
-In order to send or receive messages to a Solace message router, you need to know a few details of how to connect to the Solace message router. Specifically you need to know the following:
-
-<table>
-<tbody>
-<tr>
-<td>Resource</td>
-<td>Value</td>
-<td>Description</td>
-</tr>
-<tr>
-<td>Host url</td>
-<td>String of the form <code>protocol://DNS name:Port</code> or <code>protocol://IP:Port</code></td>
-<td>This is the address clients use when connecting to the Solace message router to send and receive messages. If Port is not provided the default port for the protocol will be used. For a Solace VMR there is only a single interface so the IP is the same as the management IP address.
-For Solace message router appliances this is the host address of the message-backbone.
-Available protocols are <code>ws://</code>, <code>wss://</code>, <code>http://</code> and <code>https://</code>
-</td>
-</tr>
-<tr>
-<td>Message VPN</td>
-<td>String</td>
-<td>The Solace message router Message VPN that this client should connect to. For the Solace VMR the simplest option is to use the “default” message-vpn which is fully enabled for message traffic.</td>
-</tr>
-<tr>
-<td>Client Username</td>
-<td>String</td>
-<td>The client username. For the Solace VMR default message VPN, authentication is disabled by default, so this can be any value.</td>
-</tr>
-<tr>
-<td>Client Password</td>
-<td>String</td>
-<td>The client password. For the Solace VMR default message VPN, authentication is disabled by default, so this can be any value.</td>
-</tr>
-</tbody>
-</table>
-
-This information will be passed as parameters to the input fields of the samples as described in the "Running the Samples" section below.
 
 ## Obtaining the Solace API
 
@@ -102,11 +72,11 @@ At the end, this tutorial walks through downloading and running the sample from 
 
 This tutorial’s sample application will send guaranteed messages to a durable queue pre-configured on the Solace message router. You can use SolAdmin or SEMP to create a durable queue. This tutorial assumes that the queue named `tutorial/queue` has been created.
 
-The structure of the code is similar to the Persistence with Queues tutorial's Queue Producer with the additions of several messages being sent and the acknowledgements logged that come back from the Solace message router for each message.
+The structure of the code is similar to the Persistence with Queues tutorial's Queue Producer with the additions of several messages being sent and the acknowledgements logged for each message that comes back from the Solace message router.
 
 The following sections from the [Persistence with Queues]({{ site.baseurl }}/persistence-with-queues) tutorial are applicable here, refer to them for all the detailed descriptions.
     
-* Pre-requisite: Creating a Durable Queue on the Solace message router
+* Prerequisite: Creating a Durable Queue on the Solace message router
 * Loading and Initializing Solace Node.js API
 * Connecting to the Solace message router
 * Session Events
@@ -114,7 +84,7 @@ The following sections from the [Persistence with Queues]({{ site.baseurl }}/per
 
 ### Configuring Per-Message publisher acknowledge event mode
 
-To confirm successful delivery of each published guaranteed message to the message-router, set "Per-Message" publisher acknowledgement so the application receives an acknowledgement event for every message. To learn more about publisher acknowledge event modes refer to the [Customer Documentation - Acknowledging Published Messages]({{ site.docs-ack-pub-msgs }}){:target="_top"}.
+To confirm successful delivery of each published guaranteed message to the message router, set "Per-Message" publisher acknowledgement so the application receives an acknowledgement event for every message. To learn more about publisher acknowledge event modes refer to the [Customer Documentation - Acknowledging Published Messages]({{ site.docs-ack-pub-msgs }}){:target="_top"}.
 
 Because the guaranteed message publisher is embedded in the `Session` object, configure the `publisherProperties` property of the `SessionProperties` which is used when creating the session. Specifically, set the `acknowledgeMode` of the `publisherProperties`:
 
@@ -216,10 +186,13 @@ try {
 
 ## Summarizing
 
-The full source code for this example is available in [GitHub]({{ site.repository }}){:target="_blank"}. If you combine the example source code shown above results in the following source:
+Combining the example source code shown above results in the following source code files:
 
-*   [ConfirmedPublish.html]({{ site.repository }}/blob/master/src/basic-samples/ConfirmedPublish/ConfirmedPublish.html)
-*   [ConfirmedPublish.js]({{ site.repository }}/blob/master/src/basic-samples/ConfirmedPublish/ConfirmedPublish.js)
+<ul>
+{% for item in page.links %}
+<li><a href="{{ site.repository }}{{ item.link }}" target="_blank">{{ item.label }}</a></li>
+{% endfor %}
+</ul>
 
 ### Getting the Source
 
@@ -229,7 +202,8 @@ Clone the GitHub repository containing the Solace samples.
 git clone {{ site.repository }}
 cd {{ site.baseurl | remove: '/'}}
 ```
-
+ 
+Note: the code in the `master` branch of this repository depends on Solace Node.js API version 10 or later. If you want to work with an older version clone the branch that corresponds your version.
 ### Installing the Web Messaging API for JavaScript
 
 It is assumed that the `lib` directory containing the API libraries will be installed at the root of the cloned `solace-samples-javascript` repository:
@@ -242,7 +216,7 @@ cp -R <path_to_unzipped_API_distribution_package>/lib/ .
 
 The sample web application comes as a pair: one HTML file and one JavaScript file that is loaded by the HTML file.
 
-It will send 10 messages, waits for the delivery confirmation for all messages then exits. The `QueueConsumer` sample application from the Persistence with Queues tutorial can be used to receive and display the sent messages.
+It will send 10 messages, wait for the delivery confirmation for all messages then exit. The `QueueConsumer` sample application from the Persistence with Queues tutorial can be used to receive and display the sent messages.
 
 **Sample Output**
 
@@ -256,6 +230,6 @@ The following is a screenshot of the tutorial’s `ConfirmedPublish.html` web pa
 
 ![]({{ site.baseurl }}/images/confirmeddelivery-javascript_img-1.png)
 
-You have now successfully sent persistent messages to a Solace router and confirmed its receipt by correlating the acknowledgement.
+You have now successfully sent guaranteed messages to a Solace router and confirmed its receipt by correlating the acknowledgement.
 
 If you have any issues sending and receiving a message, check the [Solace community]({{ site.links-community }}){:target="_top"} for answers to common issues.

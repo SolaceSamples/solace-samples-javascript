@@ -19,14 +19,15 @@
 
 /**
  * Solace Web Messaging API for JavaScript
- * Secure Session tutorial - Topic Subscriber
+ * Secure Session tutorial
  * Demonstrates using ssl to connect to the message router
+                                                
  */
 
 /*jslint es6 browser devel:true*/
 /*global solace*/
 
-var TopicSubscriber = function (topicName) {
+var SecureTopicSubscriber = function (topicName) {
     'use strict';
     var subscriber = {};
     subscriber.session = null;
@@ -64,6 +65,10 @@ var TopicSubscriber = function (topicName) {
             subscriber.log('Cannot connect: please specify all the Solace message router properties.');
             return;
         }
+                                                                                                       
+                                                                             
+                                                             
+
         // create session
         try {
             subscriber.session = solace.SolclientFactory.createSession({
@@ -81,6 +86,10 @@ var TopicSubscriber = function (topicName) {
         // define session event listeners
         subscriber.session.on(solace.SessionEventCode.UP_NOTICE, function (sessionEvent) {
             subscriber.log('=== Successfully connected and ready to subscribe. ===');
+        });
+        subscriber.session.on(solace.SessionEventCode.CONNECT_FAILED_ERROR, function (sessionEvent) {
+            subscriber.log('Connection failed to the message router: ' + sessionEvent.infoStr +
+                ' - check correct parameter values and connectivity!');
         });
         subscriber.session.on(solace.SessionEventCode.DISCONNECTED, function (sessionEvent) {
             subscriber.log('Disconnected.');
@@ -126,26 +135,12 @@ var TopicSubscriber = function (topicName) {
         }
     };
 
-    // Gracefully disconnects from Solace router
-    subscriber.disconnect = function () {
-        subscriber.log('Disconnecting from Solace router...');
-        if (subscriber.session !== null) {
-            try {
-                subscriber.session.disconnect();
-            } catch (error) {
-                subscriber.log(error.toString());
-            }
-        } else {
-            subscriber.log('Not connected to Solace router.');
-        }
-    };
-
     // Subscribes to topic on Solace message router
     subscriber.subscribe = function () {
         if (subscriber.session !== null) {
             if (subscriber.subscribed) {
-                subscriber.log('Already subscribed to "' + subscriber.topicName
-                    + '" and ready to receive messages.');
+                subscriber.log('Already subscribed to "' + subscriber.topicName +
+                    '" and ready to receive messages.');
             } else {
                 subscriber.log('Subscribing to topic: ' + subscriber.topicName);
                 try {
@@ -180,11 +175,25 @@ var TopicSubscriber = function (topicName) {
                     subscriber.log(error.toString());
                 }
             } else {
-                subscriber.log('Cannot unsubscribe because not subscribed to the topic "'
-                    + subscriber.topicName + '"');
+                subscriber.log('Cannot unsubscribe because not subscribed to the topic "' +
+                    subscriber.topicName + '"');
             }
         } else {
             subscriber.log('Cannot unsubscribe because not connected to Solace message router.');
+        }
+    };
+
+    // Gracefully disconnects from Solace message router
+    subscriber.disconnect = function () {
+        subscriber.log('Disconnecting from Solace message router...');
+        if (subscriber.session !== null) {
+            try {
+                subscriber.session.disconnect();
+            } catch (error) {
+                subscriber.log(error.toString());
+            }
+        } else {
+            subscriber.log('Not connected to Solace message router.');
         }
     };
 

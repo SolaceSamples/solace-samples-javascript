@@ -75,11 +75,15 @@ var TopicSubscriber = function (topicName) {
                 password: pass,
             });
         } catch (error) {
-            producer.log(error.toString());
+            subscriber.log(error.toString());
         }
         // define session event listeners
         subscriber.session.on(solace.SessionEventCode.UP_NOTICE, function (sessionEvent) {
             subscriber.log('=== Successfully connected and ready to subscribe. ===');
+        });
+        subscriber.session.on(solace.SessionEventCode.CONNECT_FAILED_ERROR, function (sessionEvent) {
+            subscriber.log('Connection failed to the message router: ' + sessionEvent.infoStr +
+                ' - check correct parameter values and connectivity!');
         });
         subscriber.session.on(solace.SessionEventCode.DISCONNECTED, function (sessionEvent) {
             subscriber.log('Disconnected.');
@@ -122,20 +126,6 @@ var TopicSubscriber = function (topicName) {
             subscriber.session.connect();
         } catch (error) {
             subscriber.log(error.toString());
-        }
-    };
-
-    // Gracefully disconnects from Solace router
-    subscriber.disconnect = function () {
-        subscriber.log('Disconnecting from Solace router...');
-        if (subscriber.session !== null) {
-            try {
-                subscriber.session.disconnect();
-            } catch (error) {
-                subscriber.log(error.toString());
-            }
-        } else {
-            subscriber.log('Not connected to Solace router.');
         }
     };
 
@@ -184,6 +174,20 @@ var TopicSubscriber = function (topicName) {
             }
         } else {
             subscriber.log('Cannot unsubscribe because not connected to Solace message router.');
+        }
+    };
+
+    // Gracefully disconnects from Solace message router
+    subscriber.disconnect = function () {
+        subscriber.log('Disconnecting from Solace message router...');
+        if (subscriber.session !== null) {
+            try {
+                subscriber.session.disconnect();
+            } catch (error) {
+                subscriber.log(error.toString());
+            }
+        } else {
+            subscriber.log('Not connected to Solace message router.');
         }
     };
 

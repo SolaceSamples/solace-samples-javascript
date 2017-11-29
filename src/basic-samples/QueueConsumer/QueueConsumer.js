@@ -83,6 +83,10 @@ var QueueConsumer = function (queueName) {
         consumer.session.on(solace.SessionEventCode.UP_NOTICE, function (sessionEvent) {
             consumer.log('=== Successfully connected and ready to start the message consumer. ===');
         });
+        consumer.session.on(solace.SessionEventCode.CONNECT_FAILED_ERROR, function (sessionEvent) {
+            consumer.log('Connection failed to the message router: ' + sessionEvent.infoStr +
+                ' - check correct parameter values and connectivity!');
+        });
         consumer.session.on(solace.SessionEventCode.DISCONNECTED, function (sessionEvent) {
             consumer.log('Disconnected.');
             consumer.consuming = false;
@@ -119,30 +123,36 @@ var QueueConsumer = function (queueName) {
                 try {
                     // Create a message consumer
                     consumer.messageConsumer = consumer.session.createMessageConsumer({
+                        // solace.MessageConsumerProperties
                         queueDescriptor: { name: consumer.queueName, type: solace.QueueType.QUEUE },
+                        acknowledgeMode: solace.MessageConsumerAcknowledgeMode.CLIENT, // Enabling Client ack
                     });
-                          
-                        
-                    // Define flow event listeners
+                    // Define message consumer event listeners
                     consumer.messageConsumer.on(solace.MessageConsumerEventName.UP, function () {
                         consumer.consuming = true;
                         consumer.log('=== Ready to receive messages. ===');
                     });
                     consumer.messageConsumer.on(solace.MessageConsumerEventName.CONNECT_FAILED_ERROR, function () {
                         consumer.consuming = false;
-                        consumer.log('=== Error: the flow could not bind to queue "' + consumer.queueName +
-                            '" ===\n   Ensure the queue exists on the message router vpn');
+                        consumer.log('=== Error: the message consumer could not bind to queue "' + consumer.queueName +
+                            '" ===\n   Ensure this queue exists on the message router vpn');
                     });
                     consumer.messageConsumer.on(solace.MessageConsumerEventName.DOWN, function () {
                         consumer.consuming = false;
-                        consumer.log('=== An error happened, the flow is down ===');
+                        consumer.log('=== The message consumer is now down ===');
                     });
-                    // Define message event listener
+                    consumer.messageConsumer.on(solace.MessageConsumerEventName.DOWN_ERROR, function () {
+                        consumer.consuming = false;
+                        consumer.log('=== An error happened, the message consumer is down ===');
+                    });
+                    // Define message received event listener
                     consumer.messageConsumer.on(solace.MessageConsumerEventName.MESSAGE, function (message) {
                         consumer.log('Received message: "' + message.getBinaryAttachment() + '",' +
                             ' details:\n' + message.dump());
+                        // Need to explicitly ack otherwise it will not be deleted from the message router
+                        message.acknowledge();
                     });
-                    // Connect the flow
+                    // Connect the message consumer
                     consumer.messageConsumer.connect();
                 } catch (error) {
                     consumer.log(error.toString());
@@ -151,14 +161,6 @@ var QueueConsumer = function (queueName) {
         } else {
             consumer.log('Cannot start the queue consumer because not connected to Solace message router.');
         }
-    };
-
-    consumer.exit = function () {
-        consumer.stopConsume();
-        consumer.disconnect();
-        setTimeout(function () {
-            process.exit();
-        }, 1000); // wait for 1 second to finish
     };
 
     // Disconnects the consumer from queue on Solace message router

@@ -1,4 +1,5 @@
 # Getting Started Examples
+
 ## Solace JavaScript API
 
 These tutorials will get you up to speed and sending messages with Solace technology as quickly as possible. There are two ways you can get started:
@@ -20,14 +21,14 @@ This repository contains:
     - [Confirmed Delivery](https://solacesamples.github.io/solace-samples-javascript/confirmed-delivery): Learn how to confirm that your messages are received by a Solace message router.
     - [Topic to Queue Mapping](https://solacesamples.github.io/solace-samples-javascript/topic-to-queue-mapping): Learn how to map existing topics to Solace queues.
 
-* Additional sample code, showing how to make use of **advanced** features of the Solace message-router is available in the [advanced-samples directory](https://github.com/SolaceSamples/solace-samples-javascript/tree/master/src/advanced-samples).
+* Additional sample code, showing how to make use of **advanced** features of the Solace message router is available in the [advanced-samples directory](https://github.com/SolaceSamples/solace-samples-javascript/tree/master/src/advanced-samples).
 
+    - [Secure Session](https://github.com/SolaceSamples/solace-samples-javascript/tree/master/src/advanced-samples): Learn how to use secure connection to the server and server and client certificate authentication.
     - [Active Flow Indication](https://github.com/SolaceSamples/solace-samples-javascript/tree/master/src/advanced-samples): Learn how multiple flows can bind to an exclusive queue, but only one client at a time can actively receive messages.
     - [Durable Topic Endpoint Consumer](https://github.com/SolaceSamples/solace-samples-javascript/tree/master/src/advanced-samples): Learn how to consume messages from a Durable Topic Endpoint (DTE).
-    - [Event Monitor](https://github.com/SolaceSamples/solace-samples-javascript/tree/master/src/advanced-samples): Learn how to monitor message-router generated events.
+    - [Event Monitor](https://github.com/SolaceSamples/solace-samples-javascript/tree/master/src/advanced-samples): Learn how to monitor message router generated events.
     - [GuaranteedRequestor/Replier](https://github.com/SolaceSamples/solace-samples-javascript/tree/master/src/advanced-samples): Learn how to set up guaranteed request/reply messaging.
     - [NoLocal Pub-Sub](https://github.com/SolaceSamples/solace-samples-javascript/tree/master/src/advanced-samples): Learn how to prevent messages published on a session or flow received on that same session or flow.
-    - [Secure Session](https://github.com/SolaceSamples/solace-samples-javascript/tree/master/src/advanced-samples): Learn how to use secure connection to the server and server and client certificate authentication.
 
 ## Checking out
 
@@ -38,6 +39,8 @@ git clone https://github.com/SolaceSamples/solace-samples-javascript
 cd solace-samples-javascript
 ```
  
+Note: the code in the `master` branch of this repository depends on Solace Node.js API version 10 or later. If you want to work with an older version clone the branch that corresponds your version.
+    
 ### Download the Solace JavaScript API
 
 These samples depend on version 10 or later of the Solace JavaScript API library.

@@ -21,11 +21,15 @@ This tutorial builds on the basic concepts introduced in the [publish/subscribe 
 This tutorial assumes the following:
 
 *   You are familiar with Solace [core concepts]({{ site.docs-core-concepts }}){:target="_top"}.
-*   You have access to a running Solace message router with the following configuration:
-    *   Enabled message VPN
-    *   Enabled client username
+*   You have access to Solace messaging with the following configuration details:
+    *   Connectivity information for a Solace message-VPN
+    *   Enabled client username and password
 
-One simple way to get access to a Solace message router is to start a Solace VMR load [as outlined here]({{ site.docs-vmr-setup }}){:target="_top"}. By default the Solace VMR will run with the “default” message VPN configured and ready for messaging. Going forward, this tutorial assumes that you are using the Solace VMR. If you are using a different Solace message router configuration, adapt the instructions to match your configuration.
+{% if jekyll.environment == 'solaceCloud' %}
+One simple way to get access to Solace messaging quickly is to create a messaging service in Solace Cloud [as outlined here]({{ site.links-solaceCloud-setup}}){:target="_top"}. You can find other ways to get access to Solace messaging below.
+{% else %}
+One simple way to get access to a Solace message router is to start a Solace VMR load [as outlined here]({{ site.docs-vmr-setup }}){:target="_top"}. By default the Solace VMR will with the “default” message VPN configured and ready for guaranteed messaging. Going forward, this tutorial assumes that you are using the Solace VMR. If you are using a different Solace message router configuration adapt the tutorial appropriately to match your configuration.
+{% endif %}
 
 ## Goals
 
@@ -34,44 +38,12 @@ The goal of this tutorial is to understand the following:
 1.  How to send a guaranteed message to a Solace queue
 2.  How to bind to this queue and receive a guaranteed message
 
-## Solace message router properties
-
-In order to send or receive messages to a Solace message router, you need to know a few details of how to connect to the Solace message router. Specifically you need to know the following:
-
-<table>
-<tbody>
-<tr>
-<td>Resource</td>
-<td>Value</td>
-<td>Description</td>
-</tr>
-<tr>
-<td>Host url</td>
-<td>String of the form <code>protocol://DNS name:Port</code> or <code>protocol://IP:Port</code></td>
-<td>This is the address clients use when connecting to the Solace message router to send and receive messages. If Port is not provided the default port for the protocol will be used. For a Solace VMR there is only a single interface so the IP is the same as the management IP address.
-For Solace message router appliances this is the host address of the message-backbone.
-Available protocols are <code>ws://</code>, <code>wss://</code>, <code>http://</code> and <code>https://</code>
-</td>
-</tr>
-<tr>
-<td>Message VPN</td>
-<td>String</td>
-<td>The Solace message router Message VPN that this client should connect to. For the Solace VMR the simplest option is to use the “default” message-vpn which is fully enabled for message traffic.</td>
-</tr>
-<tr>
-<td>Client Username</td>
-<td>String</td>
-<td>The client username. For the Solace VMR default message VPN, authentication is disabled by default, so this can be any value.</td>
-</tr>
-<tr>
-<td>Client Password</td>
-<td>String</td>
-<td>The client password. For the Solace VMR default message VPN, authentication is disabled by default, so this can be any value.</td>
-</tr>
-</tbody>
-</table>
-
-This information will be passed as parameters to the input fields of the samples as described in the "Running the Samples" section below.
+{% if jekyll.environment == 'solaceCloud' %}
+    {% include solaceMessaging-cloud.md %}
+{% else %}
+    {% include solaceMessaging.md %}
+{% endif %}  
+{% include solaceApi.md %}
 
 ## Obtaining the Solace API
 
@@ -79,33 +51,17 @@ This tutorial depends on you having the Solace Web Messaging API for JavaScript 
 
 The API Reference is available online at the [Web Messaging API for JavaScript documentation]({{ site.docs-api-reference }}){:target="_top"}.
 
-                                           
-
-                                                                              
-
-   
-                       
-   
-
-                                                  
-
-                                                                                                                                                                                                        
- 
-   
-                                                                          
-   
-
 ## Trying it yourself
 
 This tutorial is available in [GitHub]({{ site.repository }}){:target="_blank"} along with the other [Solace Developer Getting Started Examples]({{ site.links-get-started }}){:target="_top"}.
 
 At the end, this tutorial walks through downloading and running the sample from source.
 
-## Pre-requisite: Creating a Durable Queue on the Solace message router
+## Prerequisite: Creating a Durable Queue on the Solace message router
 
-A difference to the publish/subscribe tutorial is that for guaranteed messaging a physical endpoint resource – a durable queue, associated with the queue destination – needs to be created on the Solace message router, which will persist the messages until consumed.
+A difference with the publish/subscribe tutorial is that for guaranteed messaging a physical endpoint resource – a durable queue, associated with the queue destination – needs to be created on the Solace message router, which will persist the messages until consumed.
 
-You can use SolAdmin or SEMP to create a durable queue. This tutorial assumes that the queue named `tutorial/queue` has been created.
+You can use SolAdmin or SEMP to create a durable queue. This tutorial assumes that the queue named `tutorial/queue` has been created.  Ensure the queue is enabled for both Incoming and Outgoing messages and set the Permission to at least "Consume".
 
 ## Loading and Initializing the Solace Node.js API
 
@@ -125,7 +81,7 @@ Use the debug version of the API in `lib/solclient-debug.js` file instead, if yo
 </head>
 ~~~
 
-The first step to use the API is to initialize the `SolclientFactory`, which is the first entry point to the API. Use the latest `version10` default settings profile to unlock all Solace Node.js API features.
+Then initialize the `SolclientFactory`, which is the first entry point to the API. Add the following to initialize with the latest `version10` behavior profile to run with the default property values that Solace recommends at the time of the version 10 release.
 
 ```javascript
 var factoryProps = new solace.SolclientFactoryProperties();
@@ -133,41 +89,35 @@ factoryProps.profile = solace.SolclientFactoryProfiles.version10;
 solace.SolclientFactory.init(factoryProps);
 ```
 
-If the debug version has been loaded the required level of logging can be set like so:
+If the debug version of the API has been loaded the required level of logging can be set like so:
 
 ```javascript
 solace.SolclientFactory.setLogLevel(solace.LogLevel.DEBUG);
 ```
 
-## Implementing Persistent Messaging
+## Implementing Guaranteed Messaging
 
-For persistent messaging, we will use a "producer" to send messages to and a "consumer" to receive messages from a durable queue configured on the Solace message router. The producer will use a `PublisherFlow` object to send, and the consumer will bind to a queue destination and use a `SubscriberFlow` object to receive guaranteed messages.
+For guaranteed messaging, we will use a "producer" to send messages to and a "consumer" to receive messages from a durable queue configured on the Solace message router. The producer will use a `MessagePublisher` embedded into the `Session` object to send, and the consumer will bind to a queue destination and use a `MessageConsumer` object to receive guaranteed messages.
 
 ### Connecting to the Solace message router
 
-Similarly to the publish/subscribe tutorial, an application must connect a Solace session. The Solace session is the basis for all client communication with the Solace message router.
+Similar to the publish/subscribe tutorial, an application must connect a Solace session. The Solace session is the basis for all client communication with the Solace message router.
 
-The `solace.SolclientFactory` is used to create Solace session from a set of `SessionProperties`.
+The `solace.SolclientFactory` is used to create a Solace `Session` from `SessionProperties`.
 
-The following is an example of session creating and connecting to the Solace message router for the producer. Notice that additionally to the `sessionProperties` fields defining Solace message router properties, the `publisherProperties` field must be set to enabled to __send__ durable messages.  This is not required for the consumer's code.
+The following is an example of a session creating and connecting to the Solace message router for the producer.
 
-Compared to the publish/subscribe tutorial, it is also not required to specify a message event listener for the `Session` object. Guaranteed messages are delivered to event listeners defined for the `SubscriberFlow` object instead.
+Compared to the publish/subscribe tutorial, here it is not required to specify a message event listener for the `Session` object. Guaranteed messages are delivered to event listeners defined for the `MessageConsumer` object instead.
 
 ```javascript
-var sessionProperties = new solace.SessionProperties();
-sessionProperties.url = 'ws://' + host;
-sessionProperties.vpnName = vpn;
-sessionProperties.userName = username;
-sessionProperties.password = password;
-sessionProperties.publisherProperties = new solace.PublisherFlowProperties({enabled: true});
 // create session
-producer.session = solace.SolclientFactory.createSession(sessionProperties);
-                 
-                                                          
-                               
-                      
-                  
-                       
+producer.session = solace.SolclientFactory.createSession({
+    // solace.SessionProperties
+    url:      hosturl,
+    vpnName:  vpn,
+    userName: username,
+    password: pass,
+});
 // define session event listeners
     /*...see section Session Events...*/
 // connect the session
@@ -180,32 +130,34 @@ try {
 
 At this point your Node.js application is connected as a client to the Solace message router. You can use SolAdmin to view this client connection and related details.
 
-### Session Events
+#### Session Events
 
 The Solace Node.js API communicates changes in status and results of connect calls through emitting session events with certain event names.
 
-It is necessary to wire your application logic to events through listeners to take appropriate action. The most important events are:
+It is necessary to wire your application logic to session events through listeners to take appropriate action. The most important session events are:
 
-*   `SessionEventCode.UP_NOTICE`: success connecting session to the Solace message router
-*   `SessionEventCode.DISCONNECTED`: session was disconnected from the Solace message router
+*   `SessionEventCode.UP_NOTICE`: session has been successfully connected to the Solace message router
+*   `SessionEventCode.CONNECT_FAILED_ERROR`: unable to connect to the Solace message router
+*   `SessionEventCode.DISCONNECTED`: session has been disconnected from the Solace message router
 
-This is how event listeners can be defined in the sample producer and the sample consumer is very similar:
+This is how event listeners can be defined in the sample producer, and the sample consumer is very similar:
 
-```JavaScript
-// define session event handlers
+```javascript
+// define session event listeners
 producer.session.on(solace.SessionEventCode.UP_NOTICE, function (sessionEvent) {
     producer.log('=== Successfully connected and ready to send messages. ===');
     producer.sendMessage();
     producer.exit();
 });
-producer.session.on(solace.SessionEventCode.CONNECTING, (sessionEvent) => {
-    producer.log('Connecting...');
+producer.session.on(solace.SessionEventCode.CONNECT_FAILED_ERROR, function (sessionEvent) {
+    producer.log('Connection failed to the message router: ' + sessionEvent.infoStr +
+        ' - check correct parameter values and connectivity!');
 });
-producer.session.on(solace.SessionEventCode.DISCONNECTED, (sessionEvent) => {
+producer.session.on(solace.SessionEventCode.DISCONNECTED, function (sessionEvent) {
     producer.log('Disconnected.');
     if (producer.session !== null) {
-                                  
-                                    
+                                
+     
         producer.session.dispose();
         producer.session = null;
     }
@@ -216,25 +168,19 @@ Note that the application logic can be triggered only after receiving the `solac
 
 ### Sending a message to a queue
 
-Now it is time to send a message to the queue. 
+Now it is time to send a message to the queue. Remember that the queue must be pre-configured on the message router as described in the "Creating a Durable Queue" section.
 
 ![sending-message-to-queue]({{ site.baseurl }}/images/sending-message-to-queue-300x160.png)
 
-Remember to enable `publisherProperties` for `sessionProperties` as discussed above:
-
-```
-sessionProperties.publisherProperties = new solace.PublisherFlowProperties({enabled: true});
-```
-
-The actual method calls to create and send persistent messages to a queue is like for direct messages in the publish/subscribe tutorial. The differences are that:
-* a QUEUE type destination is created and used; and
+The actual method calls to create and send guaranteed messages to a queue are similar to those used for direct messages in the publish/subscribe tutorial. The differences are:
+* a durable queue type destination is created and used; and
 * the delivery mode is set to PERSISTENT.
 
-```JavaScript
+```javascript
 var messageText = 'Sample Message';
 var message = solace.SolclientFactory.createMessage();
-                                   
-message.setDestination(new solace.Destination(producer.queueName, solace.DestinationType.QUEUE));
+producer.log('Sending message "' + messageText + '" to queue "' + producer.queueName + '"...');
+message.setDestination(solace.SolclientFactory.createDurableQueueDestination(producer.queueName));
 message.setBinaryAttachment(messageText);
 message.setDeliveryMode(solace.MessageDeliveryModeType.PERSISTENT);
 try {
@@ -253,92 +199,83 @@ Now it is time to receive the messages sent to your queue.
 
 ![]({{ site.baseurl }}/images/receiving-message-from-queue-300x160.png)
 
-Receiving persistent messages is different from the direct messaging case described in the the publish/subscribe tutorial.
+Receiving guaranteed messages is different from the direct messaging case described in the the publish/subscribe tutorial.
 
-To receive persistent messages, a `SubscriberFlow` object needs to be created and connected so it will bind to the destination queue and can start receiving messages.
+To receive guaranteed messages, a connected `Session` is used to create a Solace `MessageConsumer` object from `MessageConsumerProperties` and then connected, meaning that it will bind to the queue on the message router and can start receiving messages.
 
-```JavaScript
-
-             
-                          
-consumer.destination = new solace.Destination(consumer.queueName, solace.DestinationType.QUEUE);
-// Create a flow
-consumer.flow = consumer.session.createSubscriberFlow(new solace.SubscriberFlowProperties({
-    endpoint: {
-        destination: consumer.destination,
-    },
-}));
-                                         
-                                                                 
-                               
-     
-                                       
-                 
+```javascript
+// Create message consumer
+consumer.messageConsumer = consumer.session.createMessageConsumer({
+    // solace.MessageConsumerProperties
+    queueDescriptor: { name: consumer.queueName, type: solace.QueueType.QUEUE },
+    acknowledgeMode: solace.MessageConsumerAcknowledgeMode.CLIENT, // Enabling Client ack
+});
+// define message consumer event listeners
+    /*...see section Message Consumer Events...*/
+// define message received event listener
+    /*...see section Message Consumer Message Received Event...*/
+// connect the message consumer
+try {
+    consumer.messageConsumer.connect();
+} catch (error) {
+    consumer.log(error.toString());
+}
 ```
 
-Flow related events will be sent to the event listeners defined for the `SubscriberFlow`. The most important flow events are:
+Notice that here we use the Solace "Client acknowledgement mode", which allows the consumers to acknowledge each message individually. You can learn more about acknowledgement modes in the [Solace Documentation – Acknowledging Messages Received by Clients]({{ site.docs-msg-consumer-ack-modes }}){:target="_top"}.
 
-*   `FlowEventName.UP`: the flow has successfully bound to the destination and ready to receive messages
-*   `FlowEventName.BIND_FAILED_ERROR`: the flow has not been able to bind to the destination
-*   `FlowEventName.DOWN`: a previously active flow is no longer bound to the destination
+```javascript
+    acknowledgeMode: solace.MessageConsumerAcknowledgeMode.CLIENT, // Enabling Client ack
+```
 
-```JavaScript
+#### Message Consumer Events
 
-                            
+Message consumer related events will be sent to the event listeners defined for the `MessageConsumer`. The most important events are:
 
-                                                                                                                                     
+*   `MessageConsumerEventName.UP`: the message consumer has successfully bound to the destination and ready to receive messages
+*   `MessageConsumerEventName.CONNECT_FAILED_ERROR`: the message consumer has not been able to bind to the destination
+*   `MessageConsumerEventName.DOWN`: the message consumer has been disconnected.
 
-                                                                                                                               
-                                                                                                                      
-                                                                                
-// Define flow event listeners
-consumer.flow.on(solace.FlowEventName.UP, function () {
+```javascript
+// Define message consumer event listeners
+consumer.messageConsumer.on(solace.MessageConsumerEventName.UP, function () {
     consumer.consuming = true;
     consumer.log('=== Ready to receive messages. ===');
 });
-consumer.flow.on(solace.FlowEventName.BIND_FAILED_ERROR, function () {
+consumer.messageConsumer.on(solace.MessageConsumerEventName.CONNECT_FAILED_ERROR, function () {
     consumer.consuming = false;
-    consumer.log("=== Error: the flow couldn't bind to queue " + consumer.queueName + " ===");
-                               
+    consumer.log('=== Error: the message consumer could not bind to queue "' + consumer.queueName +
+        '" ===\n   Ensure this queue exists on the message router vpn');
 });
-consumer.flow.on(solace.FlowEventName.DOWN, function () {
+consumer.messageConsumer.on(solace.MessageConsumerEventName.DOWN, function () {
     consumer.consuming = false;
-    consumer.log('=== An error happened, the flow is down ===');
+    consumer.log('=== An error happened, the message consumer is down ===');
 });
 ```
 
-Message received events will be sent to the message listener defined for the flow.
+#### Message Consumer Message Received Event
 
-```JavaScript
+Message received events will be sent to the message received event listener defined for the message consumer. Successful processing of a message must be explicitly acknowledged because "client acknowledgement mode" is used:
 
-                                                                                                                                                                                                                               
-// Define message event listener
-consumer.flow.on(solace.FlowEventName.MESSAGE, function onMessage(message) {
+```javascript
+// Define message received event listener
+consumer.messageConsumer.on(solace.MessageConsumerEventName.MESSAGE, function (message) {
     consumer.log('Received message: "' + message.getBinaryAttachment() + '",' +
         ' details:\n' + message.dump());
-});
-// Connect the flow
-consumer.flow.connect();
-```
-
-Note that flows can only be created and connected after receiving the `solace.SessionEventCode.UP_NOTICE` event:
-
-```JavaScript
-consumer.session.on(solace.SessionEventCode.UP_NOTICE, function (sessionEvent) {
-    consumer.log('=== Successfully connected and ready to start the message consumer. ===');
-    consumer.createAndConnectFlow();
+    // Need to explicitly ack otherwise it will not be deleted from the message router
+    message.acknowledge();
 });
 ```
 
 ## Summarizing
 
-The full source code for this example is available in [GitHub]({{ site.repository }}){:target="_blank"}. If you combine the example source code shown above results in the following source:
+Combining the example source code shown above results in the following source code files:
 
-*   [QueueProducer.html]({{ site.repository }}/blob/master/src/basic-samples/QueueProducer/QueueProducer.html)
-*   [QueueProducer.js]({{ site.repository }}/blob/master/src/basic-samples/QueueProducer/QueueProducer.js)
-*   [QueueConsumer.html]({{ site.repository }}/blob/master/basic-samples/src/QueueConsumer/QueueConsumer.html)
-*   [QueueConsumer.js]({{ site.repository }}/blob/master/src/basic-samples/QueueConsumer/QueueConsumer.js)
-
+<ul>
+{% for item in page.links %}
+<li><a href="{{ site.repository }}{{ item.link }}" target="_blank">{{ item.label }}</a></li>
+{% endfor %}
+</ul>
 
 ### Getting the Source
 
@@ -348,6 +285,8 @@ Clone the GitHub repository containing the Solace samples.
 git clone {{ site.repository }}
 cd {{ site.baseurl | remove: '/'}}
 ```
+ 
+Note: the code in the `master` branch of this repository depends on Solace Node.js API version 10 or later. If you want to work with an older version clone the branch that corresponds your version.
 
 ### Installing the Web Messaging API for JavaScript
 
@@ -363,17 +302,15 @@ cp -R <path_to_unzipped_API_distribution_package>/lib/ .
 
 The samples consist of two separate producer and consumer browser applications, each comes as a pair: one HTML file and one JavaScript file that is loaded by the HTML file.
 
-                                                                                                                                                                
-
 **Sample Output**
 
-First open `src/basic-samples/QueueConsumer/QueueConsumer.html` page in the browser and connect to a Solace router by specifying the message router properties and clicking “Connect” button.
+First open `src/basic-samples/QueueConsumer/QueueConsumer.html` page in the browser and connect to a Solace router by specifying the message router properties and clicking "Connect" button.
 
-Then bound to the destination queue by clicking the “Consume messages” button.
+Then bind to the destination queue by clicking the "Consume messages" button.
 
    
 
-The following is a screenshot of the tutorial’s `QueueConsumer.html` web page with the JavaScript debug console open in the Firefox browser. It captures the page after it was loaded and the “Connect” button was clicked and then the “Consume messages” button was clicked.
+The following is a screenshot of the tutorial’s `QueueConsumer.html` web page with the JavaScript debug console open in the Firefox browser. It captures the page after it was loaded and the "Connect" button was clicked and then the "Consume messages" button was clicked.
 
 ![]({{ site.baseurl }}/images/perswithqueues-javascript_img-1.png)
 
@@ -388,9 +325,9 @@ The following is a screenshot of the tutorial’s `QueueConsumer.html` web page 
                                                                                   
                                                       
 
-Now, open `src/basic-samples/QueueProducer/QueueProducer.html` page in the browser and connect to the same Solace router by specifying the message router properties and clicking “Connect” button.
+Now, open `src/basic-samples/QueueProducer/QueueProducer.html` page in the browser and connect to the same Solace router by specifying the message router properties and clicking "Connect" button.
 
-Send messages by clicking the “Send Message” button on the page.
+Send messages by clicking the "Send Message" button on the page.
 
    
 

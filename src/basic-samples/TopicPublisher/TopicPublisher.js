@@ -80,6 +80,10 @@ var TopicPublisher = function (topicName) {
         publisher.session.on(solace.SessionEventCode.UP_NOTICE, function (sessionEvent) {
             publisher.log('=== Successfully connected and ready to publish messages. ===');
         });
+        publisher.session.on(solace.SessionEventCode.CONNECT_FAILED_ERROR, function (sessionEvent) {
+            publisher.log('Connection failed to the message router: ' + sessionEvent.infoStr +
+                ' - check correct parameter values and connectivity!');
+        });
         publisher.session.on(solace.SessionEventCode.DISCONNECTED, function (sessionEvent) {
             publisher.log('Disconnected.');
             if (publisher.session !== null) {
@@ -105,29 +109,15 @@ var TopicPublisher = function (topicName) {
         }
     };
 
-    // Gracefully disconnects from Solace router
-    publisher.disconnect = function () {
-        publisher.log('Disconnecting from Solace router...');
-        if (publisher.session !== null) {
-            try {
-                publisher.session.disconnect();
-            } catch (error) {
-                publisher.log(error.toString());
-            }
-        } else {
-            publisher.log('Not connected to Solace router.');
-        }
-    };
-
     // Publishes one message
     publisher.publish = function () {
-        var messageText = 'Sample Message';
-        var message = solace.SolclientFactory.createMessage();
-        message.setDestination(solace.SolclientFactory.createTopicDestination(publisher.topicName));
-        message.setBinaryAttachment(messageText);
-        message.setDeliveryMode(solace.MessageDeliveryModeType.DIRECT);
-        publisher.log('Publishing message "' + messageText + '" to topic "' + publisher.topicName + '"...');
         if (publisher.session !== null) {
+            var messageText = 'Sample Message';
+            var message = solace.SolclientFactory.createMessage();
+            message.setDestination(solace.SolclientFactory.createTopicDestination(publisher.topicName));
+            message.setBinaryAttachment(messageText);
+            message.setDeliveryMode(solace.MessageDeliveryModeType.DIRECT);
+            publisher.log('Publishing message "' + messageText + '" to topic "' + publisher.topicName + '"...');
             try {
                 publisher.session.send(message);
                 publisher.log('Message published.');
@@ -135,7 +125,21 @@ var TopicPublisher = function (topicName) {
                 publisher.log(error.toString());
             }
         } else {
-            publisher.log('Cannot publish because not connected to Solace router.');
+            publisher.log('Cannot publish because not connected to Solace message router.');
+        }
+    };
+
+    // Gracefully disconnects from Solace message router
+    publisher.disconnect = function () {
+        publisher.log('Disconnecting from Solace message router...');
+        if (publisher.session !== null) {
+            try {
+                publisher.session.disconnect();
+            } catch (error) {
+                publisher.log(error.toString());
+            }
+        } else {
+            publisher.log('Not connected to Solace message router.');
         }
     };
 

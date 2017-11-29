@@ -21,18 +21,19 @@ This tutorial outlines both roles in the request-response message exchange patte
 This tutorial assumes the following:
 
 *   You are familiar with Solace [core concepts]({{ site.docs-core-concepts }}){:target="_top"}.
+*   You have access to Solace messaging with the following configuration details:
+    *   Connectivity information for a Solace message-VPN
+    *   Enabled client username and password
 
-```************** Note: expand with DataGo options **************```
-
-*   You have access to a running Solace message router with the following configuration:
-    *   Enabled message VPN
-    *   Enabled client username
-
-One simple way to get access to a Solace message router is to start a Solace VMR load [as outlined here]({{ site.docs-vmr-setup }}){:target="_top"}. By default the Solace VMR will run with the “default” message VPN configured and ready for messaging. Going forward, this tutorial assumes that you are using the Solace VMR. If you are using a different Solace message router configuration, adapt the instructions to match your configuration.
+{% if jekyll.environment == 'solaceCloud' %}
+One simple way to get access to Solace messaging quickly is to create a messaging service in Solace Cloud [as outlined here]({{ site.links-solaceCloud-setup}}){:target="_top"}. You can find other ways to get access to Solace messaging below.
+{% else %}
+One simple way to get access to a Solace message router is to start a Solace VMR load [as outlined here]({{ site.docs-vmr-setup }}){:target="_top"}. By default the Solace VMR will with the “default” message VPN configured and ready for guaranteed messaging. Going forward, this tutorial assumes that you are using the Solace VMR. If you are using a different Solace message router configuration adapt the tutorial appropriately to match your configuration.
+{% endif %}
 
 ## Goals
 
-The goal of this tutorial is to understand the following:
+The goals of this tutorial are to understand the following:
 
 *   On the requestor side:
     1.  How to create a request
@@ -42,55 +43,24 @@ The goal of this tutorial is to understand the following:
     1.  How to detect a request expecting a reply
     2.  How to generate a reply message
 
+{% if jekyll.environment == 'solaceCloud' %}
+    {% include solaceMessaging-cloud.md %}
+{% else %}
+    {% include solaceMessaging.md %}
+{% endif %}  
+{% include solaceApi.md %}
+
 ## Overview
 
 Request-reply messaging is supported by the Solace message router for all delivery modes. For direct messaging, the Solace APIs provide the `Requestor` object for convenience. This object makes it easy to send a request and wait for the reply message. It is a convenience object that makes use of the API provided “inbox” topic that is automatically created for each Solace client and automatically correlates requests with replies using the message correlation ID. (See Message Correlation below for more details). On the reply side another convenience method enables applications to easily send replies for specific requests. Direct messaging request reply is the delivery mode that is illustrated in this sample.
 
 ### Message Correlation
 
-For request-reply messaging to be successful it must be possible for the requestor to correlate the request with the subsequent reply. Solace messages support two fields that are needed to enable request-reply correlation. The reply-to field can be used by the requestor to indicate a Solace Topic where the reply should be sent. A natural choice for this is often the unique `P2PINBOX_IN_USE` topic which is an auto-generated unique topic per client which is accessible as a session property. The second requirement is to be able to detect the reply message from the stream of incoming messages. This is accomplished using the `correlation-id` field. This field will transit the Solace messaging system unmodified. Repliers can include the same `correlation-id` in a reply message to allow the requestor to detect the corresponding reply. The figure below outlines this exchange.  
+For request-reply messaging to be successful it must be possible for the requestor to correlate the request with the subsequent reply. Solace messages support two fields that are needed to enable request-reply correlation. The reply-to field can be used by the requestor to indicate a Solace Topic where the reply should be sent. A natural choice for this is often the unique `P2PINBOX_IN_USE` topic which is an auto-generated unique topic per client which is accessible as a session property. The second requirement is to be able to detect the reply message from the stream of incoming messages. This is accomplished using the `correlation-id` field. This field will transit the Solace messaging system unmodified. Repliers can include the same `correlation-id` in a reply message to allow the requestor to detect the corresponding reply. The figure below outlines this exchange.
 
 ![]({{ site.baseurl }}/images/Request-Reply_diagram-1.png)
 
 For direct messages however, this is simplified through the use of the `Requestor` object as shown in this sample.
-
-## Solace message router properties
-
-In order to send or receive messages to a Solace message router, you need to know a few details of how to connect to the Solace message router. Specifically you need to know the following:
-
-<table>
-<tbody>
-<tr>
-<td>Resource</td>
-<td>Value</td>
-<td>Description</td>
-</tr>
-<tr>
-<td>Host</td>
-<td>String of the form <code>DNS name</code> or <code>IP:Port</code></td>
-<td>This is the address clients use when connecting to the Solace message router to send and receive messages. For a Solace VMR this there is only a single interface so the IP is the same as the management IP address.
-For Solace message router appliances this is the host address of the message-backbone.
-</td>
-</tr>
-<tr>
-<td>Message VPN</td>
-<td>String</td>
-<td>The Solace message router Message VPN that this client should connect to. For the Solace VMR the simplest option is to use the “default” message-vpn which is fully enabled for message traffic.</td>
-</tr>
-<tr>
-<td>Client Username</td>
-<td>String</td>
-<td>The client username. For the Solace VMR default message VPN, authentication is disabled by default, so this can be any value.</td>
-</tr>
-<tr>
-<td>Client Password</td>
-<td>String</td>
-<td>The client password. For the Solace VMR default message VPN, authentication is disabled by default, so this can be any value.</td>
-</tr>
-</tbody>
-</table>
-
-This information will be need to be passed as parameters to the input fields of the samples as described in the "Running the Samples" section below.
 
 ## Obtaining the Solace API
 
@@ -106,7 +76,7 @@ At the end, this tutorial walks through downloading and running the sample from 
 
 ## Implementing Request/Reply
 
-This tutorial’s sample code comes as two separated web applications: one (with the “requestor” object) send requests to a specific topic and the other (with the “replier” object) subscribes to requests on that topic, receives the requests and replies on them.
+This tutorial’s sample code comes as two separate web applications: one (with the “requestor” object) send requests to a specific topic and the other (with the “replier” object) subscribes to requests on that topic, receives the requests and replies on them.
 
 The structure of the requestor application is similar to the publish/subscribe tutorial's topic publisher. Here instead of simply publishing a message, a request will be sent.
 
@@ -135,23 +105,23 @@ request.setSdtContainer(solace.SDTField.create(solace.SDTFieldType.STRING, reque
 request.setDeliveryMode(solace.MessageDeliveryModeType.DIRECT);
 ```
 
-Now the request can be sent. Notice callbacks `replyReceivedCb` and `requestFailedCb`. These are functions that will be called when a reply message is received (`replyReceivedCb`) or sending of the request is failed (`requestFailedCb`).
+Now the request can be sent. Notice callbacks `replyReceivedCb` and `requestFailedCb`. These are functions that will be called when a reply message is received (`replyReceivedCb`) or sending the request fails (`requestFailedCb`).
 
 ```javascript
 try {
-	requestor.session.sendRequest(
-		request,
-		5000, // 5 seconds timeout for this operation
-		function (session, message) {
-			requestor.replyReceivedCb(session, message);
-		},
-		function (session, event) {
-			requestor.requestFailedCb(session, event);
-		},
-		null // not providing correlation object
-	);
+    requestor.session.sendRequest(
+        request,
+        5000, // 5 seconds timeout for this operation
+        function (session, message) {
+            requestor.replyReceivedCb(session, message);
+        },
+        function (session, event) {
+            requestor.requestFailedCb(session, event);
+        },
+        null // not providing correlation object
+    );
 } catch (error) {
-	requestor.log(error.toString());
+    requestor.log(error.toString());
 }
 ```
 
@@ -161,20 +131,20 @@ Now it is time to receive the request and generate an appropriate reply.
 
 ![]({{ site.baseurl }}/images/Request-Reply_diagram-3.png)
 
-Just as with previous tutorials, you still need to connect a session and subscribe to the topics that requests are sent on (the request topic). The following is an example of such reply.
+Just as with previous tutorials, you still need to connect a session and subscribe to the topics that requests are sent on (the request topic). The following is an example of such a reply.
 
 ```javascript
 replier.reply = function (message) {
-                                                                                                 
-	if (replier.session !== null) {
-		var reply = solace.SolclientFactory.createMessage();
-		var replyText = message. message.getSdtContainer().getValue() + " - Sample Reply";
-		reply.setSdtContainer(solace.SDTField.create(solace.SDTFieldType.STRING, replyText));
-		replier.session.sendReply(message, reply);
-                                
-	} else {
-		replier.log('Cannot reply: not connected to Solace message router.');
-	}
+    if (replier.session !== null) {
+        var reply = solace.SolclientFactory.createMessage();
+        var ba = message.getBinaryAttachment();
+        var replyText = message.getSdtContainer().getValue() + " - Sample Reply";
+        reply.setSdtContainer(solace.SDTField.create(solace.SDTFieldType.STRING, replyText));
+        replier.session.sendReply(message, reply);
+        replier.log('Replied.');
+    } else {
+        replier.log('Cannot reply: not connected to Solace message router.');
+    }
 };
 ```
 
@@ -182,7 +152,7 @@ The replier.reply is the function that is called from the replier message event 
 
 ```javascript
 // define message event listener
-replier.session.on(solace.SessionEventCode.MESSAGE, (message) => {
+replier.session.on(solace.SessionEventCode.MESSAGE, function (message) {
     try {
         replier.reply(message);
     } catch (error) {
@@ -191,15 +161,14 @@ replier.session.on(solace.SessionEventCode.MESSAGE, (message) => {
 });
 ```
 
-###Receiving the Reply Message
+### Receiving the Reply Message
 
-All that’s left is to receive and process the reply message as it is received at the requestor or report a failure to send the request:
+All that’s left is to receive and process the reply message as it is received at the requestor or report a failure:
 
 ```javascript
 requestor.replyReceivedCb = function (session, message) {
 	requestor.log('Received reply: "' + message.getSdtContainer().getValue() + '"');
 };
-
 requestor.requestFailedCb = function (session, event) {
 	requestor.log('Request failure: ' + event.toString());
 };
@@ -207,12 +176,13 @@ requestor.requestFailedCb = function (session, event) {
 
 ## Summarizing
 
-The full source code for this example is available in [GitHub]({{ site.repository }}){:target="_blank"}. If you combine the example source code shown above results in the following source:
+Combining the example source code shown above results in the following source code files:
 
-*   [BasicRequestor.html]({{ site.repository }}/blob/master/src/basic-samples/BasicRequestor/BasicRequestor.html)
-*   [BasicRequestor.js]({{ site.repository }}/blob/master/src/basic-samples/BasicRequestor/BasicRequestor.js)
-*   [BasicReplier.html]({{ site.repository }}/blob/master/src/basic-samples/BasicReplier/BasicReplier.html)
-*   [BasicReplier.js]({{ site.repository }}/blob/master/src/basic-samples/BasicReplier/BasicReplier.js)
+<ul>
+{% for item in page.links %}
+<li><a href="{{ site.repository }}{{ item.link }}" target="_blank">{{ item.label }}</a></li>
+{% endfor %}
+</ul>
 
 ### Getting the Source
 
@@ -222,6 +192,8 @@ Clone the GitHub repository containing the Solace samples.
 git clone https://github.com/SolaceSamples/solace-samples-nodejs
 cd {{ site.baseurl | remove: '/'}}/src/basic-samples
 ```
+ 
+Note: the code in the `master` branch of this repository depends on Solace Node.js API version 10 or later. If you want to work with an older version clone the branch that corresponds your version.
 
 ### Installing the Web Messaging API for JavaScript
 

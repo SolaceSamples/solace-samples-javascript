@@ -120,7 +120,6 @@ var NoLocalPubSub = function (topicName) {
             if (subscribeDirectTopicFlag) {
                 if (!session.isCapable(solace.CapabilityType.NO_LOCAL)) {
                     sample.log('This sample requires an appliance with support for NO_LOCAL.');
-                    sample.exit();
                 }
                 session.subscribe(
                     sample.topicDestination,
@@ -158,6 +157,10 @@ var NoLocalPubSub = function (topicName) {
                 messageConsumer.connect();
             };
             sample.sessionsUp++;
+        });
+        session.on(solace.SessionEventCode.CONNECT_FAILED_ERROR, function (sessionEvent) {
+            sample.log('Connection failed to the message router: ' + sessionEvent.infoStr +
+                ' - check correct parameter values and connectivity!');
         });
         if (subscribeDirectTopicFlag) {
             // define message event listener

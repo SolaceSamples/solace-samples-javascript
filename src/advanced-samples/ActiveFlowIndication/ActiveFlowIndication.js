@@ -20,7 +20,7 @@
 /**
  * Solace Web Messaging API for JavaScript
  * Active Flow Indication - Consumer
- * Demonstrates active flow notification to multiple flows bound to an exclusive queue
+ * Demonstrates flow ACTIVE/INACTIVE notification to multiple message consumers bound to an exclusive queue
  */
 
 /*jslint es6 browser devel:true*/
@@ -30,8 +30,8 @@ var QueueConsumer = function (queueName) {
     'use strict';
     var consumer = {};
     consumer.session = null;
-    consumer.flow1 = null;
-    consumer.flow2 = null;
+    consumer.msgConsumer1 = null;
+    consumer.msgConsumer2 = null;
     consumer.queueName = queueName;
     consumer.consuming = false;
     consumer.numOfMessages = 10;
@@ -60,6 +60,7 @@ var QueueConsumer = function (queueName) {
         var hosturl = document.getElementById('hosturl').value;
         consumer.log('Connecting to Solace message router using url: ' + hosturl);
         var username = document.getElementById('username').value;
+                                                 
         consumer.log('Client username: ' + username);
         var pass = document.getElementById('password').value;
         var vpn = document.getElementById('message-vpn').value;
@@ -83,6 +84,10 @@ var QueueConsumer = function (queueName) {
         // define session event listeners
         consumer.session.on(solace.SessionEventCode.UP_NOTICE, function (sessionEvent) {
             consumer.log('=== Successfully connected and ready to start the message consumer. ===');
+        });
+        consumer.session.on(solace.SessionEventCode.CONNECT_FAILED_ERROR, function (sessionEvent) {
+            consumer.log('Connection failed to the message router: ' + sessionEvent.infoStr +
+                ' - check correct parameter values and connectivity!');
         });
         consumer.session.on(solace.SessionEventCode.DISCONNECTED, function (sessionEvent) {
             consumer.log('Disconnected.');
@@ -119,12 +124,12 @@ var QueueConsumer = function (queueName) {
             } else {
                 consumer.log('Starting consumer for exclusive queue: ' + consumer.queueName + ' on two flows.');
                 try {
-                    // Create the flows
-                    consumer.flow1 = consumer.createActiveIndFlow(consumer.session, 'flow 1');
-                    consumer.flow2 = consumer.createActiveIndFlow(consumer.session, 'flow 2');
-                    // Connect the flow
-                    consumer.flow1.connect();
-                    consumer.flow2.connect();
+                    // Create the message consumers
+                    consumer.msgConsumer1 = consumer.createActiveIndFlow(consumer.session, 'message consumer 1');
+                    consumer.msgConsumer2 = consumer.createActiveIndFlow(consumer.session, 'message consumer 2');
+                    // Connect the message consumer
+                    consumer.msgConsumer1.connect();
+                    consumer.msgConsumer2.connect();
                 } catch (error) {
                     consumer.log("!!!" + error.toString());
                 }
@@ -141,19 +146,19 @@ var QueueConsumer = function (queueName) {
             acknowledgeMode: solace.MessageConsumerAcknowledgeMode.CLIENT,
             activeIndicationEnabled: true,
         });
-        // Define flow event listeners
+        // Define message consumer event listeners
         messageConsumer.on(solace.MessageConsumerEventName.UP, function () {
             consumer.consuming = true;
             consumer.log('=== ' + messageConsumerName + ': Ready to receive messages. ===');
         });
         messageConsumer.on(solace.MessageConsumerEventName.CONNECT_FAILED_ERROR, function () {
             consumer.consuming = false;
-            consumer.log('=== ' + messageConsumerName + ': Error: the flow could not bind to queue "' + consumer.queueName +
-                '" ===\n   Ensure the queue exists on the message router vpn');
+            consumer.log('=== ' + messageConsumerName + ': Error: the message consumer could not bind to queue "' +
+                consumer.queueName + '" ===\n   Ensure this queue exists on the message router vpn');
         });
         messageConsumer.on(solace.MessageConsumerEventName.DOWN, function () {
             consumer.consuming = false;
-            consumer.log('=== ' + messageConsumerName + ': The flow is down ===');
+            consumer.log('=== ' + messageConsumerName + ': The message consumer is down ===');
         });
         messageConsumer.on(solace.MessageConsumerEventName.ACTIVE, function () {
             consumer.log('=== ' + messageConsumerName + ': received ACTIVE event');
@@ -167,7 +172,7 @@ var QueueConsumer = function (queueName) {
             consumer.log('Received message ' + consumer.receivedMessages + ' out of ' + consumer.numOfMessages +
                 ' messages expected on ' + messageConsumerName);
             message.acknowledge();
-            // Disconnect flow when target number of messages have been received
+            // Disconnect message consumer when target number of messages have been received
             if (consumer.receivedMessages === consumer.numOfMessages/2) {
                 console.log('Disconnecting ' + messageConsumerName);
               messageConsumer.disconnect();
