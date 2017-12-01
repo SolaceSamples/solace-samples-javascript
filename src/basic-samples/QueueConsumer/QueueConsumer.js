@@ -56,17 +56,22 @@ var QueueConsumer = function (queueName) {
             return;
         }
         var hosturl = document.getElementById('hosturl').value;
-        consumer.log('Connecting to Solace message router using url: ' + hosturl);
+        // check for valid protocols
+        if (hosturl.lastIndexOf('ws://', 0) !== 0 && hosturl.lastIndexOf('wss://', 0) !== 0 &&
+            hosturl.lastIndexOf('http://', 0) !== 0 && hosturl.lastIndexOf('https://', 0) !== 0) {
+            consumer.log('Invalid protocol - please use one of ws://, wss://, http://, https://');
+            return;
+        }
         var username = document.getElementById('username').value;
-        consumer.log('Client username: ' + username);
         var pass = document.getElementById('password').value;
         var vpn = document.getElementById('message-vpn').value;
-        consumer.log('Solace message router VPN name: ' + vpn);
         if (!hosturl || !username || !pass || !vpn) {
-                    
             consumer.log('Cannot connect: please specify all the Solace message router properties.');
             return;
         }
+        consumer.log('Connecting to Solace message router using url: ' + hosturl);
+        consumer.log('Client username: ' + username);
+        consumer.log('Solace message router VPN name: ' + vpn);
         // create session
         try {
             consumer.session = solace.SolclientFactory.createSession({
@@ -104,7 +109,7 @@ var QueueConsumer = function (queueName) {
         }
     };
 
-    // Actually connects the session
+    // Actually connects the session triggered when the iframe has been loaded - see in html code
     consumer.connectToSolace = function () {
         try {
             consumer.session.connect();

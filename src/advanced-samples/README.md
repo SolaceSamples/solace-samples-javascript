@@ -12,20 +12,7 @@ To learn more about specific features and details, refer to the [Solace develope
 
 ## Description and instructions
 
-* __SecureSession__: This sample will show the use of secure connection to the server using server and client certificate authentication.
-
-    *Prerequisites*:
-    
-    Following certificates and key must be locally available in the `certs` folder under `advanced-samples`. It is assumed that you know how TLS/SSL certificates and Certificate Authorities ("CAs") work and you have generated the required private/public keys and certificates using ssl tools.
-    
-    * root_ca-rsa.crt - root certificate of the Certificate Authority which signed the message router's certificate
-    * client1-rsa-1.crt - client certificate
-    * client1-rsa-1.key - client private key
-    
-    On the message router:
-    
-    * server trusted root is configured - root certificate of the Certificate Authority which signed the client certificate
-    * server certificate including private key is configured
+* __SecureSession__: This sample will show the use of secure connection to the server. The web application user may need to select or cancel selection of a client certificate to use in a popup window - triggered by an invisible iframe connecting securely to the server. This is necessary because the message router is always requesting a client certificate.
 
 * __ActiveFlowIndication__: This sample will show how multiple flows can bind to an exclusive queue, but only one client at a time can actively receive messages. If the Active Flow Indication Flow property is enabled, a Flow active/inactive event is returned to the client when its bound flow becomes/stops being the active flow. Start this app, then the `basic-samples/ConfirmedPublish` app can be used to send 10 messages to trigger it.
 

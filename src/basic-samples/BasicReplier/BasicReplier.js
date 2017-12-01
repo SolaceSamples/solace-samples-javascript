@@ -27,7 +27,7 @@
 /*global solace*/
 
 var BasicReplier = function (topicName) {
-    "use strict";
+    'use strict';
     var replier = {};
     replier.session = null;
     replier.topicName = topicName;
@@ -50,21 +50,26 @@ var BasicReplier = function (topicName) {
     // Establishes connection to Solace message router
     replier.connect = function () {
         if (replier.session !== null) {
-            replier.log('Already connected and ready to subscribe to request topic.');
+            replier.log('Already connected and ready to ready to receive requests.');
             return;
         }
         var hosturl = document.getElementById('hosturl').value;
-        replier.log('Connecting to Solace message router using url: ' + hosturl);
+        // check for valid protocols
+        if (hosturl.lastIndexOf('ws://', 0) !== 0 && hosturl.lastIndexOf('wss://', 0) !== 0 &&
+            hosturl.lastIndexOf('http://', 0) !== 0 && hosturl.lastIndexOf('https://', 0) !== 0) {
+            replier.log('Invalid protocol - please use one of ws://, wss://, http://, https://');
+            return;
+        }
         var username = document.getElementById('username').value;
-        replier.log('Client username: ' + username);
         var pass = document.getElementById('password').value;
         var vpn = document.getElementById('message-vpn').value;
-        replier.log('Solace message router VPN name: ' + vpn);
         if (!hosturl || !username || !pass || !vpn) {
-                    
             replier.log('Cannot connect: please specify all the Solace message router properties.');
             return;
         }
+        replier.log('Connecting to Solace message router using url: ' + hosturl);
+        replier.log('Client username: ' + username);
+        replier.log('Solace message router VPN name: ' + vpn);
         // create session
         try {
             replier.session = solace.SolclientFactory.createSession({
@@ -123,7 +128,7 @@ var BasicReplier = function (topicName) {
         }
     };
 
-    // Actually connects the session
+    // Actually connects the session triggered when the iframe has been loaded - see in html code
     replier.connectToSolace = function () {
         try {
             replier.session.connect();
@@ -183,10 +188,13 @@ var BasicReplier = function (topicName) {
         replier.log('Replying...');
         if (replier.session !== null) {
             var reply = solace.SolclientFactory.createMessage();
-            var replyText = message.getSdtContainer().getValue() + " - Sample Reply";
-            reply.setSdtContainer(solace.SDTField.create(solace.SDTFieldType.STRING, replyText));
-            replier.session.sendReply(message, reply);
-            replier.log('Replied.');
+            var sdtContainer = message.getSdtContainer();
+            if (sdtContainer.getType() === solace.SDTFieldType.STRING) {
+                var replyText = message.getSdtContainer().getValue() + " - Sample Reply";
+                reply.setSdtContainer(solace.SDTField.create(solace.SDTFieldType.STRING, replyText));
+                replier.session.sendReply(message, reply);
+                replier.log('Replied.');
+            }
         } else {
             replier.log('Cannot reply: not connected to Solace message router.');
         }

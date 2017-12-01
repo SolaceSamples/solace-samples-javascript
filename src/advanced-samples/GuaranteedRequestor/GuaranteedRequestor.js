@@ -22,6 +22,15 @@
  * Guaranteed Request/Reply tutorial - Guaranteed Requestor
  * Demonstrates how to send a guaranteed request message and
  * waits to receive a reply message as a response.
+ *
+ * This sample will show the implementation of guaranteed Request-Reply messaging,
+ * where `GuaranteedRequestor` is a message Endpoint that sends a guaranteed request message
+ * to a request topic and waits to receive a reply message on a dedicated temporary queue as
+ * a response; `GuaranteedReplier` is a message Endpoint that waits to receive a request message
+ * on a request topic - it will create a non-durable topic endpoint for that - and responds to
+ * it by sending a guaranteed reply message.
+ * Start the replier first as the non-durable topic endpoint will only be created for the
+ * duration of the replier session and any request sent before that will not be received.
  */
 
 /*jslint es6 browser devel:true*/
@@ -50,33 +59,26 @@ var GuaranteedRequestor = function (requestTopicName) {
     // Establishes connection to Solace message router
     requestor.connect = function () {
         if (requestor.session !== null) {
+            requestor.log('Already connected and ready to send requests.');
             return;
-                                                           
-                                                                     
-                                                                     
-                                                                   
-                                                     
-                                                                        
-                    
-                                                                                                          
-             
         }
         var hosturl = document.getElementById('hosturl').value;
-
-                                                                         
-                                                                 
-                                    
-        requestor.log('Connecting to Solace message router using url: ' + hosturl);
+        // check for valid protocols
+        if (hosturl.lastIndexOf('ws://', 0) !== 0 && hosturl.lastIndexOf('wss://', 0) !== 0 &&
+            hosturl.lastIndexOf('http://', 0) !== 0 && hosturl.lastIndexOf('https://', 0) !== 0) {
+            requestor.log('Invalid protocol - please use one of ws://, wss://, http://, https://');
+            return;
+        }
         var username = document.getElementById('username').value;
-        requestor.log('Client username: ' + username);
         var pass = document.getElementById('password').value;
         var vpn = document.getElementById('message-vpn').value;
-        requestor.log('Solace message router VPN name: ' + vpn);
         if (!hosturl || !username || !pass || !vpn) {
-                    
             requestor.log('Cannot connect: please specify all the Solace message router properties.');
             return;
         }
+        requestor.log('Connecting to Solace message router using url: ' + hosturl);
+        requestor.log('Client username: ' + username);
+        requestor.log('Solace message router VPN name: ' + vpn);
         // create session
         try {
             requestor.session = solace.SolclientFactory.createSession({
@@ -113,7 +115,7 @@ var GuaranteedRequestor = function (requestTopicName) {
         }
     };
 
-    // Actually connects the session
+    // Actually connects the session triggered when the iframe has been loaded - see in html code
     requestor.connectToSolace = function () {
         try {
             requestor.session.connect();

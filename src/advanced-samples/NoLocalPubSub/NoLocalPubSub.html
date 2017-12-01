@@ -21,12 +21,12 @@
 <!--
     Solace Web Messaging API for JavaScript
     NoLocal tutorial
-    Demonstrates the use of the NO_LOCAL Session and Flow properties.
+    Demonstrates the use of the NO_LOCAL Session and Message Consumer properties.
   -->
 
 <html lang="en">
   <head>
-    <title>Solace Web Messaging API for JavaScript, Active Flow Indication tutorial</title>
+    <title>Solace Web Messaging API for JavaScript, Active Consumer Indication tutorial</title>
     <meta http-equiv="X-UA-Compatible" content="IE=edge;" />
     <meta charset="utf-8"/>
 
@@ -41,7 +41,7 @@
 
     <!-- Execute the RequestReply Basic Requestor tutorial -->
     <script>
-      var sample =
+      var sample = null;
       window.onload = function () {
         // Initialize factory with the most recent API defaults
         var factoryProps = new solace.SolclientFactoryProperties();
@@ -87,7 +87,7 @@
     <div class="doc-body">
       
       <h2>NoLocal tutorial</h2>
-      <h3>NoLocal Session and Flow demo</h3>
+      <h3>NoLocal on Session and on Consumer demo</h3>
       <form class="pure-form pure-form-aligned">
         <fieldset>
 

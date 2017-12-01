@@ -19,7 +19,7 @@
 
 /**
  * Solace Web Messaging API for JavaScript
- * PublishSubscribe tutorial - Topic Publisher
+ * Publish/Subscribe tutorial - Topic Publisher
  * Demonstrates publishing direct messages to a topic
  */
 
@@ -46,7 +46,7 @@ var TopicPublisher = function (topicName) {
 
     publisher.log('\n*** Publisher to topic "' + publisher.topicName + '" is ready to connect ***');
 
-    // Establishes connection to Solace router
+    // Establishes connection to Solace message router
     publisher.connect = function () {
         // extract params
         if (publisher.session !== null) {
@@ -54,16 +54,22 @@ var TopicPublisher = function (topicName) {
             return;
         }
         var hosturl = document.getElementById('hosturl').value;
-        publisher.log('Connecting to Solace message router using url: ' + hosturl);
+        // check for valid protocols
+        if (hosturl.lastIndexOf('ws://', 0) !== 0 && hosturl.lastIndexOf('wss://', 0) !== 0 &&
+            hosturl.lastIndexOf('http://', 0) !== 0 && hosturl.lastIndexOf('https://', 0) !== 0) {
+            publisher.log('Invalid protocol - please use one of ws://, wss://, http://, https://');
+            return;
+        }
         var username = document.getElementById('username').value;
-        publisher.log('Client username: ' + username);
         var pass = document.getElementById('password').value;
         var vpn = document.getElementById('message-vpn').value;
-        publisher.log('Solace message router VPN name: ' + vpn);
         if (!hosturl || !username || !pass || !vpn) {
             publisher.log('Cannot connect: please specify all the Solace message router properties.');
             return;
         }
+        publisher.log('Connecting to Solace message router using url: ' + hosturl);
+        publisher.log('Client username: ' + username);
+        publisher.log('Solace message router VPN name: ' + vpn);
         // create session
         try {
             publisher.session = solace.SolclientFactory.createSession({
@@ -100,7 +106,7 @@ var TopicPublisher = function (topicName) {
         }
     };
 
-    // Actually connects the session
+    // Actually connects the session triggered when the iframe has been loaded - see in html code
     publisher.connectToSolace = function () {
         try {
             publisher.session.connect();

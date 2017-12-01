@@ -20,8 +20,16 @@
 /**
  * Solace Web Messaging API for JavaScript
  * Event Monitor tutorial - Event Subscriber
- * Demonstrates subscribing to the router event topic for Client
- * Connect events
+ * Demonstrates subscribing to the router event topic for Client Connect events
+ *
+ * This sample is making use of the special event monitoring topic subscriptions to build
+ * an application that monitors message router generated events.
+ * Start this sample then run any other sample app and observe a client connect event reported
+ * for that sample. To learn more, refer to
+ * https://docs.solace.com/System-and-Software-Maintenance/Subscribing-to-MBus-Events.htm
+ * in the customer documentation.
+ *
+ * Prerequisite: configure the vpn on the message router to "Publish Client Event Messages".
  */
 
 /*jslint es6 browser devel:true*/
@@ -55,17 +63,22 @@ var EventSubscriber = function () {
             return;
         }
         var hosturl = document.getElementById('hosturl').value;
-        subscriber.log('Connecting to Solace message router using url: ' + hosturl);
+        // check for valid protocols
+        if (hosturl.lastIndexOf('ws://', 0) !== 0 && hosturl.lastIndexOf('wss://', 0) !== 0 &&
+            hosturl.lastIndexOf('http://', 0) !== 0 && hosturl.lastIndexOf('https://', 0) !== 0) {
+            subscriber.log('Invalid protocol - please use one of ws://, wss://, http://, https://');
+            return;
+        }
         var username = document.getElementById('username').value;
-        subscriber.log('Client username: ' + username);
         var pass = document.getElementById('password').value;
         var vpn = document.getElementById('message-vpn').value;
-        subscriber.log('Solace message router VPN name: ' + vpn);
         if (!hosturl || !username || !pass || !vpn) {
-                    
             subscriber.log('Cannot connect: please specify all the Solace message router properties.');
             return;
         }
+        subscriber.log('Connecting to Solace message router using url: ' + hosturl);
+        subscriber.log('Client username: ' + username);
+        subscriber.log('Solace message router VPN name: ' + vpn);
         // create session
         try {
             subscriber.session = solace.SolclientFactory.createSession({
@@ -120,7 +133,7 @@ var EventSubscriber = function () {
         }
     };
 
-    // Actually connects the session
+    // Actually connects the session triggered when the iframe has been loaded - see in html code
     subscriber.connectToSolace = function () {
         try {
             subscriber.session.connect();

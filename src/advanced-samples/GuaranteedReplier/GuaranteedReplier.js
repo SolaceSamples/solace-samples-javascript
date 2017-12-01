@@ -22,6 +22,15 @@
  * Guaranteed Request/Reply tutorial - Guaranteed Replier
  * Demonstrates how to receive a request message and responds
  * to it by sending a guaranteed reply message.
+ *
+ * This sample will show the implementation of guaranteed Request-Reply messaging,
+ * where `GuaranteedRequestor` is a message Endpoint that sends a guaranteed request message
+ * to a request topic and waits to receive a reply message on a dedicated temporary queue as
+ * a response; `GuaranteedReplier` is a message Endpoint that waits to receive a request message
+ * on a request topic - it will create a non-durable topic endpoint for that - and responds to
+ * it by sending a guaranteed reply message.
+ * Start the replier first as the non-durable topic endpoint will only be created for the
+ * duration of the replier session and any request sent before that will not be received.
  */
 
 /*jslint es6 browser devel:true*/
@@ -51,20 +60,26 @@ var GuaranteedReplier = function (requestTopicName) {
     // Establishes connection to Solace message router
     replier.connect = function () {
         if (replier.session !== null) {
+            replier.log('Already connected and ready to subscribe to request topic.');
             return;
         }
         var hosturl = document.getElementById('hosturl').value;
-        replier.log('Connecting to Solace message router using url: ' + hosturl);
+        // check for valid protocols
+        if (hosturl.lastIndexOf('ws://', 0) !== 0 && hosturl.lastIndexOf('wss://', 0) !== 0 &&
+            hosturl.lastIndexOf('http://', 0) !== 0 && hosturl.lastIndexOf('https://', 0) !== 0) {
+            replier.log('Invalid protocol - please use one of ws://, wss://, http://, https://');
+            return;
+        }
         var username = document.getElementById('username').value;
-        replier.log('Client username: ' + username);
         var pass = document.getElementById('password').value;
         var vpn = document.getElementById('message-vpn').value;
-        replier.log('Solace message router VPN name: ' + vpn);
         if (!hosturl || !username || !pass || !vpn) {
-                    
             replier.log('Cannot connect: please specify all the Solace message router properties.');
             return;
         }
+        replier.log('Connecting to Solace message router using url: ' + hosturl);
+        replier.log('Client username: ' + username);
+        replier.log('Solace message router VPN name: ' + vpn);
         // create session
         try {
             replier.session = solace.SolclientFactory.createSession({
@@ -79,7 +94,8 @@ var GuaranteedReplier = function (requestTopicName) {
         }
         // define session event listeners
         replier.session.on(solace.SessionEventCode.UP_NOTICE, function (sessionEvent) {
-            replier.log('=== Successfully connected and ready to consume messages sent to request topic ===');
+            replier.log('=== Successfully connected and ready to subscribe to messages ' +
+                'sent to request topic ===');
         });
         replier.session.on(solace.SessionEventCode.CONNECT_FAILED_ERROR, function (sessionEvent) {
             replier.log('Connection failed to the message router: ' + sessionEvent.infoStr +
@@ -102,7 +118,7 @@ var GuaranteedReplier = function (requestTopicName) {
         }
     };
 
-    // Actually connects the session
+    // Actually connects the session triggered when the iframe has been loaded - see in html code
     replier.connectToSolace = function () {
         try {
             replier.session.connect();
@@ -123,13 +139,15 @@ var GuaranteedReplier = function (requestTopicName) {
                         topicEndpointSubscription: replier.requestTopicName,
                         queueDescriptor: { type: solace.QueueType.TOPIC_ENDPOINT, durable: false }
                     });
+                    replier.messageConsumer.on(solace.MessageConsumerEventName.UP, function () {
+                        replier.active = true;
+                        replier.log('Replier is consuming from temporary topic endpoint,' +
+                            ' which is attracting messages to "' + replier.requestTopicName + '"');
+                    });
                     replier.messageConsumer.on(solace.MessageConsumerEventName.MESSAGE, function onMessage(message) {
                         replier.reply(message);
                     });
                     replier.messageConsumer.connect();
-                    replier.active = true;
-                    replier.log('Replier is consuming from temporary topic endpoint, which is attracting messages to '
-                        + replier.requestTopicName);
                 } catch (error) {
                     replier.log(error.toString());
                 }
@@ -145,7 +163,7 @@ var GuaranteedReplier = function (requestTopicName) {
         if (replier.session !== null) {
             try {
                 var replyMsg = solace.SolclientFactory.createMessage();
-                var replyText = message.getBinaryAttachment() + " - Sample Reply";
+                var replyText = message.getBinaryAttachment().toString() + " - Sample Reply";
                 replyMsg.setBinaryAttachment(replyText);
                 replyMsg.setDestination(message.getReplyTo());
                 replyMsg.setCorrelationId(message.getCorrelationId());

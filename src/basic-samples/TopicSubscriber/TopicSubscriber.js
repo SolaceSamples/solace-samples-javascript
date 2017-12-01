@@ -19,7 +19,7 @@
 
 /**
  * Solace Web Messaging API for JavaScript
- * PublishSubscribe tutorial - Topic Subscriber
+ * Publish/Subscribe tutorial - Topic Subscriber
  * Demonstrates subscribing to a topic for direct messages and receiving messages
  */
 
@@ -55,16 +55,22 @@ var TopicSubscriber = function (topicName) {
             return;
         }
         var hosturl = document.getElementById('hosturl').value;
-        subscriber.log('Connecting to Solace message router using url: ' + hosturl);
+        // check for valid protocols
+        if (hosturl.lastIndexOf('ws://', 0) !== 0 && hosturl.lastIndexOf('wss://', 0) !== 0 &&
+            hosturl.lastIndexOf('http://', 0) !== 0 && hosturl.lastIndexOf('https://', 0) !== 0) {
+            subscriber.log('Invalid protocol - please use one of ws://, wss://, http://, https://');
+            return;
+        }
         var username = document.getElementById('username').value;
-        subscriber.log('Client username: ' + username);
         var pass = document.getElementById('password').value;
         var vpn = document.getElementById('message-vpn').value;
-        subscriber.log('Solace message router VPN name: ' + vpn);
         if (!hosturl || !username || !pass || !vpn) {
             subscriber.log('Cannot connect: please specify all the Solace message router properties.');
             return;
         }
+        subscriber.log('Connecting to Solace message router using url: ' + hosturl);
+        subscriber.log('Client username: ' + username);
+        subscriber.log('Solace message router VPN name: ' + vpn);
         // create session
         try {
             subscriber.session = solace.SolclientFactory.createSession({
@@ -120,7 +126,7 @@ var TopicSubscriber = function (topicName) {
         }
     };
 
-    // Actually connects the session
+    // Actually connects the session triggered when the iframe has been loaded - see in html code
     subscriber.connectToSolace = function () {
         try {
             subscriber.session.connect();

@@ -20,8 +20,11 @@
 /**
  * Solace Web Messaging API for JavaScript
  * Secure Session tutorial
- * Demonstrates using ssl to connect to the message router
-                                                
+ * Demonstrates the use of secure session
+ * The web application user may need to select or cancel selection of a
+ * client certificate to use in a popup window - triggered by an invisible
+ * iframe connecting securely to the server. This is necessary because the
+ * message router is always requesting a client certificate.
  */
 
 /*jslint es6 browser devel:true*/
@@ -46,29 +49,30 @@ var SecureTopicSubscriber = function (topicName) {
         logTextArea.scrollTop = logTextArea.scrollHeight;
     };
 
-    subscriber.log('\n*** Subscriber to topic "' + subscriber.topicName + '" is ready to connect ***');
+    subscriber.log('\n*** Secure Subscriber to topic "' + subscriber.topicName + '" is ready to connect ***');
 
-    // Establishes connection to Solace router
+    // Establishes connection to Solace message router
     subscriber.connect = function () {
         if (subscriber.session !== null) {
             subscriber.log('Already connected and ready to subscribe.');
             return;
         }
         var hosturl = document.getElementById('hosturl').value;
-        subscriber.log('Connecting to Solace message router using url: ' + hosturl);
+        // check for valid protocols
+        if (hosturl.lastIndexOf('wss://', 0) !== 0 && hosturl.lastIndexOf('https://', 0) !== 0) {
+            subscriber.log('This sample expects secure protocols wss:// or https://');
+            return;
+        }
         var username = document.getElementById('username').value;
-        subscriber.log('Client username: ' + username);
         var pass = document.getElementById('password').value;
         var vpn = document.getElementById('message-vpn').value;
-        subscriber.log('Solace message router VPN name: ' + vpn);
         if (!hosturl || !username || !pass || !vpn) {
             subscriber.log('Cannot connect: please specify all the Solace message router properties.');
             return;
         }
-                                                                                                       
-                                                                             
-                                                             
-
+        subscriber.log('Connecting to Solace message router using url: ' + hosturl);
+        subscriber.log('Client username: ' + username);
+        subscriber.log('Solace message router VPN name: ' + vpn);
         // create session
         try {
             subscriber.session = solace.SolclientFactory.createSession({
@@ -118,15 +122,11 @@ var SecureTopicSubscriber = function (topicName) {
                 message.dump());
         });
         // if secure connection, first load iframe so the browser can provide a client-certificate
-        if (hosturl.lastIndexOf('wss://', 0) === 0 || hosturl.lastIndexOf('https://', 0) === 0) {
-            var urlNoProto = hosturl.split('/').slice(2).join('/'); // remove protocol prefix
-            document.getElementById('iframe').src = 'https://' + urlNoProto + '/crossdomain.xml';
-        } else {
-            subscriber.connectToSolace();   // otherwise proceed
-        }
+        var urlNoProto = hosturl.split('/').slice(2).join('/'); // remove protocol prefix
+        document.getElementById('iframe').src = 'https://' + urlNoProto + '/crossdomain.xml';
     };
 
-    // Actually connects the session
+    // Actually connects the session triggered when the iframe has been loaded - see in html code
     subscriber.connectToSolace = function () {
         try {
             subscriber.session.connect();

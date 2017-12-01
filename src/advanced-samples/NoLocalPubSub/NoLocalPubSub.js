@@ -22,9 +22,13 @@
  * NoLocal tutorial
  * Demonstrates the use of the NO_LOCAL Session and MessageConsumer properties.
  *
+ * With these properties enabled, messages published on a Session cannot be received on that
+ * same session or on a Consumer on that Session even when there is a matching subscription.
+ * This sample will create and use a temporary queue.
+ *
  * This sample will:
  *  - Subscribe to a Topic for Direct messages on a Session with No Local delivery enabled.
- *  - Create a message consumer to a Queue with No Local Delivery enabled on the Message Consumer,
+ *  - Create a message Consumer to a Queue with No Local Delivery enabled on the Message Consumer,
  *    but not on the Session.
  *  - Publish a Direct message on each Session, and verify it is not delivered locally.
  *  - Publish a message to the Queue on each Session, and verify it is not delivered locally.
@@ -65,16 +69,22 @@ var NoLocalPubSub = function (topicName) {
             return;
         }
         var hosturl = document.getElementById('hosturl').value;
-        sample.log('Connecting to Solace message router using url: ' + hosturl);
+        // check for valid protocols
+        if (hosturl.lastIndexOf('ws://', 0) !== 0 && hosturl.lastIndexOf('wss://', 0) !== 0 &&
+            hosturl.lastIndexOf('http://', 0) !== 0 && hosturl.lastIndexOf('https://', 0) !== 0) {
+            sample.log('Invalid protocol - please use one of ws://, wss://, http://, https://');
+            return;
+        }
         var username = document.getElementById('username').value;
-        sample.log('Client username: ' + username);
         var pass = document.getElementById('password').value;
         var vpn = document.getElementById('message-vpn').value;
-        sample.log('Solace message router VPN name: ' + vpn);
         if (!hosturl || !username || !pass || !vpn) {
             sample.log('Cannot connect: please specify all the Solace message router properties.');
             return;
         }
+        sample.log('Connecting to Solace message router using url: ' + hosturl);
+        sample.log('Client username: ' + username);
+        sample.log('Solace message router VPN name: ' + vpn);
         sample.sessionProperties = new solace.SessionProperties({
             url:      hosturl,
             vpnName:  vpn,
@@ -90,36 +100,42 @@ var NoLocalPubSub = function (topicName) {
         }
     };
 
-    // Actually connects the session
+    // Actually connects the session triggered when the iframe has been loaded - see in html code
     sample.connectToSolace = function () {
         try {
             // session 1: session level NoLocal is not set,
             // consuming on queue with message consumer level NoLocal is SET
             sample.sessionProperties.noLocal = false;
-            sample.session1 = sample.createSession('Session1 (session NoLocal=false, ' +
-                'message consumer NoLocal=true)', sample.sessionProperties, false, true);
+            sample.session1 = sample.createSession({
+                sessionName: 'Session1 (session NoLocal=false, message consumer NoLocal=true)',
+                sessionProperties: sample.sessionProperties,
+                isDirectSubscriberFlag: false,
+                isConsumerFlag: true });
             sample.session1.connect();
             // session 2: session level NoLocal is SET, will consume direct messages on topic
             sample.sessionProperties.noLocal = true;
-            sample.session2 = sample.createSession('Session2 (session NoLocal=true, ' +
-                'direct message consumer)', sample.sessionProperties, true, false);
+            sample.session2 = sample.createSession({
+                sessionName: 'Session2 (session NoLocal=true, direct message consumer)',
+                sessionProperties: sample.sessionProperties,
+                isDirectSubscriberFlag: true,
+                isConsumerFlag: false, });
             sample.session2.connect();
         } catch (error) {
             sample.log(error.toString());
         }
     };
 
-    sample.createSession = function (sessionName, sessionProperties,
-                                     subscribeDirectTopicFlag, consumeFlowQueueFlag) {
+    sample.createSession = function (params) {
         // create session
         var session = null;
-        session = solace.SolclientFactory.createSession(sessionProperties);
+        session = solace.SolclientFactory.createSession(params.sessionProperties);
         // define session event listeners
         session.on(solace.SessionEventCode.UP_NOTICE, function (sessionEvent) {
-            sample.log('=== ' + sessionName + ' successfully connected ===');
-            if (subscribeDirectTopicFlag) {
+            sample.log(params.sessionName + ' successfully connected.');
+            if (params.isDirectSubscriberFlag) {
                 if (!session.isCapable(solace.CapabilityType.NO_LOCAL)) {
                     sample.log('This sample requires an appliance with support for NO_LOCAL.');
+                    sample.exit();
                 }
                 session.subscribe(
                     sample.topicDestination,
@@ -129,7 +145,7 @@ var NoLocalPubSub = function (topicName) {
                 );
                 sample.log('Subscribed to topic: ' + sample.topicName);
             };
-            if (consumeFlowQueueFlag) {
+            if (params.isConsumerFlag) {
                 // Create the message consumer with NoLocal SET
                 var messageConsumer = session.createMessageConsumer({
                     queueDescriptor: { type: solace.QueueType.QUEUE, durable: false },
@@ -141,16 +157,16 @@ var NoLocalPubSub = function (topicName) {
                 });
                 // Define message consumer event listeners
                 messageConsumer.on(solace.MessageConsumerEventName.UP, function () {
-                    sample.log('=== ' + sessionName + ' consumer flow to temporary queue is up. ===');
+                    sample.log(params.sessionName + ' consumer to temporary queue is up.');
                     sample.queueDestination = messageConsumer.getDestination();
                     // start demo if both sessions up
                     if (sample.sessionsUp === 2) {
-                        sample.startDemo();
+                        sample.log('=== Ready to start the demo ===');
                     }
                 });
                 // Define message event listener
                 messageConsumer.on(solace.MessageConsumerEventName.MESSAGE, function (message) {
-                    sample.log('Received ' + message.getBinaryAttachment() + '! - session: ' + sessionName + ', ' +
+                    sample.log('Received ' + message.getBinaryAttachment() + '! - session: ' + params.sessionName + ', ' +
                         'guaranteed message.');
                 });
                 // Connect the message consumer
@@ -162,10 +178,10 @@ var NoLocalPubSub = function (topicName) {
             sample.log('Connection failed to the message router: ' + sessionEvent.infoStr +
                 ' - check correct parameter values and connectivity!');
         });
-        if (subscribeDirectTopicFlag) {
+        if (params.isDirectSubscriberFlag) {
             // define message event listener
             session.on(solace.SessionEventCode.MESSAGE, function (message) {
-                sample.log('Received ' + message.getBinaryAttachment() + '! - session: ' + sessionName + ',' +
+                sample.log('Received ' + message.getBinaryAttachment() + '! - session: ' + params.sessionName + ',' +
                     'direct message.');
             });
         };

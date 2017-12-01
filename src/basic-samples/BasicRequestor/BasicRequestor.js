@@ -53,16 +53,22 @@ var BasicRequestor = function (topicName) {
             return;
         }
         var hosturl = document.getElementById('hosturl').value;
-        requestor.log('Connecting to Solace message router using url: ' + hosturl);
-        var username = document.getElementById('username').value;
-        requestor.log('Client username: ' + username);
-        var pass = document.getElementById('password').value;
-        var vpn = document.getElementById('message-vpn').value;
-        requestor.log('Solace message router VPN name: ' + vpn);
-        if (!hosturl || !username || !pass || !vpn) {
-            requestor.log('Cannot connect: please specify all the Solace message router properties.');
+        // check for valid protocols
+        if (hosturl.lastIndexOf('ws://', 0) !== 0 && hosturl.lastIndexOf('wss://', 0) !== 0 &&
+            hosturl.lastIndexOf('http://', 0) !== 0 && hosturl.lastIndexOf('https://', 0) !== 0) {
+            session.log('Invalid protocol - please use one of ws://, wss://, http://, https://');
             return;
         }
+        var username = document.getElementById('username').value;
+        var pass = document.getElementById('password').value;
+        var vpn = document.getElementById('message-vpn').value;
+        if (!hosturl || !username || !pass || !vpn) {
+            session.log('Cannot connect: please specify all the Solace message router properties.');
+            return;
+        }
+        requestor.log('Connecting to Solace message router using url: ' + hosturl);
+        requestor.log('Client username: ' + username);
+        requestor.log('Solace message router VPN name: ' + vpn);
         // create session
         try {
             requestor.session = solace.SolclientFactory.createSession({
@@ -78,6 +84,7 @@ var BasicRequestor = function (topicName) {
         // define session event listeners
         requestor.session.on(solace.SessionEventCode.UP_NOTICE, function (sessionEvent) {
             requestor.log('=== Successfully connected and ready to send requests. ===');
+                                
         });
         requestor.session.on(solace.SessionEventCode.CONNECT_FAILED_ERROR, function (sessionEvent) {
             requestor.log('Connection failed to the message router: ' + sessionEvent.infoStr +
@@ -99,7 +106,7 @@ var BasicRequestor = function (topicName) {
         }
     };
 
-    // Actually connects the session
+    // Actually connects the session triggered when the iframe has been loaded - see in html code
     requestor.connectToSolace = function () {
         try {
             requestor.session.connect();
@@ -139,7 +146,8 @@ var BasicRequestor = function (topicName) {
 
     // Callback for replies
     requestor.replyReceivedCb = function (session, message) {
-        requestor.log('Received reply: "' + message.getSdtContainer().getValue() + '", details:\n' + message.dump());
+        requestor.log('Received reply: "' + message.getSdtContainer().getValue() + '"' +
+            ' details:\n' + message.dump());
     };
 
     // Callback for request failures

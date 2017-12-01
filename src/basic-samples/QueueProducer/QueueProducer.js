@@ -42,27 +42,33 @@ var QueueProducer = function (queueName) {
         var logTextArea = document.getElementById('log');
         logTextArea.value += timestamp + line + '\n';
         logTextArea.scrollTop = logTextArea.scrollHeight;
-   };
+    };
 
     producer.log('\n*** Producer to queue "' + producer.queueName + '" is ready to connect ***');
 
-    // Establishes connection to Solace message router by its hostname
+    // Establishes connection to Solace message router
     producer.connect = function () {
         if (producer.session !== null) {
             producer.log('Already connected and ready to send messages.');
             return;
         }
         var hosturl = document.getElementById('hosturl').value;
-        producer.log('Connecting to Solace message router using url: ' + hosturl);
+        // check for valid protocols
+        if (hosturl.lastIndexOf('ws://', 0) !== 0 && hosturl.lastIndexOf('wss://', 0) !== 0 &&
+            hosturl.lastIndexOf('http://', 0) !== 0 && hosturl.lastIndexOf('https://', 0) !== 0) {
+            producer.log('Invalid protocol - please use one of ws://, wss://, http://, https://');
+            return;
+        }
         var username = document.getElementById('username').value;
-        producer.log('Client username: ' + username);
         var pass = document.getElementById('password').value;
         var vpn = document.getElementById('message-vpn').value;
-        producer.log('Solace message router VPN name: ' + vpn);
         if (!hosturl || !username || !pass || !vpn) {
             producer.log('Cannot connect: please specify all the Solace message router properties.');
             return;
         }
+        producer.log('Connecting to Solace message router using url: ' + hosturl);
+        producer.log('Client username: ' + username);
+        producer.log('Solace message router VPN name: ' + vpn);
         // create session
         try {
             producer.session = solace.SolclientFactory.createSession({
@@ -78,6 +84,8 @@ var QueueProducer = function (queueName) {
         // define session event listeners
         producer.session.on(solace.SessionEventCode.UP_NOTICE, function (sessionEvent) {
             producer.log('=== Successfully connected and ready to send messages. ===');
+                                   
+                            
         });
         producer.session.on(solace.SessionEventCode.CONNECT_FAILED_ERROR, function (sessionEvent) {
             producer.log('Connection failed to the message router: ' + sessionEvent.infoStr +
@@ -99,7 +107,7 @@ var QueueProducer = function (queueName) {
         }
     };
 
-    // Actually connects the session
+    // Actually connects the session triggered when the iframe has been loaded - see in html code
     producer.connectToSolace = function () {
         try {
             producer.session.connect();

@@ -20,13 +20,13 @@
 
 <!--
     Solace Web Messaging API for JavaScript
-    Active Flow Indication - Consumer
-    Demonstrates active flow notification to multiple flows bound to an exclusive queue
+    Active Consumer Indication - Consumer
+    Demonstrates active consumer notification to multiple consumers bound to an exclusive queue
   -->
 
 <html lang="en">
   <head>
-    <title>Solace Web Messaging API for JavaScript, Active Flow Indication tutorial</title>
+    <title>Solace Web Messaging API for JavaScript, Active Consumer Indication tutorial</title>
     <meta http-equiv="X-UA-Compatible" content="IE=edge;" />
     <meta charset="utf-8"/>
 
@@ -37,7 +37,7 @@
     <script src="../../../lib/solclient-debug.js"></script>
 
     <!-- Load the RequestReply Guaranteed Requestor tutorial -->
-    <script src="ActiveFlowIndication.js"></script>
+    <script src="ActiveConsumerIndication.js"></script>
 
     <!-- Execute the RequestReply Basic Requestor tutorial -->
     <script>
@@ -86,7 +86,7 @@
 
     <div class="doc-body">
       
-      <h2>Active Flow Indication</h2>
+      <h2>Active Consumer Indication</h2>
       <h3>QueueConsumer</h3>
       <form class="pure-form pure-form-aligned">
         <fieldset>
@@ -117,7 +117,7 @@
           <button type="button" class="pure-button button-error" id="disconnect">Disconnect</button>
         </p>
         <p>
-          <button type="button" class="pure-button pure-button-primary" id="request">Start consuming 10 messages on two flows</button>
+          <button type="button" class="pure-button pure-button-primary" id="request">Start consuming 10 messages on two consumers</button>
         </p>
         
         <textarea id="log" rows="20" cols="90" autofocus></textarea>

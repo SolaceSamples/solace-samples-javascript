@@ -362,6 +362,6 @@ This is the consumer is receiving a message (`QueueConsumer.html)`:
                                                                                                      
                                               
 
-You have now successfully connected a client, sent persistent messages to a queue and received them from a consumer flow.
+You have now successfully connected a client, sent guaranteed messages to a queue and received them from a message consumer.
 
 If you have any issues sending and receiving a message, check the [Solace community]({{ site.links-community }}){:target="_top"} for answers to common issues.
