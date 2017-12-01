@@ -12,7 +12,7 @@ links-community: http://dev.solace.com/community/
 links-solaceCloud-setup: http://cloud.solace.com/create-messaging-service/
 docs-vmr-setup: http://docs.solace.com/Solace-VMR-Set-Up/Setting-Up-VMRs.htm
 docs-core-concepts: http://docs.solace.com/Features/Core-Concepts.htm
-docs-session-events: http://docs.solace.com/Solace-Messaging-APIs/Creating-Client-Sessions-1.htm#Handle-Sess-Events
+docs-session-events: http://docs.solace.com/Solace-Messaging-APIs/Developer-Guide/Handling-Session-Events.htm
 #----------------------------------------------------
 # Generally don't modify items below this point
 url: "solacesamples.github.io" # the base hostname & protocol for your site
