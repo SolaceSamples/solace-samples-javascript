@@ -7,7 +7,7 @@ repository: //github.com/SolaceSamples/solace-samples-javascript
 # Also see _includes/intro.html to customize the description which gets included in index.html.
 
 # Links
-advanced-samples: //github.com/SolaceSamples/solace-samples-javascript/tree/EnterpriseJavaScriptUpdates/src/advanced-samples
+advanced-samples: //github.com/SolaceSamples/solace-samples-javascript/tree/master/src/advanced-samples
 links-community: //dev.solace.com/community/
 links-downloads: //dev.solace.com/downloads/
 links-get-started-javascript: //dev.solace.com/get-started/javascript-tutorials/
