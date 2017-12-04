@@ -65,6 +65,24 @@
         }
       };
     </script>
+	<style>
+        .warning {
+            padding: 5px; 
+            border: 1px solid black; 
+            background-color: #ff8;
+        }
+        .ie11 {
+            /* Hide instructions that only apply to IE11/Edge */
+            display: none; 
+        }
+        @media all and (-ms-high-contrast: none), (-ms-high-contrast: active) {
+            .ie11 {
+                /* Show instructions in IE11. If you're trying this sample from the local filesystem,
+                   it's easy to miss the prompt at the bottom of the window. */
+                display: block !important;
+            }
+        }
+	</style>
   </head>
 
   <body>
@@ -88,6 +106,16 @@
       
       <h2>Request/Reply Tutorial</h2>
       <h3>Guaranteed Requestor</h3>
+      <!--[if IE]>
+          <div class="ie9 warning" style="padding: 5px; border: 1px solid black; background-color: #ff8;">
+              IE9 only: If you are running this sample from the local filesystem, click the "Allow blocked content" button
+              in the popup below to enable JavaScript.
+          </div>
+      <![endif]-->
+      <div class="ie11 warning">
+          IE 11 only: If you are running this sample from the local filesystem, click the "Allow blocked content" button
+          in the popup below to enable JavaScript.
+      </div>
       <form class="pure-form pure-form-aligned">
         <fieldset>
 
