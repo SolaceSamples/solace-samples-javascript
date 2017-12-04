@@ -39,7 +39,7 @@ git clone https://github.com/SolaceSamples/solace-samples-javascript
 cd solace-samples-javascript
 ```
  
-Note: the code in the `master` branch of this repository depends on Solace Node.js API version 10 or later. If you want to work with an older version clone the branch that corresponds your version.
+Note: the code in the `master` branch of this repository depends on Solace JavaScript API version 10 or later. If you want to work with an older version clone the branch that corresponds your version.
     
 ### Download the Solace JavaScript API
 

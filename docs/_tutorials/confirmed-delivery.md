@@ -43,7 +43,7 @@ The goal of this tutorial is to understand the following:
 
 In order to send guaranteed messages to a Solace message router with no chance of message loss, it is absolutely necessary to properly process the acknowledgements that come back from the Solace message router. These acknowledgements will let you know if the message was accepted by the Solace message router or if it was rejected. If it was rejected, the acknowledgement will also contain exact details of why. For example, you may not have permission to send guaranteed messages or the queue destination may not exist etc.
 
-In order to properly handle message acknowledgements it is also important to know which message is being acknowledged. In other words, applications often need some application context along with the acknowledgement from the Solace message router to properly process the business logic on their end. The Solace Node.js API enables this through emitting a session event called `ACKNOWLEDGED_MESSAGE` when a message is successfully acknowledged. Similarly, the session event `REJECTED_MESSAGE_ERROR` is emitted in case of an error.
+In order to properly handle message acknowledgements it is also important to know which message is being acknowledged. In other words, applications often need some application context along with the acknowledgement from the Solace message router to properly process the business logic on their end. The Solace JavaScript API enables this through emitting a session event called `ACKNOWLEDGED_MESSAGE` when a message is successfully acknowledged. Similarly, the session event `REJECTED_MESSAGE_ERROR` is emitted in case of an error.
 This allows applications to attach a correlation object on message send and this correlation object is then passed to the event listeners implemented for above events. This allows applications to easily pass the application context to the acknowledgement, enabling proper correlation of messages sent and acknowledgements received.
 
 For the purposes of this tutorial, we will track message context using the following simple object. It will keep track of the application assigned message sequence number.
@@ -66,7 +66,7 @@ The structure of the code is similar to the Persistence with Queues tutorial's Q
 The following sections from the [Persistence with Queues]({{ site.baseurl }}/persistence-with-queues) tutorial are applicable here, refer to them for all the detailed descriptions.
     
 * Prerequisite: Creating a Durable Queue on the Solace message router
-* Loading and Initializing Solace Node.js API
+* Loading and Initializing Solace JavaScript API
 * Connecting to the Solace message router
 * Session Events
 * Sending a message to a queue
@@ -192,7 +192,7 @@ git clone {{ site.repository }}
 cd {{ site.baseurl | remove: '/'}}
 ```
  
-Note: the code in the `master` branch of this repository depends on Solace Node.js API version 10 or later. If you want to work with an older version clone the branch that corresponds your version.
+Note: the code in the `master` branch of this repository depends on Solace JavaScript API version 10 or later. If you want to work with an older version clone the branch that corresponds your version.
 ### Installing the Web Messaging API for JavaScript
 
 It is assumed that the `lib` directory containing the API libraries will be installed at the root of the cloned `solace-samples-javascript` repository:

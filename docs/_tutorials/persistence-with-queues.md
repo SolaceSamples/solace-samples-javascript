@@ -87,11 +87,11 @@ try {
 }
 ```
 
-At this point your Node.js application is connected as a client to the Solace message router. You can use SolAdmin to view this client connection and related details.
+At this point your JavaScript application is connected as a client to the Solace message router. You can use SolAdmin to view this client connection and related details.
 
 #### Session Events
 
-The Solace Node.js API communicates changes in status and results of connect calls through emitting session events with certain event names.
+The Solace JavaScript API communicates changes in status and results of connect calls through emitting session events with certain event names.
 
 It is necessary to wire your application logic to session events through listeners to take appropriate action. The most important session events are:
 
@@ -245,7 +245,7 @@ git clone {{ site.repository }}
 cd {{ site.baseurl | remove: '/'}}
 ```
  
-Note: the code in the `master` branch of this repository depends on Solace Node.js API version 10 or later. If you want to work with an older version clone the branch that corresponds your version.
+Note: the code in the `master` branch of this repository depends on Solace JavaScript API version 10 or later. If you want to work with an older version clone the branch that corresponds your version.
 
 ### Installing the Web Messaging API for JavaScript
 
