@@ -5,7 +5,7 @@ summary: Learn how to map existing topics to Solace queues.
 icon: I_dev_topic2q.svg
 ---
 
-This tutorial builds on the basic concepts introduced in the [Persistence with Queues]({{ site.baseurl }}/persistence-with-queues) tutorial and will show you how to make use of one of Solace’s advanced queueing features called `Topic to Queue Mapping` with a JavaScript API client using a Solace Message Router.
+This tutorial builds on the basic concepts introduced in the [Persistence with Queues]({{ site.baseurl }}/persistence-with-queues) tutorial and will show you how to make use of one of Solace’s advanced queueing features called `Topic to Queue Mapping` with a JavaScript API client using Solace messaging.
 
 ## Overview
 

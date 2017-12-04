@@ -1,5 +1,5 @@
 
-## Loading and Initializing the Solace Node.js API
+## Loading and Initializing the Solace JavaScript API
 
 To load the Solace Web Messaging API for JavaScript on your HTML page simply include the `solclient.js` file from the distribution.
 

@@ -33,7 +33,7 @@ One simple way to get access to a Solace message router is to start a Solace VMR
 
 ## Goals
 
-The goal of this tutorial is to demonstrate the most basic messaging interaction using a Solace message router. This tutorial will show you:
+The goal of this tutorial is to demonstrate the most basic messaging interaction using Solace messaging. This tutorial will show you:
 
 1.  How to build and send a message on a topic
 2.  How to subscribe to a topic and receive a message
