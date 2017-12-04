@@ -10,7 +10,10 @@ repository: https://github.com/SolaceSamples/solace-samples-javascript
 links-downloads: //dev.solace.com/downloads/
 links-community: //dev.solace.com/community/
 links-solaceCloud-setup: //cloud.solace.com/create-messaging-service/
-docs-vmr-setup: //docs.solace.com/Solace-VMR-Set-Up/Setting-Up-VMRs.htmsolace-apis-dev:
+docs-vmr-setup: //docs.solace.com/Solace-VMR-Set-Up/Setting-Up-VMRs.htm
+docs-core-concepts: //docs.solace.com/Features/Core-Concepts.htm
+docs-session-events: //docs.solace.com/Solace-Messaging-APIs/Developer-Guide/Handling-Session-Events.htm
+solace-apis-dev:
   - value: //dev.solace.com/get-started/c-tutorials/
     name: C
   - value: //dev.solace.com/get-started/dotnet-tutorials/
