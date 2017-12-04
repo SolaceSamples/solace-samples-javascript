@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<!--
+    Licensed to the Apache Software Foundation (ASF) under one
+    or more contributor license agreements.  See the NOTICE file
+    distributed with this work for additional information
+    regarding copyright ownership.  The ASF licenses this file
+    to you under the Apache License, Version 2.0 (the
+    "License"); you may not use this file except in compliance
+    with the License.  You may obtain a copy of the License at
+    
+    http://www.apache.org/licenses/LICENSE-2.0
+    
+    Unless required by applicable law or agreed to in writing,
+    software distributed under the License is distributed on an
+    "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+    KIND, either express or implied.  See the License for the
+    specific language governing permissions and limitations
+    under the License.
+  -->
+
+<!--
+    Solace Web Messaging API for JavaScript
+    RequestReply tutorial - Basic Replier
+    Demonstrates sending a request and receiving a reply
+  -->
+
+<html lang="en">
+  <head>
+    <title>Solace Web Messaging API for JavaScript Request/Reply tutorial - Basic Replier</title>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge;" />
+    <meta charset="utf-8"/>
+
+    <link rel="stylesheet" type="text/css" href="../../resources/css/pure.css"></link>
+    <link rel="stylesheet" type="text/css" href="../../resources/css/samples.css"></link>
+    
+    <!-- Load Solace Web Messaging API for JavaScript -->
+    <script src="../../../lib/solclient-debug.js"></script>
+
+    <!-- Load the RequestReply Basic Replier tutorial -->
+    <script src="BasicReplier.js"></script>
+
+    <!-- Execute the RequestReply Basic Replier tutorial -->
+    <script>
+      var replier = null;
+      window.onload = function () {
+        // Initialize factory with the most recent API defaults
+        var factoryProps = new solace.SolclientFactoryProperties();
+        factoryProps.profile = solace.SolclientFactoryProfiles.version10;
+        solace.SolclientFactory.init(factoryProps);
+
+        // enable logging to JavaScript console at WARN level
+        // NOTICE: works only with "solclientjs-debug.js"
+        solace.SolclientFactory.setLogLevel(solace.LogLevel.WARN);
+
+        // create the replier, specifying name of the request topic
+        replier = new BasicReplier('tutorial/topic');
+        // assign buttons to the replier functions
+        document.getElementById("connect").addEventListener("click", replier.connect);
+        document.getElementById("disconnect").addEventListener("click", replier.disconnect);
+        document.getElementById("subscribe").addEventListener("click", replier.subscribe);
+        document.getElementById("unsubscribe").addEventListener("click", replier.unsubscribe);
+      };
+      function iframeloaded(){
+        if (replier) {
+          replier.connectToSolace();
+        }
+      };
+    </script>
+	<style>
+        .warning {
+            padding: 5px; 
+            border: 1px solid black; 
+            background-color: #ff8;
+        }
+        .ie11 {
+            /* Hide instructions that only apply to IE11/Edge */
+            display: none; 
+        }
+        @media all and (-ms-high-contrast: none), (-ms-high-contrast: active) {
+            .ie11 {
+                /* Show instructions in IE11. If you're trying this sample from the local filesystem,
+                   it's easy to miss the prompt at the bottom of the window. */
+                display: block !important;
+            }
+        }
+	</style>
+  </head>
+
+  <body>
+    <!-- used to prompt selection of client certificate -->
+    <iframe id="iframe" src="" onload="iframeloaded()" hidden></iframe>
+
+    <div class="banner">
+      <div class="banner-interior">
+        <span class="logo">
+          <a href="http://dev.solace.com/">
+            <img src="../../resources/images/solace-logo-white.png"/>
+          </a>
+        </span>
+        <div class="banner-heading">
+          Solace Web Messaging API for JavaScript
+        </div>
+      </div>
+    </div>
+
+    <div class="doc-body">
+
+      <h2>Request/Reply Tutorial</h2>
+      <h3>Basic Replier</h3>
+      <!--[if IE]>
+          <div class="ie9 warning" style="padding: 5px; border: 1px solid black; background-color: #ff8;">
+              IE9 only: If you are running this sample from the local filesystem, click the "Allow blocked content" button
+              in the popup below to enable JavaScript.
+          </div>
+      <![endif]-->
+      <div class="ie11 warning">
+          IE 11 only: If you are running this sample from the local filesystem, click the "Allow blocked content" button
+          in the popup below to enable JavaScript.
+      </div>
+      <form class="pure-form pure-form-aligned">
+        <fieldset>
+
+          <div class="pure-control-group">
+            <label for="hosturl">Solace router host url</label>
+            <input id="hosturl" type="text" placeholder="<protocol://host[:port]>">
+          </div>
+
+          <div class="pure-control-group">
+            <label for="message-vpn">Message-vpn</label>
+            <input id="message-vpn" type="text" placeholder="Message VPN" value="default">
+          </div>
+
+          <div class="pure-control-group">
+            <label for="username">Username</label>
+            <input id="username" type="text" placeholder="Username">
+          </div>
+
+          <div class="pure-control-group">
+            <label for="password">Password</label>
+            <input id="password" type="password" placeholder="Password">
+          </div>
+
+        </fieldset>
+        <p>
+          <button type="button" class="pure-button pure-button-primary" id="connect">Connect</button>
+          <button type="button" class="pure-button button-error" id="disconnect">Disconnect</button>
+        </p>
+        <p>
+          <button type="button" class="pure-button pure-button-primary" id="subscribe">Subscribe</button>
+          <button type="button" class="pure-button pure-button-primary" id="unsubscribe">Unsubscribe</button>
+        </p>
+        
+        <textarea id="log" rows="20" cols="90" autofocus></textarea>
+        
+      </form>
+
+    </div>
+    
+  </body>
+  
+</html>
+

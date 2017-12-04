@@ -1,4 +1,5 @@
 # Getting Started Examples
+
 ## Solace JavaScript API
 
 These tutorials will get you up to speed and sending messages with Solace technology as quickly as possible. There are two ways you can get started:
@@ -8,26 +9,54 @@ These tutorials will get you up to speed and sending messages with Solace techno
 
 ## Contents
 
-This repository contains code and matching tutorial walk throughs for five different basic Solace messaging patterns. For a nice introduction to the Solace API and associated tutorials, check out the [tutorials home page](https://solacesamples.github.io/solace-samples-javascript/).
+This repository contains:
 
-## Checking out and Building
+* Code and matching tutorial walk throughs for five different **basic** Solace messaging patterns. For a nice introduction to the Solace API and associated tutorials, check out the [tutorials home page](https://solacesamples.github.io/solace-samples-javascript/).
 
-To check out the project and build it, do the following:
+    See the individual tutorials for details:
 
-  1. clone this GitHub repository
-  1. `cd solace-samples-javascript`
+    - [Publish/Subscribe](https://solacesamples.github.io/solace-samples-javascript/publish-subscribe): Learn how to set up pub/sub messaging on a Solace VMR.
+    - [Persistence](https://solacesamples.github.io/solace-samples-javascript/persistence-with-queues): Learn how to set up persistence for guaranteed delivery.
+    - [Request/Reply](https://solacesamples.github.io/solace-samples-javascript/request-reply): Learn how to set up request/reply messaging.
+    - [Confirmed Delivery](https://solacesamples.github.io/solace-samples-javascript/confirmed-delivery): Learn how to confirm that your messages are received by a Solace message router.
+    - [Topic to Queue Mapping](https://solacesamples.github.io/solace-samples-javascript/topic-to-queue-mapping): Learn how to map existing topics to Solace queues.
+
+* Additional sample code, showing how to make use of **advanced** features of the Solace message router is available in the [advanced-samples directory](https://github.com/SolaceSamples/solace-samples-javascript/tree/master/src/advanced-samples).
+
+    - [Secure Session](https://github.com/SolaceSamples/solace-samples-javascript/tree/master/src/advanced-samples/SecureSession): Learn how to use secure connection to the server and server and client certificate authentication.
+    - [Active Consumer Indication](https://github.com/SolaceSamples/solace-samples-javascript/tree/master/src/advanced-samples/ActiveConsumerIndication): Learn how multiple consumers can bind to an exclusive queue, but only one client at a time can actively receive messages.
+    - [Durable Topic Endpoint Consumer](https://github.com/SolaceSamples/solace-samples-javascript/tree/master/src/advanced-samples/DTEConsumer): Learn how to consume messages from a Durable Topic Endpoint (DTE).
+    - [Event Monitor](https://github.com/SolaceSamples/solace-samples-javascript/tree/master/src/advanced-samples/EventMonitor): Learn how to monitor message router generated events.
+    - [GuaranteedRequestor/Replier](https://github.com/SolaceSamples/solace-samples-javascript/tree/master/src/advanced-samples): Learn how to set up guaranteed request/reply messaging.
+    - [NoLocal Pub-Sub](https://github.com/SolaceSamples/solace-samples-javascript/tree/master/src/advanced-samples/NoLocalPubSub): Learn how to prevent messages published on a session or consumer received on that same session or consumer.
+
+## Checking out
+
+To check out the project, clone this GitHub repository:
+
+```
+git clone https://github.com/SolaceSamples/solace-samples-javascript
+cd solace-samples-javascript
+```
  
+Note: the code in the `master` branch of this repository depends on Solace JavaScript API version 10 or later. If you want to work with an older version clone the branch that corresponds your version.
+    
 ### Download the Solace JavaScript API
 
-The Solace JavaScript API library can be [downloaded here](http://dev.solace.com/downloads/).  The instructions in this tutorial assume you have downloaded the Web Messaging API for JavaScript library and unpacked it to a known location. The samples assume a `lib` subdirectory within each samples directory. For example `src/TopicPublisher/lib`.
+These samples depend on version 10 or later of the Solace JavaScript API library.
+
+The Solace JavaScript API library can be [downloaded here](http://dev.solace.com/downloads/).  The instructions in this tutorial assume you have downloaded the Web Messaging API for JavaScript library and unpacked it to a known location. The samples assume a  `lib` directory containing the API libraries will be installed in the current `solace-samples-javascript` directory at the root of the cloned repo:
+
+```bash
+cp -R <path_to_unzipped_API_distribution_package>/lib/ .
+```
 
 ## Running the Samples
 
-The samples are found in the `src` directory. Each sample is in it's own subdirectory. Within each sample subdirectory there is an html file which you load to launch the sample.
+The samples are found in the `src/basic-samples` and `src/advanced-samples` directories. Each sample is in it's own subdirectory. Within each sample subdirectory there is an html file which you load to launch the sample.
 
 For example the `TopicPublisher` is found here:
-
-    src/TopicPublisher
+    src/basic-samples/TopicPublisher
 
 And it is launched by running the following in your browser:
 
