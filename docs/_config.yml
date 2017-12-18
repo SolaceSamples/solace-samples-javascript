@@ -2,7 +2,7 @@
 title: Solace Samples Javascript
 summary: These tutorials get you up to speed sending and receiving messages with Solace technology.
 baseurl: "/solace-samples-javascript"
-repository: //github.com/SolaceSamples/solace-samples-javascript
+repository: https://github.com/SolaceSamples/solace-samples-javascript
 
 # Also see _includes/intro.html to customize the description which gets included in index.html.
 
