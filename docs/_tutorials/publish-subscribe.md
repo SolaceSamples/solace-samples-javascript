@@ -278,7 +278,7 @@ Combining the example source code shown above results in the following source co
 Clone the GitHub repository containing the Solace samples.
 
 ```
-git clone https://github.com/SolaceSamples/solace-samples-javascript
+git clone {{ site.repository }}
 cd {{ site.repository | split: '/' | last}}
 ```
  
