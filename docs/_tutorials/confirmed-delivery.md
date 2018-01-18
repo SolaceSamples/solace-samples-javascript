@@ -21,11 +21,7 @@ This tutorial assumes the following:
     *   Connectivity information for a Solace message-VPN
     *   Enabled client username and password
 
-{% if jekyll.environment == 'solaceCloud' %}
 One simple way to get access to Solace messaging quickly is to create a messaging service in Solace Cloud [as outlined here]({{ site.links-solaceCloud-setup}}){:target="_top"}. You can find other ways to get access to Solace messaging below.
-{% else %}
-One simple way to get access to a Solace message router is to start a Solace VMR load [as outlined here]({{ site.docs-vmr-setup }}){:target="_top"}. By default the Solace VMR will with the “default” message VPN configured and ready for guaranteed messaging. Going forward, this tutorial assumes that you are using the Solace VMR. If you are using a different Solace message router configuration adapt the tutorial appropriately to match your configuration.
-{% endif %}
 
 ## Goals
 
@@ -33,11 +29,7 @@ The goal of this tutorial is to understand the following:
 
 *  How to properly handle guaranteed message acknowledgements on message send.
 
-{% if jekyll.environment == 'solaceCloud' %}
-    {% include solaceMessaging-cloud.md %}
-{% else %}
-    {% include solaceMessaging.md %}
-{% endif %}  
+{% include solaceMessaging.md %}
 
 ## Overview
 
@@ -64,7 +56,7 @@ This tutorial’s sample application will send guaranteed messages to a durable 
 The structure of the code is similar to the Persistence with Queues tutorial's Queue Producer with the additions of several messages being sent and the acknowledgements logged for each message that comes back from the Solace message router.
 
 The following sections from the [Persistence with Queues]({{ site.baseurl }}/persistence-with-queues) tutorial are applicable here, refer to them for all the detailed descriptions.
-    
+
 * Prerequisite: Creating a Durable Queue on the Solace message router
 * Loading and Initializing Solace JavaScript API
 * Connecting to the Solace message router
@@ -191,7 +183,7 @@ Clone the GitHub repository containing the Solace samples.
 git clone {{ site.repository }}
 cd {{ site.repository | split: '/' | last}}
 ```
- 
+
 Note: the code in the `master` branch of this repository depends on Solace JavaScript API version 10 or later. If you want to work with an older version clone the branch that corresponds your version.
 ### Installing the Web Messaging API for JavaScript
 
@@ -213,7 +205,7 @@ Open `src/basic-samples/ConfirmedPublish/ConfirmedPublish.html` page in the brow
 
 Send messages by clicking the “Send 10 Messages” button on the page.
 
-Observe the confirmation for the delivery of all 10 messages. 
+Observe the confirmation for the delivery of all 10 messages.
 
 The following is a screenshot of the tutorial’s `ConfirmedPublish.html` web page with the JavaScript debug console open in the Firefox browser. It captures the page after it was loaded and the “Connect” button was clicked and then the “Consume messages” button was clicked.
 

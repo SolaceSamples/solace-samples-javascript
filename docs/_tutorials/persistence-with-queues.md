@@ -25,11 +25,7 @@ This tutorial assumes the following:
     *   Connectivity information for a Solace message-VPN
     *   Enabled client username and password
 
-{% if jekyll.environment == 'solaceCloud' %}
 One simple way to get access to Solace messaging quickly is to create a messaging service in Solace Cloud [as outlined here]({{ site.links-solaceCloud-setup}}){:target="_top"}. You can find other ways to get access to Solace messaging below.
-{% else %}
-One simple way to get access to a Solace message router is to start a Solace VMR load [as outlined here]({{ site.docs-vmr-setup }}){:target="_top"}. By default the Solace VMR will with the “default” message VPN configured and ready for guaranteed messaging. Going forward, this tutorial assumes that you are using the Solace VMR. If you are using a different Solace message router configuration adapt the tutorial appropriately to match your configuration.
-{% endif %}
 
 ## Goals
 
@@ -38,12 +34,7 @@ The goal of this tutorial is to understand the following:
 1.  How to send a guaranteed message to a Solace queue
 2.  How to bind to this queue and receive a guaranteed message
 
-{% if jekyll.environment == 'solaceCloud' %}
-    {% include solaceMessaging-cloud.md %}
-{% else %}
-    {% include solaceMessaging.md %}
-{% endif %}
-
+{% include solaceMessaging.md %}
 {% include solaceApi.md %}
 
 ## Prerequisite: Creating a Durable Queue on the Solace message router
@@ -115,8 +106,8 @@ producer.session.on(solace.SessionEventCode.CONNECT_FAILED_ERROR, function (sess
 producer.session.on(solace.SessionEventCode.DISCONNECTED, function (sessionEvent) {
     producer.log('Disconnected.');
     if (producer.session !== null) {
-                                
-     
+
+
         producer.session.dispose();
         producer.session = null;
     }
@@ -244,7 +235,7 @@ Clone the GitHub repository containing the Solace samples.
 git clone {{ site.repository }}
 cd {{ site.repository | split: '/' | last}}
 ```
- 
+
 Note: the code in the `master` branch of this repository depends on Solace JavaScript API version 10 or later. If you want to work with an older version clone the branch that corresponds your version.
 
 ### Installing the Web Messaging API for JavaScript
@@ -254,8 +245,8 @@ It is assumed that the `lib` directory containing the API libraries will be inst
 ```bash
 cp -R <path_to_unzipped_API_distribution_package>/lib/ .
 ```
-                       
-   
+
+
 
 ### Running the Samples
 
@@ -267,28 +258,28 @@ First open `src/basic-samples/QueueConsumer/QueueConsumer.html` page in the brow
 
 Then bind to the destination queue by clicking the "Consume messages" button.
 
-   
+
 
 The following is a screenshot of the tutorial’s `QueueConsumer.html` web page with the JavaScript debug console open in the Firefox browser. It captures the page after it was loaded and the "Connect" button was clicked and then the "Consume messages" button was clicked.
 
 ![]({{ site.baseurl }}/images/perswithqueues-javascript_img-1.png)
 
-       
-                                                                  
-          
-                                                              
-                                                                             
-                                    
-                                                  
-                               
-                                                                                  
-                                                      
+
+
+
+
+
+
+
+
+
+
 
 Now, open `src/basic-samples/QueueProducer/QueueProducer.html` page in the browser and connect to the same Solace router by specifying the message router properties and clicking "Connect" button.
 
 Send messages by clicking the "Send Message" button on the page.
 
-   
+
 
 The following screenshots of the tutorial’s `QueueProducer.html` and `QueueConsumer.html` web pages with the JavaScript debug console open in the Firefox browser. It captures the pages after a message was sent and received.
 
@@ -296,30 +287,30 @@ This is the producer is sending a message (`QueueProducer.html)`:
 
 ![]({{ site.baseurl }}/images/perswithqueues-javascript_img-2.png)
 
-       
-                                                                  
-          
-                                                              
-                                                                             
-                                    
-                                                  
-                                                                     
-                                                                        
-                        
-                                                      
+
+
+
+
+
+
+
+
+
+
+
 
 This is the consumer is receiving a message (`QueueConsumer.html)`:
 
 ![]({{ site.baseurl }}/images/perswithqueues-javascript_img-3.png)
 
-       
-                                                       
-                                                              
-                                            
-                                                  
-                                            
-                                                                                                     
-                                              
+
+
+
+
+
+
+
+
 
 You have now successfully connected a client, sent guaranteed messages to a queue and received them from a message consumer.
 
