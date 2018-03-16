@@ -163,7 +163,6 @@ With a subscriber session created in the previous step, we declare a message eve
 // define message event listener
 subscriber.session.on(solace.SessionEventCode.MESSAGE, function (message) {
     subscriber.log('Received message: "' + message.getBinaryAttachment() + '", details:\n' + message.dump());
-        '", details:\n' + message.dump());
 });
 // connect the session
 ```
