@@ -12,15 +12,15 @@ The "Getting Started" tutorials will get you up to speed and sending messages wi
 
 This repository contains:
 
-* Code and matching tutorial walk throughs for five different **basic** Solace messaging patterns. For a nice introduction to the Solace API and associated tutorials, check out the [tutorials home page](https://solacesamples.github.io/solace-samples-javascript/).
+* Code and matching tutorial walk throughs for five different **basic** Solace messaging patterns. For a nice introduction to the Solace API and associated tutorials, check out the [tutorials home page](https://dev.solace.com/samples/solace-samples-javascript/).
 
     See the individual tutorials for details:
 
-    - [Publish/Subscribe](https://solacesamples.github.io/solace-samples-javascript/publish-subscribe): Learn how to set up pub/sub messaging on a Solace VMR.
-    - [Persistence](https://solacesamples.github.io/solace-samples-javascript/persistence-with-queues): Learn how to set up persistence for guaranteed delivery.
-    - [Request/Reply](https://solacesamples.github.io/solace-samples-javascript/request-reply): Learn how to set up request/reply messaging.
-    - [Confirmed Delivery](https://solacesamples.github.io/solace-samples-javascript/confirmed-delivery): Learn how to confirm that your messages are received by a Solace message router.
-    - [Topic to Queue Mapping](https://solacesamples.github.io/solace-samples-javascript/topic-to-queue-mapping): Learn how to map existing topics to Solace queues.
+    - [Publish/Subscribe](https://dev.solace.com/samples/solace-samples-javascript/publish-subscribe): Learn how to set up pub/sub messaging on a Solace VMR.
+    - [Persistence](https://dev.solace.com/samples/solace-samples-javascript/persistence-with-queues): Learn how to set up persistence for guaranteed delivery.
+    - [Request/Reply](https://dev.solace.com/samples/solace-samples-javascript/request-reply): Learn how to set up request/reply messaging.
+    - [Confirmed Delivery](https://dev.solace.com/samples/solace-samples-javascript/confirmed-delivery): Learn how to confirm that your messages are received by a Solace message router.
+    - [Topic to Queue Mapping](https://dev.solace.com/samples/solace-samples-javascript/topic-to-queue-mapping): Learn how to map existing topics to Solace queues.
 
 * Additional sample code, showing how to make use of **advanced** features of the Solace message router is available in the [advanced-samples directory](https://github.com/SolaceSamples/solace-samples-javascript/tree/master/src/advanced-samples).
 
@@ -63,7 +63,7 @@ And it is launched by running the following in your browser:
 
     TopicPublisher.html
 
-See the [tutorials](https://solacesamples.github.io/solace-samples-javascript/) for more details.
+See the [tutorials](https://dev.solace.com/samples/solace-samples-javascript/) for more details.
 
 ## Contributing
 
