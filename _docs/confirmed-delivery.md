@@ -29,7 +29,7 @@ The goal of this tutorial is to understand the following:
 
 *  How to properly handle guaranteed message acknowledgements on message send.
 
-{% include solaceMessaging.md %}
+{% include_relative assets/solaceMessaging.md %}
 
 ## Overview
 
@@ -47,7 +47,7 @@ const correlationKey = {
 };
 ```
 
-{% include solaceApi.md %}
+{% include_relative assets/solaceApi.md %}
 
 ## Implementing Confirmed Delivery
 
@@ -209,7 +209,7 @@ Observe the confirmation for the delivery of all 10 messages.
 
 The following is a screenshot of the tutorial’s `ConfirmedPublish.html` web page with the JavaScript debug console open in the Firefox browser. It captures the page after it was loaded and the “Connect” button was clicked and then the “Consume messages” button was clicked.
 
-![]({{ site.baseurl }}/images/confirmeddelivery-javascript_img-1.png)
+![]({{ site.baseurl }}/assets/images/confirmeddelivery-javascript_img-1.png)
 
 You have now successfully sent guaranteed messages to a Solace router and confirmed its receipt by correlating the acknowledgement.
 
