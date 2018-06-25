@@ -30,4 +30,3 @@ If the debug version of the API has been loaded the required level of logging ca
 ```javascript
 solace.SolclientFactory.setLogLevel(solace.LogLevel.DEBUG);
 ```
-
