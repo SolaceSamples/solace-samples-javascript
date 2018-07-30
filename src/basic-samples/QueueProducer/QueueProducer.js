@@ -126,6 +126,7 @@ var QueueProducer = function (queueName) {
             message.setBinaryAttachment(messageText);
             message.setDeliveryMode(solace.MessageDeliveryModeType.PERSISTENT);
             try {
+                // Delivery not yet confirmed. See ConfirmedPublish.js
                 producer.session.send(message);
                 producer.log('Message sent.');
             } catch (error) {
