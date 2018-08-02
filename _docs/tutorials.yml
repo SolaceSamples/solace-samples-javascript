@@ -8,3 +8,4 @@
 
   features:
   - feature_ActiveConsumerIndication
+  - feature_DTEConsumer

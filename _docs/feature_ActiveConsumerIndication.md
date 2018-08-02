@@ -9,7 +9,7 @@ links:
 
 This feature introduction shows how multiple consumers can bind to an exclusive queue, but only one client at a time can actively receive messages.
 
-The example code build on the Subscriber in the [publish/subscribe]({{ site.baseurl }}/publish-subscribe) messaging pattern.
+The example code builds on the Subscriber in the [publish/subscribe]({{ site.baseurl }}/publish-subscribe) messaging pattern.
 
 ## Feature Overview
 
