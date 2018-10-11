@@ -1,7 +1,7 @@
 ---
 layout: features
 title: Active Consumer Indication
-summary: Demonstrates Consumer ACTIVE/INACTIVE notification to multiple message consumers bound to an exclusive queue
+summary: Learn to use consumer active flow indication with exclusive queues.
 links:
     - label: ActiveConsumerIndication
       link: /blob/master/src/features/ActiveConsumerIndication
