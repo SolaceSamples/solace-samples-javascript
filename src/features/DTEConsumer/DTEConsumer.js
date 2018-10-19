@@ -108,13 +108,9 @@ var DTEConsumer = function (topicEndpointName, topicName) {
                 consumer.session = null;
             }
         });
-        // if secure connection, first load iframe so the browser can provide a client-certificate
-        if (hosturl.lastIndexOf('wss://', 0) === 0 || hosturl.lastIndexOf('https://', 0) === 0) {
-            var urlNoProto = hosturl.split('/').slice(2).join('/'); // remove protocol prefix
-            document.getElementById('iframe').src = 'https://' + urlNoProto + '/crossdomain.xml';
-        } else {
-            consumer.connectToSolace();   // otherwise proceed
-        }
+
+        consumer.connectToSolace();   
+
     };
 
     // Actually connects the session triggered when the iframe has been loaded - see in html code

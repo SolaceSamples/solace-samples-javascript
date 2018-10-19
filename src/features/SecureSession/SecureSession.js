@@ -21,10 +21,6 @@
  * Solace Web Messaging API for JavaScript
  * Secure Session tutorial
  * Demonstrates the use of secure session
- * The web application user may need to select or cancel selection of a
- * client certificate to use in a popup window - triggered by an invisible
- * iframe connecting securely to the server. This is necessary because the
- * message router is always requesting a client certificate.
  */
 
 /*jslint es6 browser devel:true*/
@@ -121,9 +117,6 @@ var SecureTopicSubscriber = function (topicName) {
             subscriber.log('Received message: "' + message.getBinaryAttachment() + '", details:\n' +
                 message.dump());
         });
-        // if secure connection, first load iframe so the browser can provide a client-certificate
-        var urlNoProto = hosturl.split('/').slice(2).join('/'); // remove protocol prefix
-        document.getElementById('iframe').src = 'https://' + urlNoProto + '/crossdomain.xml';
     };
 
     // Actually connects the session triggered when the iframe has been loaded - see in html code
