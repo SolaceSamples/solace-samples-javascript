@@ -107,13 +107,9 @@ var QueueProducer = function (queueName) {
                 producer.session = null;
             }
         });
-        // if secure connection, first load iframe so the browser can provide a client-certificate
-        if (hosturl.lastIndexOf('wss://', 0) === 0 || hosturl.lastIndexOf('https://', 0) === 0) {
-            var urlNoProto = hosturl.split('/').slice(2).join('/'); // remove protocol prefix
-            document.getElementById('iframe').src = 'https://' + urlNoProto + '/crossdomain.xml';
-        } else {
-            producer.connectToSolace();   // otherwise proceed
-        }
+
+        producer.connectToSolace();   
+
     };
 
     // Actually connects the session triggered when the iframe has been loaded - see in html code
