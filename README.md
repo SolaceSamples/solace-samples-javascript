@@ -30,6 +30,7 @@ This repository contains:
     - [Event Monitor](https://github.com/SolaceSamples/solace-samples-javascript/tree/master/src/features/EventMonitor): Learn how to monitor message router generated events.
     - [GuaranteedRequestor/Replier](https://github.com/SolaceSamples/solace-samples-javascript/tree/master/src/features): Learn how to set up guaranteed request/reply messaging.
     - [NoLocal Pub-Sub](https://github.com/SolaceSamples/solace-samples-javascript/tree/master/src/features/NoLocalPubSub): Learn how to prevent messages published on a session or consumer received on that same session or consumer.
+    - [Message Replay](https://github.com/SolaceSamples/solace-samples-javascript/tree/master/src/features/MessageReplay): Learn how to initiate and process the replay of previously published messages, as well as deal with an externally initiated replay.
 
 ## Checking out
 

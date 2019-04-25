@@ -29,3 +29,7 @@ To learn more about specific features and details, refer to the [Solace develope
 * __GuaranteedRequestor/Replier__: This sample will show the implementation of guaranteed Request-Reply messaging, where `GuaranteedRequestor` is a message Endpoint that sends a guaranteed request message to a request topic and waits to receive a reply message on a dedicated temporary queue as a response; `GuaranteedReplier` is a message Endpoint that waits to receive a request message on a request topic - it will create a non-durable topic endpoint for that - and responds to it by sending a guaranteed reply message. Start the replier first as the non-durable topic endpoint will only be created for the duration of the replier session and any request sent before that will not be received.
 
 * __NoLocalPubSub__: This sample will show the use of the NO_LOCAL Session and Flow properties. With these properties enabled, messages published on a Session cannot be received on that same session or on a Flow on that Session even when there is a matching subscription. This sample will create and use a temporary queue.
+
+* __MessageReplay__: This sample will show how a client can initiate and process the replay of previously published messages, as well as deal with an externally initiated replay.
+
+    *Prerequisite*: this sample requires that the queue "tutorial/queue" exists on the message router and configured to be "exclusive".  Ensure the queue is enabled for both Incoming and Outgoing messages and set the Permission to at least 'Consume'.
