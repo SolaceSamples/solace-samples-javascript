@@ -130,8 +130,20 @@ var QueueConsumer = function (queueName) {
                 consumer.log('Already started consumer for queue "' + consumer.queueName + '", stop the consumer first.');
             } else {
                 consumer.log('Starting message replay for queue: ' + consumer.queueName);
-                //consumer.replayStartLocation = solace.SolclientFactory.createReplayStartLocationDate(new Date(1992, 6, 6, 18, 23, 22, 5));
                 consumer.replayStartLocation = solace.SolclientFactory.createReplayStartLocationBeginning();
+                /***************************************************************
+                 * Alternative replay start specifications to try instead of
+                 * createReplayStartLocationBeginning().
+                 */
+                /* Milliseconds after the Jan 1st of 1970 UTC+0: */
+                // consumer.replayStartLocation = solace.SolclientFactory.createReplayStartLocationDate(1554331492);
+
+                /* RFC3339 UTC date with timezone offset 0: */
+                // consumer.replayStartLocation = solace.SolclientFactory.createReplayStartLocationDate(Date.parse('2019-04-03T18:48:00Z'));
+
+                /* RFC3339 date with timezone: */
+                // consumer.replayStartLocation = solace.SolclientFactory.createReplayStartLocationDate(Date.parse('DATE:2019-04-03T18:48:00-05:00'));
+
                 consumer.createFlow();
             }
         } else {
@@ -139,7 +151,7 @@ var QueueConsumer = function (queueName) {
         }
     };
 
-    // Starts message replay from a queue on Solace message router
+    // Creates and starts a consumer flow from a queue
     consumer.createFlow = function () {
         try {
             // Create a message consumer
@@ -167,8 +179,8 @@ var QueueConsumer = function (queueName) {
                 consumer.log('Received "DOWN_ERROR" event - details: ' + details);
                 switch(details.subcode) {
                     case solace.ErrorSubcode.REPLAY_STARTED:
-                        consumer.log('Router initiating replay, reconnecting flow to recieve messages.');
-                        consumer.replayStartLocation = null;   // Client initiated replay is not neeeded here
+                        consumer.log('Router initiating replay, reconnecting flow to receive messages.');
+                        consumer.replayStartLocation = null;   // Client-initiated replay is not neeeded here
                         consumer.createFlow();
                         break;
                     case solace.ErrorSubcode.REPLAY_START_TIME_NOT_AVAILABLE:
@@ -176,7 +188,7 @@ var QueueConsumer = function (queueName) {
                         consumer.replayStartLocation = solace.SolclientFactory.createReplayStartLocationBeginning();
                         consumer.createFlow();
                         break;
-                    // Placeholder for additional event handling
+                    // Additional events example, may add specific handler code here
                     case solace.ErrorSubcode.REPLAY_FAILED:
                     case solace.ErrorSubcode.REPLAY_CANCELLED:
                     case solace.ErrorSubcode.REPLAY_LOG_MODIFIED:
