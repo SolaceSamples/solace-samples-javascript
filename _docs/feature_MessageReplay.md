@@ -64,13 +64,16 @@ consumer.replayStartLocation = solace.SolclientFactory.createReplayStartLocation
  * createReplayStartLocationBeginning().
  */
 /* Milliseconds after the Jan 1st of 1970 UTC+0: */
-// consumer.replayStartLocation = solace.SolclientFactory.createReplayStartLocationDate(1554331492);
+// consumer.replayStartLocation = solace.SolclientFactory.createReplayStartLocationDate(
+//              new Date(1554331492));
 
 /* RFC3339 UTC date with timezone offset 0: */
-// consumer.replayStartLocation = solace.SolclientFactory.createReplayStartLocationDate(Date.parse('2019-04-03T18:48:00Z'));
+// consumer.replayStartLocation = solace.SolclientFactory.createReplayStartLocationDate(
+//              new Date(Date.parse('2019-04-03T18:48:00Z')));
 
 /* RFC3339 date with timezone: */
-// consumer.replayStartLocation = solace.SolclientFactory.createReplayStartLocationDate(Date.parse('DATE:2019-04-03T18:48:00-05:00'));
+// consumer.replayStartLocation = solace.SolclientFactory.createReplayStartLocationDate(
+//              new Date(Date.parse('2019-04-03T18:48:00-05:00')));
 ```
 
 Indicate that replay is requested by setting a non-null `replayStartLocation` in `solace.MessageConsumerProperties`, which is then passed to `createMessageConsumer()` as a parameter.
@@ -97,10 +100,10 @@ If a replay-related event occurs, the consumer flow is disconnected and a `solac
 
 Some of the important Subcodes:
 * REPLAY_STARTED - a replay has been administratively started from the message broker; the consumer flow is being disconnected.
-* REPLAY_START_TIME_NOT_AVAILABLE - the requested replay start date is before when the replay log was created or in the future, which is not allowed - see above section, "Initiating replay"
+* REPLAY_START_TIME_NOT_AVAILABLE - the requested replay start date is before when the replay log was created or in the future, which is not allowed
 * REPLAY_FAILED - indicates that an unexpected error has happened during replay
 
-For the definition of additional replay-related Subcodes refer to `solace.ErrorSubcode` in the [Java API Reference]({{ site.docs-api-errorresponse-subcode-ex }}) (search for REPLAY).
+For the definition of additional replay-related Subcodes refer to `solace.ErrorSubcode` in the [JavaScript API Reference]({{ site.docs-api-errorresponse-subcode-ex }}) (search for REPLAY).
 
 Here we will define the event handler to process events with some more example Subcodes.
 
@@ -151,18 +154,16 @@ Follow the instructions to [check out and run the samples]({{ site.repository }}
 
 Before running this sample, be sure that Message Replay is enabled in the Message VPN. Also, create an exclusive queue with the name "tutorial/queue" and messages must have been published to the replay log for this queue:
 
-* Use the [QueueProducer]({{ site.repository }}/blob/master/src/basic-samples/QueueProducer/) sample to create and publish one message to the queue.
-* Use the [QueueConsumer]({{ site.repository }}/blob/master/src/basic-samples/QueueConsumer/) sample to drain the queue so that replay is performed on an empty queue and observed by this sample. Both samples are from the [Persistence with Queues]({{ site.baseurl }}/persistence-with-queues) tutorial and they are using "tutorial/queue" by default. Remember to load them from your local checkout into your browser.
+* Use the "QueueProducer" sample from `src/basic-samples/QueueProducer` in your cloned repo to create and publish one message to the queue. To start, simply load `QueueConsumer.html` into you browser.
+* Use the "QueueConsumer" sample from `src/basic-samples/QueueConsumer` to drain the queue so that replay is performed on an empty queue and observed by this sample. Both samples are from the [Persistence with Queues]({{ site.baseurl }}/persistence-with-queues) tutorial and they are using "tutorial/queue" by default. Note: after draining, disconnect the "QueueConsumer" from the queue because there can be only one consumer flow active on an exclusive queue at any time and the replay sample will need to connect a new one.
 
 At this point the replay log has one message.
 
 You can now run this sample and observe the following, particularly the "messageId"s listed.
 
-Note: disconnect the "QueueConsumer" from the queue because there can be only one consumer flow active on an exclusive queue, which will be needed by the replay sample.
-
-1. First, use [MessageReplay]({{ site.repository }}/blob/master/src/basic-samples/MessageReplay/) for a client initiated replay. All messages are requested and replayed from the replay log.
+1. First, use "MessageReplay" from `src/features/MessageReplay` for a client initiated replay. All messages are requested and replayed from the replay log.
 2. After replay the application is able to receive live messages. Try it by publishing a new message using the "QueueProducer" sample. Note that this message will also be added to the replay log.
-3. Now start a replay from the message broker. The flow event handler monitors for a replay start event. When the message broker initiates a replay, the flow will see a DOWN_ERROR event with cause REPLAY_STARTED. This means an administrator has initiated a replay, and the application must destroy and re-create the flow to receive the replayed messages.
+3. Now start a replay from the message broker. The "MessageReplay" flow event handler monitors for a replay start event. When the message broker initiates a replay, the flow will see a DOWN_ERROR event with cause REPLAY_STARTED. This means an administrator has initiated a replay, and the application must destroy and re-create the flow to receive the replayed messages.
 This will replay all logged messages including the live one published in step 2.
 
 ![alt text]({{ site.baseurl }}/assets/images/initiate-replay.png "Initiating Replay using Solace PubSub+ Manager")

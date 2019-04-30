@@ -136,13 +136,13 @@ var QueueConsumer = function (queueName) {
                  * createReplayStartLocationBeginning().
                  */
                 /* Milliseconds after the Jan 1st of 1970 UTC+0: */
-                // consumer.replayStartLocation = solace.SolclientFactory.createReplayStartLocationDate(1554331492);
+                // consumer.replayStartLocation = solace.SolclientFactory.createReplayStartLocationDate(new Date(1554331492));
 
                 /* RFC3339 UTC date with timezone offset 0: */
-                // consumer.replayStartLocation = solace.SolclientFactory.createReplayStartLocationDate(Date.parse('2019-04-03T18:48:00Z'));
+                // consumer.replayStartLocation = solace.SolclientFactory.createReplayStartLocationDate(new Date(Date.parse('2019-04-03T18:48:00Z')));
 
                 /* RFC3339 date with timezone: */
-                // consumer.replayStartLocation = solace.SolclientFactory.createReplayStartLocationDate(Date.parse('DATE:2019-04-03T18:48:00-05:00'));
+                // consumer.replayStartLocation = solace.SolclientFactory.createReplayStartLocationDate(new Date(Date.parse('2019-04-03T18:48:00-05:00')));
 
                 consumer.createFlow();
             }
