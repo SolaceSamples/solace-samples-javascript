@@ -188,7 +188,7 @@ var QueueConsumer = function (queueName) {
                         consumer.replayStartLocation = solace.SolclientFactory.createReplayStartLocationBeginning();
                         consumer.createFlow();
                         break;
-                    // Additional events example, may add specific handler code here
+                    // Additional events example, may add specific handler code under each:
                     case solace.ErrorSubcode.REPLAY_FAILED:
                     case solace.ErrorSubcode.REPLAY_CANCELLED:
                     case solace.ErrorSubcode.REPLAY_LOG_MODIFIED:

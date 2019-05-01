@@ -118,7 +118,7 @@ consumer.messageConsumer.on(solace.MessageConsumerEventName.DOWN_ERROR, function
         case solace.ErrorSubcode.REPLAY_START_TIME_NOT_AVAILABLE:
             :
             break;
-        // Additional events example, may add specific handler code here
+        // Additional events example, may add specific handler code under each:
         case solace.ErrorSubcode.REPLAY_FAILED:
         case solace.ErrorSubcode.REPLAY_CANCELLED:
         case solace.ErrorSubcode.REPLAY_LOG_MODIFIED:
