@@ -1,5 +1,5 @@
 # Site settings
-title: Solace Samples Javascript
+title: Solace Samples JavaScript
 summary: These tutorials get you up to speed sending and receiving messages with Solace technology.
 baseurl: "/solace-samples-javascript"
 repository: https://github.com/SolaceSamples/solace-samples-javascript
@@ -8,11 +8,11 @@ repository: https://github.com/SolaceSamples/solace-samples-javascript
 
 # Links
 advanced-samples: //github.com/SolaceSamples/solace-samples-javascript/tree/master/src/advanced-samples
-links-community: //dev.solace.com/community/
 links-downloads: //dev.solace.com/downloads/
+links-community: //dev.solace.com/community/
 links-get-started-javascript: //dev.solace.com/get-started/javascript-tutorials/
-links-solaceCloud-setup: //cloud.solace.com/create-messaging-service/
 links-tech-other: //dev.solace.com/tech/#other
+links-solaceCloud-setup: //cloud.solace.com/create-messaging-service/
 docs-core-concepts: //docs.solace.com/Features/Core-Concepts.htm
 docs-session-events: //docs.solace.com/Solace-Messaging-APIs/Creating-Client-Sessions-1.htm#Handle-Sess-Events
 docs-api-reference: //docs.solace.com/API-Developer-Online-Ref-Documentation/js/index.html
@@ -20,3 +20,9 @@ docs-semp: //docs.solace.com/SEMP/Using-SEMP-to-Manage-and-Monitor-Routers.htm
 docs-topic-mapping: //docs.solace.com/Features/Core-Concepts.htm#topic-queue-mapping
 docs-dte: //docs.solace.com/Features/Endpoints.htm
 docs-active-flow-indication: //docs.solace.com/Solace-PubSub-Messaging-APIs/Developer-Guide/Creating-Flows.htm#Active-Flow-Indication
+docs-psplus-manager: //docs.solace.com/Solace-PubSub-Manager/PubSub-Manager-Overview.htm
+docs-semp-api: //docs.solace.com/SEMP/Using-SEMP.htm
+docs-endpoints: //docs.solace.com/Messaging-Basics/Endpoints.htm#Endpoints
+docs-api-errorresponse-subcode-ex: //docs.solace.com/API-Developer-Online-Ref-Documentation/js/solace.ErrorSubcode.html
+docs-replay-use-cases: //docs.solace.com/Features/Message-Replay.htm#Applicat
+docs-replay-cli-config: //docs.solace.com/Configuring-and-Managing/Msg-Replay-Config.htm
