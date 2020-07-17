@@ -159,16 +159,19 @@ var QueueConsumer = function (queueName) {
                 // solace.MessageConsumerProperties
                 queueDescriptor: { name: consumer.queueName, type: solace.QueueType.QUEUE },
                 acknowledgeMode: solace.MessageConsumerAcknowledgeMode.CLIENT, // Enabling Client ack
-                replayStartLocation: consumer.replayStartLocation,
+                replayStartLocation: consumer.replayStartLocation
             });
             // Define message consumer event listeners
             consumer.messageConsumer.on(solace.MessageConsumerEventName.UP, function () {
                 consumer.consuming = true;
             });
-            consumer.messageConsumer.on(solace.MessageConsumerEventName.CONNECT_FAILED_ERROR, function () {
+            consumer.messageConsumer.on(solace.MessageConsumerEventName.CONNECT_FAILED_ERROR, function (error) {
                 consumer.consuming = false;
-                consumer.log('=== Error: the message consumer could not bind to queue "' + consumer.queueName +
-                    '" ===\n   Ensure this queue exists on the message router vpn');
+                consumer.log('\n=== Error: the message consumer could not bind to queue "' + consumer.queueName +
+			"' ===\nError message: " + error.message +
+                        "\nEnsure that:" +
+                        "\n   - The queue exists on the message router vpn" +
+			"\n   - You have created the replay log.");
             });
             consumer.messageConsumer.on(solace.MessageConsumerEventName.DOWN, function () {
                 consumer.consuming = false;
