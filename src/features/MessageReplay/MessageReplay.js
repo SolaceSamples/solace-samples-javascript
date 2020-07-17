@@ -158,7 +158,7 @@ var QueueConsumer = function (queueName) {
             consumer.messageConsumer = consumer.session.createMessageConsumer({
                 // solace.MessageConsumerProperties
                 queueDescriptor: { name: consumer.queueName, type: solace.QueueType.QUEUE },
-                acknowledgeMode: solace.MessageConsumerAcknowledgeMode.CLIENT,
+                acknowledgeMode: solace.MessageConsumerAcknowledgeMode.CLIENT, // Enabling Client ack
                 replayStartLocation: consumer.replayStartLocation
             });
             // Define message consumer event listeners
