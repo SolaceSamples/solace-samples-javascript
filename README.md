@@ -28,7 +28,7 @@ This repository contains:
     - [Active Consumer Indication](https://tutorials.solace.dev/javascript/active-consumer-indication/): Learn how multiple consumers can bind to an exclusive queue, but only one client at a time can actively receive messages.
     - [Durable Topic Endpoint Consumer](https://tutorials.solace.dev/javascript/dte-consumer/): Learn how to consume messages from a Durable Topic Endpoint (DTE).
     - [Event Monitor](https://github.com/SolaceSamples/solace-samples-javascript/tree/master/src/features/EventMonitor): Learn how to monitor message router generated events.
-    - [GuaranteedRequestor/Replier](https://github.com/SolaceSamples/solace-samples-javascript/tree/master/src/features): Learn how to set up guaranteed request/reply messaging.
+    - [GuaranteedRequestor](https://github.com/SolaceSamples/solace-samples-javascript/tree/master/src/features/GuaranteedRequestor)/[Replier](https://github.com/SolaceSamples/solace-samples-javascript/tree/master/src/features/GuaranteedRequestor): Learn how to set up guaranteed request/reply messaging.
     - [NoLocal Pub-Sub](https://github.com/SolaceSamples/solace-samples-javascript/tree/master/src/features/NoLocalPubSub): Learn how to prevent messages published on a session or consumer received on that same session or consumer.
     - [Message Replay](https://tutorials.solace.dev/javascript/message-replay/): Learn how to initiate and process the replay of previously published messages, as well as deal with an externally initiated replay.
 
