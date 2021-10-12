@@ -25,12 +25,12 @@ This repository contains:
 * The following additional samples showing how to make use of advanced features of the Solace message router.
 
     - [Secure Session](https://github.com/SolaceSamples/solace-samples-javascript/tree/master/src/features/SecureSession): Learn how to use secure connection to the server and server and client certificate authentication.
-    - [Active Consumer Indication (code)](https://dev.solace.com/samples/solace-samples-javascript/feature_ActiveConsumerIndication) [(tutorial)](https://tutorials.solace.dev/javascript/active-consumer-indication/): Learn how multiple consumers can bind to an exclusive queue, but only one client at a time can actively receive messages.
-    - [Durable Topic Endpoint Consumer (code)](https://dev.solace.com/samples/solace-samples-javascript/feature_DTEConsumer) [(tutorial)](https://tutorials.solace.dev/javascript/dte-consumer/): Learn how to consume messages from a Durable Topic Endpoint (DTE).
+    - [Active Consumer Indication](https://tutorials.solace.dev/javascript/active-consumer-indication/): Learn how multiple consumers can bind to an exclusive queue, but only one client at a time can actively receive messages.
+    - [Durable Topic Endpoint Consumer](https://tutorials.solace.dev/javascript/dte-consumer/): Learn how to consume messages from a Durable Topic Endpoint (DTE).
     - [Event Monitor](https://github.com/SolaceSamples/solace-samples-javascript/tree/master/src/features/EventMonitor): Learn how to monitor message router generated events.
     - [GuaranteedRequestor/Replier](https://github.com/SolaceSamples/solace-samples-javascript/tree/master/src/features): Learn how to set up guaranteed request/reply messaging.
     - [NoLocal Pub-Sub](https://github.com/SolaceSamples/solace-samples-javascript/tree/master/src/features/NoLocalPubSub): Learn how to prevent messages published on a session or consumer received on that same session or consumer.
-    - [Message Replay (code)](https://github.com/SolaceSamples/solace-samples-javascript/tree/master/src/features/MessageReplay) [(tutorial)](https://tutorials.solace.dev/javascript/message-replay/): Learn how to initiate and process the replay of previously published messages, as well as deal with an externally initiated replay.
+    - [Message Replay](https://tutorials.solace.dev/javascript/message-replay/): Learn how to initiate and process the replay of previously published messages, as well as deal with an externally initiated replay.
 
 ## Checking out
 
@@ -64,7 +64,7 @@ And it is launched by running the following in your browser:
 
     TopicPublisher.html
 
-See the [tutorials](https://dev.solace.com/samples/solace-samples-javascript/) for more details.
+See the [tutorials](https://tutorials.solace.dev/javascript) for more details.
 
 ## Contributing
 
