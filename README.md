@@ -12,25 +12,25 @@ The "Getting Started" tutorials will get you up to speed and sending messages wi
 
 This repository contains:
 
-* Code and matching tutorial walk throughs for five different **basic** Solace messaging patterns. For a nice introduction to the Solace API and associated tutorials, check out the [tutorials home page](https://dev.solace.com/samples/solace-samples-javascript/).
+* Code and matching tutorial walk throughs for five different **basic** Solace messaging patterns. For a nice introduction to the Solace API and associated tutorials, check out the [tutorials home page](https://tutorials.solace.dev/javascript).
 
     See the individual tutorials for details:
 
-    - [Publish/Subscribe](https://dev.solace.com/samples/solace-samples-javascript/publish-subscribe): Learn how to set up pub/sub messaging on a Solace VMR.
-    - [Persistence](https://dev.solace.com/samples/solace-samples-javascript/persistence-with-queues): Learn how to set up persistence for guaranteed delivery.
-    - [Request/Reply](https://dev.solace.com/samples/solace-samples-javascript/request-reply): Learn how to set up request/reply messaging.
-    - [Confirmed Delivery](https://dev.solace.com/samples/solace-samples-javascript/confirmed-delivery): Learn how to confirm that your messages are received by a Solace message router.
-    - [Topic to Queue Mapping](https://dev.solace.com/samples/solace-samples-javascript/topic-to-queue-mapping): Learn how to map existing topics to Solace queues.
+    - [Publish/Subscribe](https://tutorials.solace.dev/javascript/publish-subscribe/): Learn how to set up pub/sub messaging on a Solace VMR.
+    - [Persistence](https://tutorials.solace.dev/javascript/persistence-with-queues/): Learn how to set up persistence for guaranteed delivery.
+    - [Request/Reply](https://tutorials.solace.dev/javascript/request-reply/): Learn how to set up request/reply messaging.
+    - [Confirmed Delivery](https://tutorials.solace.dev/javascript/confirmed-delivery/): Learn how to confirm that your messages are received by a Solace message router.
+    - [Topic to Queue Mapping](https://tutorials.solace.dev/javascript/topic-to-queue-mapping/): Learn how to map existing topics to Solace queues.
 
 * The following additional samples showing how to make use of advanced features of the Solace message router.
 
     - [Secure Session](https://github.com/SolaceSamples/solace-samples-javascript/tree/master/src/features/SecureSession): Learn how to use secure connection to the server and server and client certificate authentication.
-    - [Active Consumer Indication](https://dev.solace.com/samples/solace-samples-javascript/feature_ActiveConsumerIndication): Learn how multiple consumers can bind to an exclusive queue, but only one client at a time can actively receive messages.
-    - [Durable Topic Endpoint Consumer](https://dev.solace.com/samples/solace-samples-javascript/feature_DTEConsumer): Learn how to consume messages from a Durable Topic Endpoint (DTE).
+    - [Active Consumer Indication (code)](https://dev.solace.com/samples/solace-samples-javascript/feature_ActiveConsumerIndication) [(tutorial)](https://tutorials.solace.dev/javascript/active-consumer-indication/): Learn how multiple consumers can bind to an exclusive queue, but only one client at a time can actively receive messages.
+    - [Durable Topic Endpoint Consumer (code)](https://dev.solace.com/samples/solace-samples-javascript/feature_DTEConsumer) [(tutorial)](https://tutorials.solace.dev/javascript/dte-consumer/): Learn how to consume messages from a Durable Topic Endpoint (DTE).
     - [Event Monitor](https://github.com/SolaceSamples/solace-samples-javascript/tree/master/src/features/EventMonitor): Learn how to monitor message router generated events.
     - [GuaranteedRequestor/Replier](https://github.com/SolaceSamples/solace-samples-javascript/tree/master/src/features): Learn how to set up guaranteed request/reply messaging.
     - [NoLocal Pub-Sub](https://github.com/SolaceSamples/solace-samples-javascript/tree/master/src/features/NoLocalPubSub): Learn how to prevent messages published on a session or consumer received on that same session or consumer.
-    - [Message Replay](https://github.com/SolaceSamples/solace-samples-javascript/tree/master/src/features/MessageReplay): Learn how to initiate and process the replay of previously published messages, as well as deal with an externally initiated replay.
+    - [Message Replay (code)](https://github.com/SolaceSamples/solace-samples-javascript/tree/master/src/features/MessageReplay) [(tutorial)](https://tutorials.solace.dev/javascript/message-replay/): Learn how to initiate and process the replay of previously published messages, as well as deal with an externally initiated replay.
 
 ## Checking out
 
