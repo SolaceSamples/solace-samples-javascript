@@ -117,8 +117,9 @@ var SecureTopicSubscriber = function (topicName) {
             subscriber.log('Received message: "' + message.getBinaryAttachment() + '", details:\n' +
                 message.dump());
         });
-        // connect to broker
-        subscriber.connectToSolace();
+        // if secure connection, first load iframe so the browser can provide a client-certificate
+        var urlNoProto = hosturl.split('/').slice(2).join('/'); // remove protocol prefix
+        document.getElementById('iframe').src = 'https://' + urlNoProto + '/crossdomain.xml';
     };
 
     // Actually connects the session triggered when the iframe has been loaded - see in html code
