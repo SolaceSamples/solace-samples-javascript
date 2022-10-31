@@ -26,14 +26,12 @@
 /*jslint es6 browser devel:true*/
 /*global solace*/
 
-var GuaranteedSubscriber = function (queueName, ) {
+var GuaranteedSubscriber = function (queueName,topicName) {
     'use strict';
-    const API = 'js';
-    const TOPIC_PREFIX = "solace/samples/";  // used as the topic "root"
     var subscriber = {};
     subscriber.session = null;
     subscriber.flow = null;
-    subscriber.topicName = TOPIC_PREFIX + API + '/pers/pub/>';
+    subscriber.topicName = topicName;
     subscriber.queueName = queueName;
     subscriber.consuming = false;
 

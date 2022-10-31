@@ -54,7 +54,7 @@
         solace.SolclientFactory.setLogLevel(solace.LogLevel.WARN);
 
         // create the consumer, specifying name of the queue
-        subscriber = new GuaranteedSubscriber('tutorial/queue', 'solace/samples/js/pers/pub');
+        subscriber = new GuaranteedSubscriber('tutorial/queue', 'solace/samples/js/pers/>');
         // assign buttons to the subscriber functions
         document.getElementById("connect").addEventListener("click", subscriber.connect);
         document.getElementById("disconnect").addEventListener("click", subscriber.disconnect);
@@ -144,7 +144,7 @@
 
         </fieldset>
         <div class="box">
-          NOTE: Before you proceed, please ensure that the required queue with appropriate subscription is created on the Broker.
+          NOTE: Before you proceed, please ensure that the required queue with appropriate subscription is created on the message router vpn.
         </div>
         <div>
           <button type="button" class="pure-button pure-button-primary" id="connect">Connect</button>

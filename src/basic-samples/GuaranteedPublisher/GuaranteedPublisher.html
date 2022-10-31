@@ -54,7 +54,7 @@
         solace.SolclientFactory.setLogLevel(solace.LogLevel.WARN);
 
         // create the publisher, specifying name of the topic
-        publisher = new GuaranteedPublisher('solace/samples/js/pers/pub');
+        publisher = new GuaranteedPublisher('solace/samples/js/pers');
         // assign buttons to the publisher functions
         document.getElementById("connect").addEventListener("click", publisher.connect);
         document.getElementById("disconnect").addEventListener("click", publisher.disconnect);

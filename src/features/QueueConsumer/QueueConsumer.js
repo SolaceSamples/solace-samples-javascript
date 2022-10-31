@@ -32,7 +32,6 @@ var QueueConsumer = function (queueName) {
     consumer.session = null;
     consumer.flow = null;
     consumer.queueName = queueName;
-    consumer.queueDestination = new solace.Destination(consumer.queueName, solace.DestinationType.QUEUE);
     consumer.consuming = false;
 
     // Logger
