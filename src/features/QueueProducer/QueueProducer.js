@@ -77,6 +77,9 @@ var QueueProducer = function (queueName) {
                 vpnName:  vpn,
                 userName: username,
                 password: pass,
+                publisherProperties: {
+                  acknowledgeMode: solace.MessagePublisherAcknowledgeMode.PER_MESSAGE,
+              }          
             });
         } catch (error) {
             producer.log(error.toString());
@@ -97,6 +100,14 @@ var QueueProducer = function (queueName) {
                 producer.session.dispose();
                 producer.session = null;
             }
+        });
+        producer.session.on(solace.SessionEventCode.ACKNOWLEDGED_MESSAGE, function (sessionEvent) {
+            producer.log('Delivery of message with correlation key = ' +
+                sessionEvent.correlationKey.id + ' confirmed.');
+        });
+        producer.session.on(solace.SessionEventCode.REJECTED_MESSAGE_ERROR, function (sessionEvent) {
+            producer.log('Delivery of message with correlation key = ' +
+                sessionEvent.correlationKey.id + ' rejected, info: ' + sessionEvent.infoStr);
         });
 
         producer.connectToSolace();   
@@ -121,10 +132,17 @@ var QueueProducer = function (queueName) {
             message.setDestination(solace.SolclientFactory.createDurableQueueDestination(producer.queueName));
             message.setBinaryAttachment(messageText);
             message.setDeliveryMode(solace.MessageDeliveryModeType.PERSISTENT);
+            // Define a correlation key object
+            const correlationKey = {
+                name: "MESSAGE_CORRELATIONKEY",
+                id: Date.now()
+            };
+            message.setCorrelationKey(correlationKey);
+    
             try {
                 // Delivery not yet confirmed. See ConfirmedPublish.js
                 producer.session.send(message);
-                producer.log('Message sent.');
+                producer.log('Message sent with correlation key: ' + correlationKey.id);
             } catch (error) {
                 producer.log(error.toString());
             }
@@ -146,6 +164,11 @@ var QueueProducer = function (queueName) {
             producer.log('Not connected to Solace message router.');
         }
     };
+
+    producer.clear = function () {
+      producer.log('Clearing log messages...');
+      document.getElementById('log').value = "";
+    }
 
     return producer;
 };

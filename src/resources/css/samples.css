@@ -41,3 +41,20 @@ body {
 label {
     margin-right:     15px;
 }
+
+#log {
+  width: 100%;
+}
+
+.right {
+  float: right;
+}
+
+.box {
+  padding: 1em;
+  margin-bottom: 1rem;
+  font-weight: bold;
+  font-style: italic;
+  background-color: #e6e6e6;
+  border: 1px solid #d3d3d3;
+}

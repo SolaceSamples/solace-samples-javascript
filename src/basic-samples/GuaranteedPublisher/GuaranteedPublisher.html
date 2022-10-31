@@ -8,7 +8,7 @@
     "License"); you may not use this file except in compliance
     with the License.  You may obtain a copy of the License at
     
-      http://www.apache.org/licenses/LICENSE-2.0
+    http://www.apache.org/licenses/LICENSE-2.0
     
     Unless required by applicable law or agreed to in writing,
     software distributed under the License is distributed on an
@@ -16,18 +16,18 @@
     KIND, either express or implied.  See the License for the
     specific language governing permissions and limitations
     under the License.
--->
+  -->
 
 <!--
     Solace Web Messaging API for JavaScript
-    Persistence with Queues tutorial - Queue Consumer
-    Demonstrates sending persistent messages to a queue
--->
+    Publishing Guaranteed messages on a Topic tutorial - Guaranteed publisher
+    Demonstrates sending persistent messages on a topic
+  -->
 
 <html lang="en">
 
   <head>
-    <title>Solace Web Messaging API for JavaScript, Persistence with Queues tutorial - Queue Consumer</title>
+    <title>Solace Web Messaging API for JavaScript, Publishing Guaranteed messages on a Topic tutorial - Guaranteed Publisher</title>
     <meta http-equiv="X-UA-Compatible" content="IE=edge;" />
     <meta charset="utf-8"/>
 
@@ -37,12 +37,12 @@
     <!-- Load Solace Web Messaging API for JavaScript -->
     <script src="../../../lib/solclient-debug.js"></script>
 
-    <!-- Load the Persistence with Queues - Queue Consumer  -->
-    <script src="QueueConsumer.js"></script>
+    <!-- Load the Guaranteed Publisher  -->
+    <script src="GuaranteedPublisher.js"></script>
 
-    <!-- Execute the PublishSubscribe Topic Subscriber tutorial -->
+    <!-- Execute the Guaranteed Publish on a topic - Guaranteed Publisher tutorial -->
     <script>
-      var subscriber = null;
+      var publisher = null;
       window.onload = function () {
         // Initialize factory with the most recent API defaults
         var factoryProps = new solace.SolclientFactoryProperties();
@@ -53,17 +53,17 @@
         // NOTICE: works only with "solclientjs-debug.js"
         solace.SolclientFactory.setLogLevel(solace.LogLevel.WARN);
 
-        // create the consumer, specifying name of the queue
-        subscriber = new QueueConsumer('tutorial/queue');
-        // assign buttons to the subscriber functions
-        document.getElementById("connect").addEventListener("click", subscriber.connect);
-        document.getElementById("disconnect").addEventListener("click", subscriber.disconnect);
-        document.getElementById("startconsume").addEventListener("click", subscriber.startConsume);
-        document.getElementById("stopconsume").addEventListener("click", subscriber.stopConsume);
+        // create the publisher, specifying name of the topic
+        publisher = new GuaranteedPublisher('solace/samples/js/pers/pub');
+        // assign buttons to the publisher functions
+        document.getElementById("connect").addEventListener("click", publisher.connect);
+        document.getElementById("disconnect").addEventListener("click", publisher.disconnect);
+        document.getElementById("publish").addEventListener("click", publisher.publish);
+        document.getElementById("clear").addEventListener("click", publisher.clear);
       };
       function iframeloaded(){
-        if (subscriber) {
-            subscriber.connectToSolace();
+        if (publisher) {
+          publisher.connectToSolace();
         }
       };
     </script>
@@ -105,8 +105,8 @@
     </div>
 
     <div class="doc-body">
-      <h2>Persistence with Queues tutorial</h2>
-      <h3>Queue Consumer</h3>
+      <h2>Persistence with Topics tutorial</h2>
+      <h3>Guaranteed Publisher</h3>
       <!--[if IE]>
           <div class="ie9 warning" style="padding: 5px; border: 1px solid black; background-color: #ff8;">
               IE9 only: If you are running this sample from the local filesystem, click the "Allow blocked content" button
@@ -117,7 +117,6 @@
           IE 11 only: If you are running this sample from the local filesystem, click the "Allow blocked content" button
           in the popup below to enable JavaScript.
       </div>
-
       <form class="pure-form pure-form-aligned">
         <fieldset>
 
@@ -147,8 +146,8 @@
           <button type="button" class="pure-button button-error" id="disconnect">Disconnect</button>
         </p>
         <p>
-          <button type="button" class="pure-button pure-button-primary" id="startconsume">Consume messages </button>
-          <button type="button" class="pure-button button-error" id="stopconsume">Stop consuming</button>
+          <button type="button" class="pure-button pure-button-primary" id="publish">Send Message </button>
+          <button type="button" class="pure-button pure-button-secondary right" id="clear">Clear</button>
         </p>
         
         <textarea id="log" rows="20" cols="90" autofocus></textarea>
@@ -158,6 +157,6 @@
     </div>
 
   </body>
-  
+
 </html>
 

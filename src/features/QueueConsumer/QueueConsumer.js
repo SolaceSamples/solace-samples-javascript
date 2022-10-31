@@ -199,6 +199,11 @@ var QueueConsumer = function (queueName) {
         }
     };
 
+    consumer.clear = function () {
+      consumer.log('Clearing log messages...');
+      document.getElementById('log').value = "";
+    }
+
     return consumer;
 };
 

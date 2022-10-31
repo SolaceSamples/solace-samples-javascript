@@ -59,6 +59,7 @@
         document.getElementById("connect").addEventListener("click", producer.connect);
         document.getElementById("disconnect").addEventListener("click", producer.disconnect);
         document.getElementById("publish").addEventListener("click", producer.sendMessage);
+        document.getElementById("clear").addEventListener("click", producer.clear);
       };
       function iframeloaded(){
         if (producer) {
@@ -140,12 +141,16 @@
           </div>
 
         </fieldset>
+        <div class="box">
+          NOTE: Before you proceed, please ensure that the required queue is created on the Broker.
+        </div>
         <p>
           <button type="button" class="pure-button pure-button-primary" id="connect">Connect</button>
           <button type="button" class="pure-button button-error" id="disconnect">Disconnect</button>
         </p>
         <p>
           <button type="button" class="pure-button pure-button-primary" id="publish">Send Message </button>
+          <button type="button" class="pure-button pure-button-secondary right" id="clear">Clear</button>
         </p>
         
         <textarea id="log" rows="20" cols="90" autofocus></textarea>
