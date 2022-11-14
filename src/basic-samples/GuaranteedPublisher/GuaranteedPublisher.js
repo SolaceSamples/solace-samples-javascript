@@ -44,7 +44,7 @@ var GuaranteedPublisher = function (topicName) {
         logTextArea.scrollTop = logTextArea.scrollHeight;
     };
 
-    publisher.log('\n*** publisher to topic "' + publisher.topicName + '/*" is ready to connect ***');
+    publisher.log('\n*** publisher to topic "' + publisher.topicName + '/{correlation_id}" is ready to connect ***');
 
     // Establishes connection to Solace PubSub+ Event Broker
     publisher.connect = function () {
