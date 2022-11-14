@@ -20,7 +20,7 @@ To learn more about specific features and details, refer to the [Solace develope
 
 * __DTEConsumer__: This sample shows how to consume messages from a Durable Topic Endpoint (DTE). The sample will associate the DTE with the topic "tutorial/topic", so the `basic-samples/TopicPublisher` app can be used to send messages to this topic.
 
-    *Prerequisite*: the DTE with the name "tutorial/dte" must have been provisioned on the message router vpn.  Ensure the DTE is enabled for both Incoming and Outgoing messages and set the Permission to at least 'Consume'.
+    *Prerequisite*: the DTE with the name "tutorial/dte" must have been provisioned on the Solace PubSub+ Event Broker.  Ensure the DTE is enabled for both Incoming and Outgoing messages and set the Permission to at least 'Consume'.
 
 * __EventMonitor__: This sample demonstrates how to use the special event monitoring topic subscriptions to build an application that monitors message router generated events. Start this sample then run any other sample app and observe a client connect event reported for that sample.
 

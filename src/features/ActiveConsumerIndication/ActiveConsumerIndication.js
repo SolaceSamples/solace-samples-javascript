@@ -170,7 +170,7 @@ var QueueConsumer = function (queueName) {
         messageConsumer.on(solace.MessageConsumerEventName.CONNECT_FAILED_ERROR, function () {
             sample.consuming = false;
             sample.log('=== ' + messageConsumerName + ': Error: the message consumer could not bind to queue "' +
-                sample.queueName + '" ===\n   Ensure this queue exists on the message router vpn');
+                sample.queueName + '" ===\n   Ensure this queue exists on the Solace PubSub+ Event Broker');
         });
         messageConsumer.on(solace.MessageConsumerEventName.DOWN, function () {
             sample.consuming = false;

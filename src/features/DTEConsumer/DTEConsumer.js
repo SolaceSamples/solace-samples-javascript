@@ -148,7 +148,7 @@ var DTEConsumer = function (topicEndpointName, topicName) {
                         consumer.consuming = false;
                         consumer.log('=== Error: the message consumer could not bind to DTE "' +
                             consumer.topicEndpointName +
-                            '" ===\n   Ensure this Durable Topic Endpoint exists on the message router vpn');
+                            '" ===\n   Ensure this Durable Topic Endpoint exists on the Solace PubSub+ Event Broker');
                     });
                     consumer.messageConsumer.on(solace.MessageConsumerEventName.DOWN, function () {
                         consumer.consuming = false;

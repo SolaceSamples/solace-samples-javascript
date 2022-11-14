@@ -47,8 +47,8 @@ var GuaranteedSubscriber = function (queueName) {
     };
 
     subscriber.log('\n*** Consumer to queue "' + subscriber.queueName + '" is ready to connect ***');
-    consumer.log('\n/*********************************************************************' +
-                  '\nNOTE: Ensure that the queue with appropriate subscription is created on the Broker.' +
+    subscriber.log('\n/*********************************************************************' +
+                  '\nNOTE: Ensure that the queue with an appropriate subscription is created on the Broker.' +
                   '\n/********************************************************************/')
 
     // Establishes connection to Solace PubSub+ Event Broker
@@ -138,7 +138,7 @@ var GuaranteedSubscriber = function (queueName) {
                     subscriber.messageSubscriber.on(solace.MessageConsumerEventName.CONNECT_FAILED_ERROR, function () {
                         subscriber.consuming = false;
                         subscriber.log('=== Error: the message subscriber could not bind to queue "' + subscriber.queueName +
-                            '" ===\n   Ensure this queue exists on the message router vpn');
+                            '" ===\n   Ensure this queue exists on the Solace PubSub+ Event Broker');
                     });
                     subscriber.messageSubscriber.on(solace.MessageConsumerEventName.DOWN, function () {
                         subscriber.consuming = false;

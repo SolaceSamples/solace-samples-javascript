@@ -170,7 +170,7 @@ var QueueConsumer = function (queueName) {
                 consumer.log('\n=== Error: the message consumer could not bind to queue "' + consumer.queueName +
 			"' ===\nError message: " + error.message +
                         "\nEnsure that:" +
-                        "\n   - The queue exists on the message router vpn" +
+                        "\n   - The queue exists on the Solace PubSub+ Event Broker" +
 			"\n   - You have created the replay log.");
             });
             consumer.messageConsumer.on(solace.MessageConsumerEventName.DOWN, function () {
