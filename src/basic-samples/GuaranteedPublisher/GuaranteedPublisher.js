@@ -19,14 +19,14 @@
 
 /**
  * Solace Web Messaging API for JavaScript
- * Publish/Subscribe tutorial - Topic Publisher
- * Demonstrates publishing direct messages to a topic
+ * Publishing Guaranteed messages on a Topic tutorial - Guaranteed publisher
+ * Demonstrates sending persistent messages on a topic
  */
 
 /*jslint es6 browser devel:true*/
 /*global solace*/
 
-var TopicPublisher = function (topicName) {
+var GuaranteedPublisher = function (topicName) {
     'use strict';
     var publisher = {};
     publisher.session = null;
@@ -44,11 +44,10 @@ var TopicPublisher = function (topicName) {
         logTextArea.scrollTop = logTextArea.scrollHeight;
     };
 
-    publisher.log('\n*** Publisher to topic "' + publisher.topicName + '" is ready to connect ***');
+    publisher.log('\n*** publisher to topic "' + publisher.topicName + '/{correlation_id}" is ready to connect ***');
 
     // Establishes connection to Solace PubSub+ Event Broker
     publisher.connect = function () {
-        // extract params
         if (publisher.session !== null) {
             publisher.log('Already connected and ready to publish messages.');
             return;
@@ -78,6 +77,9 @@ var TopicPublisher = function (topicName) {
                 vpnName:  vpn,
                 userName: username,
                 password: pass,
+                publisherProperties: {
+                  acknowledgeMode: solace.MessagePublisherAcknowledgeMode.PER_MESSAGE,
+              }          
             });
         } catch (error) {
             publisher.log(error.toString());
@@ -85,6 +87,8 @@ var TopicPublisher = function (topicName) {
         // define session event listeners
         publisher.session.on(solace.SessionEventCode.UP_NOTICE, function (sessionEvent) {
             publisher.log('=== Successfully connected and ready to publish messages. ===');
+                                   
+                            
         });
         publisher.session.on(solace.SessionEventCode.CONNECT_FAILED_ERROR, function (sessionEvent) {
             publisher.log('Connection failed to the message router: ' + sessionEvent.infoStr +
@@ -96,6 +100,14 @@ var TopicPublisher = function (topicName) {
                 publisher.session.dispose();
                 publisher.session = null;
             }
+        });
+        publisher.session.on(solace.SessionEventCode.ACKNOWLEDGED_MESSAGE, function (sessionEvent) {
+            publisher.log('Delivery of message with correlation key = ' +
+                sessionEvent.correlationKey.id + ' confirmed.');
+        });
+        publisher.session.on(solace.SessionEventCode.REJECTED_MESSAGE_ERROR, function (sessionEvent) {
+            publisher.log('Delivery of message with correlation key = ' +
+                sessionEvent.correlationKey.id + ' rejected, info: ' + sessionEvent.infoStr);
         });
 
         publisher.connectToSolace();   
@@ -111,23 +123,32 @@ var TopicPublisher = function (topicName) {
         }
     };
 
-    // Publishes one message
+    // Publish one message
     publisher.publish = function () {
         if (publisher.session !== null) {
             var messageText = 'Sample Message';
             var message = solace.SolclientFactory.createMessage();
-            message.setDestination(solace.SolclientFactory.createTopicDestination(publisher.topicName));
             message.setBinaryAttachment(messageText);
-            message.setDeliveryMode(solace.MessageDeliveryModeType.DIRECT);
-            publisher.log('Publishing message "' + messageText + '" to topic "' + publisher.topicName + '"...');
+            message.setDeliveryMode(solace.MessageDeliveryModeType.PERSISTENT);
+            // OPTIONAL: You can set a correlation key on the message and check for the correlation
+            // in the ACKNOWLEDGE_MESSAGE callback. Define a correlation key object
+            const correlationKey = {
+                name: "MESSAGE_CORRELATIONKEY",
+                id: Date.now()
+            };
+            message.setCorrelationKey(correlationKey);
+            publisher.log('Publishing message "' + messageText + '" to topic "' + publisher.topicName + '/' + correlationKey.id + '"...');
+            message.setDestination(solace.SolclientFactory.createTopicDestination(publisher.topicName + '/' + correlationKey.id));
+
             try {
+                // Delivery not yet confirmed. See ConfirmedPublish.js
                 publisher.session.send(message);
-                publisher.log('Message published.');
+                publisher.log('Message sent with correlation key: ' + correlationKey.id);
             } catch (error) {
                 publisher.log(error.toString());
             }
         } else {
-            publisher.log('Cannot publish because not connected to Solace PubSub+ Event Broker.');
+            publisher.log('Cannot publish messages because not connected to Solace PubSub+ Event Broker.');
         }
     };
 
@@ -144,6 +165,11 @@ var TopicPublisher = function (topicName) {
             publisher.log('Not connected to Solace PubSub+ Event Broker.');
         }
     };
+
+    publisher.clear = function () {
+      publisher.log('Clearing log messages...');
+      document.getElementById('log').value = "";
+    }
 
     return publisher;
 };

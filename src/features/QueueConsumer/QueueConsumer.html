@@ -8,7 +8,7 @@
     "License"); you may not use this file except in compliance
     with the License.  You may obtain a copy of the License at
     
-    http://www.apache.org/licenses/LICENSE-2.0
+      http://www.apache.org/licenses/LICENSE-2.0
     
     Unless required by applicable law or agreed to in writing,
     software distributed under the License is distributed on an
@@ -16,18 +16,18 @@
     KIND, either express or implied.  See the License for the
     specific language governing permissions and limitations
     under the License.
-  -->
+-->
 
 <!--
     Solace Web Messaging API for JavaScript
-    Persistence with Queues tutorial - Queue Producer
+    Persistence with Queues tutorial - Queue Consumer
     Demonstrates sending persistent messages to a queue
-  -->
+-->
 
 <html lang="en">
 
   <head>
-    <title>Solace Web Messaging API for JavaScript, Persistence with Queues tutorial - Queue Producer</title>
+    <title>Solace Web Messaging API for JavaScript, Persistence with Queues tutorial - Queue Consumer</title>
     <meta http-equiv="X-UA-Compatible" content="IE=edge;" />
     <meta charset="utf-8"/>
 
@@ -37,12 +37,12 @@
     <!-- Load Solace Web Messaging API for JavaScript -->
     <script src="../../../lib/solclient-debug.js"></script>
 
-    <!-- Load the Persistence with Queues - Queue Producer -->
-    <script src="QueueProducer.js"></script>
+    <!-- Load the Persistence with Queues - Queue Consumer  -->
+    <script src="QueueConsumer.js"></script>
 
-    <!-- Execute the Persistence with Queues - Queue Producer tutorial -->
+    <!-- Execute the PublishSubscribe Topic Subscriber tutorial -->
     <script>
-      var producer = null;
+      var subscriber = null;
       window.onload = function () {
         // Initialize factory with the most recent API defaults
         var factoryProps = new solace.SolclientFactoryProperties();
@@ -53,16 +53,18 @@
         // NOTICE: works only with "solclientjs-debug.js"
         solace.SolclientFactory.setLogLevel(solace.LogLevel.WARN);
 
-        // create the producer, specifying name of the queue
-        producer = new QueueProducer('tutorial/queue');
-        // assign buttons to the producer functions
-        document.getElementById("connect").addEventListener("click", producer.connect);
-        document.getElementById("disconnect").addEventListener("click", producer.disconnect);
-        document.getElementById("publish").addEventListener("click", producer.sendMessage);
+        // create the consumer, specifying name of the queue
+        subscriber = new QueueConsumer('tutorial/queue');
+        // assign buttons to the subscriber functions
+        document.getElementById("connect").addEventListener("click", subscriber.connect);
+        document.getElementById("disconnect").addEventListener("click", subscriber.disconnect);
+        document.getElementById("startconsume").addEventListener("click", subscriber.startConsume);
+        document.getElementById("stopconsume").addEventListener("click", subscriber.stopConsume);
+        document.getElementById("clear").addEventListener("click", subscriber.clear);
       };
       function iframeloaded(){
-        if (producer) {
-          producer.connectToSolace();
+        if (subscriber) {
+            subscriber.connectToSolace();
         }
       };
     </script>
@@ -105,7 +107,7 @@
 
     <div class="doc-body">
       <h2>Persistence with Queues tutorial</h2>
-      <h3>Queue Producer</h3>
+      <h3>Queue Consumer</h3>
       <!--[if IE]>
           <div class="ie9 warning" style="padding: 5px; border: 1px solid black; background-color: #ff8;">
               IE9 only: If you are running this sample from the local filesystem, click the "Allow blocked content" button
@@ -116,6 +118,7 @@
           IE 11 only: If you are running this sample from the local filesystem, click the "Allow blocked content" button
           in the popup below to enable JavaScript.
       </div>
+
       <form class="pure-form pure-form-aligned">
         <fieldset>
 
@@ -140,21 +143,25 @@
           </div>
 
         </fieldset>
+        <div class="box">
+          NOTE: Before you proceed, please ensure that the required queue is created on the Solace PubSub+ Event Broker.
+        </div>
         <p>
           <button type="button" class="pure-button pure-button-primary" id="connect">Connect</button>
           <button type="button" class="pure-button button-error" id="disconnect">Disconnect</button>
         </p>
         <p>
-          <button type="button" class="pure-button pure-button-primary" id="publish">Send Message </button>
+          <button type="button" class="pure-button pure-button-primary" id="startconsume">Consume messages </button>
+          <button type="button" class="pure-button button-error" id="stopconsume">Stop consuming</button>
+          <button type="button" class="pure-button pure-button-secondary right" id="clear">Clear</button>
         </p>
         
         <textarea id="log" rows="20" cols="90" autofocus></textarea>
-        
       </form>
 
     </div>
 
   </body>
-
+  
 </html>
 

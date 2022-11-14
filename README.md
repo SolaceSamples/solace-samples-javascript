@@ -6,7 +6,7 @@ The "Getting Started" tutorials will get you up to speed and sending messages wi
 
 - Follow [these instructions](https://cloud.solace.com/learn/group_getting_started/ggs_signup.html) to quickly spin up a cloud-based Solace messaging service for your applications.
 - Follow [these instructions](https://docs.solace.com/Solace-SW-Broker-Set-Up/Setting-Up-SW-Brokers.htm) to start the Solace PubSub+ software event broker in leading Clouds, Container Platforms or Hypervisors. The tutorials outline where to download and how to install the Solace PubSub+ software event broker.
-- If your company has Solace message routers deployed, contact your middleware team to obtain the host name or IP address of a Solace message router to test against, a username and password to access it, and a VPN in which you can produce and consume messages.
+- If your company has Solace PubSub+ Event Brokers deployed, contact your middleware team to obtain the host name or IP address of a Solace PubSub+ Event Broker to test against, a username and password to access it, and a VPN in which you can produce and consume messages.
 
 ## Contents
 
@@ -19,10 +19,10 @@ This repository contains:
     - [Publish/Subscribe](https://tutorials.solace.dev/javascript/publish-subscribe/): Learn how to set up pub/sub messaging on a Solace PubSub+ software event broker.
     - [Persistence](https://tutorials.solace.dev/javascript/persistence-with-queues/): Learn how to set up persistence for guaranteed delivery.
     - [Request/Reply](https://tutorials.solace.dev/javascript/request-reply/): Learn how to set up request/reply messaging.
-    - [Confirmed Delivery](https://tutorials.solace.dev/javascript/confirmed-delivery/): Learn how to confirm that your messages are received by a Solace message router.
+    - [Confirmed Delivery](https://tutorials.solace.dev/javascript/confirmed-delivery/): Learn how to confirm that your messages are received by a Solace PubSub+ Event Broker.
     - [Topic to Queue Mapping](https://tutorials.solace.dev/javascript/topic-to-queue-mapping/): Learn how to map existing topics to Solace queues.
 
-* The following additional samples showing how to make use of advanced features of the Solace message router.
+* The following additional samples showing how to make use of advanced features of the Solace PubSub+ Event Broker.
 
     - [Secure Session](https://github.com/SolaceSamples/solace-samples-javascript/tree/master/src/features/SecureSession): Learn how to use secure connection to the server and server and client certificate authentication.
     - [Active Consumer Indication](https://tutorials.solace.dev/javascript/active-consumer-indication/): Learn how multiple consumers can bind to an exclusive queue, but only one client at a time can actively receive messages.

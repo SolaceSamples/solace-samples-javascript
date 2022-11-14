@@ -46,7 +46,7 @@ var QueueProducer = function (queueName) {
 
     producer.log('\n*** Producer to queue "' + producer.queueName + '" is ready to connect ***');
 
-    // Establishes connection to Solace message router
+    // Establishes connection to Solace PubSub+ Event Broker
     producer.connect = function () {
         if (producer.session !== null) {
             producer.log('Already connected and ready to send messages.');
@@ -63,12 +63,12 @@ var QueueProducer = function (queueName) {
         var pass = document.getElementById('password').value;
         var vpn = document.getElementById('message-vpn').value;
         if (!hosturl || !username || !pass || !vpn) {
-            producer.log('Cannot connect: please specify all the Solace message router properties.');
+            producer.log('Cannot connect: please specify all the Solace PubSub+ Event Broker properties.');
             return;
         }
-        producer.log('Connecting to Solace message router using url: ' + hosturl);
+        producer.log('Connecting to Solace PubSub+ Event Broker using url: ' + hosturl);
         producer.log('Client username: ' + username);
-        producer.log('Solace message router VPN name: ' + vpn);
+        producer.log('Solace PubSub+ Event Broker VPN name: ' + vpn);
         // create session
         try {
             producer.session = solace.SolclientFactory.createSession({
@@ -77,6 +77,9 @@ var QueueProducer = function (queueName) {
                 vpnName:  vpn,
                 userName: username,
                 password: pass,
+                publisherProperties: {
+                  acknowledgeMode: solace.MessagePublisherAcknowledgeMode.PER_MESSAGE,
+              }          
             });
         } catch (error) {
             producer.log(error.toString());
@@ -97,6 +100,14 @@ var QueueProducer = function (queueName) {
                 producer.session.dispose();
                 producer.session = null;
             }
+        });
+        producer.session.on(solace.SessionEventCode.ACKNOWLEDGED_MESSAGE, function (sessionEvent) {
+            producer.log('Delivery of message with correlation key = ' +
+                sessionEvent.correlationKey.id + ' confirmed.');
+        });
+        producer.session.on(solace.SessionEventCode.REJECTED_MESSAGE_ERROR, function (sessionEvent) {
+            producer.log('Delivery of message with correlation key = ' +
+                sessionEvent.correlationKey.id + ' rejected, info: ' + sessionEvent.infoStr);
         });
 
         producer.connectToSolace();   
@@ -121,21 +132,29 @@ var QueueProducer = function (queueName) {
             message.setDestination(solace.SolclientFactory.createDurableQueueDestination(producer.queueName));
             message.setBinaryAttachment(messageText);
             message.setDeliveryMode(solace.MessageDeliveryModeType.PERSISTENT);
+            // OPTIONAL: You can set a correlation key on the message and check for the correlation
+            // in the ACKNOWLEDGE_MESSAGE callback. Define a correlation key object
+            const correlationKey = {
+                name: "MESSAGE_CORRELATIONKEY",
+                id: Date.now()
+            };
+            message.setCorrelationKey(correlationKey);
+    
             try {
                 // Delivery not yet confirmed. See ConfirmedPublish.js
                 producer.session.send(message);
-                producer.log('Message sent.');
+                producer.log('Message sent with correlation key: ' + correlationKey.id);
             } catch (error) {
                 producer.log(error.toString());
             }
         } else {
-            producer.log('Cannot send messages because not connected to Solace message router.');
+            producer.log('Cannot send messages because not connected to Solace PubSub+ Event Broker.');
         }
     };
 
-    // Gracefully disconnects from Solace message router
+    // Gracefully disconnects from Solace PubSub+ Event Broker
     producer.disconnect = function () {
-        producer.log('Disconnecting from Solace message router...');
+        producer.log('Disconnecting from Solace PubSub+ Event Broker...');
         if (producer.session !== null) {
             try {
                 producer.session.disconnect();
@@ -143,9 +162,14 @@ var QueueProducer = function (queueName) {
                 producer.log(error.toString());
             }
         } else {
-            producer.log('Not connected to Solace message router.');
+            producer.log('Not connected to Solace PubSub+ Event Broker.');
         }
     };
+
+    producer.clear = function () {
+      producer.log('Clearing log messages...');
+      document.getElementById('log').value = "";
+    }
 
     return producer;
 };

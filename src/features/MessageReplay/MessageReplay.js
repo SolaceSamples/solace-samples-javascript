@@ -50,7 +50,7 @@ var QueueConsumer = function (queueName) {
 
     consumer.log('\n*** Consumer to queue "' + consumer.queueName + '" is ready to connect ***');
 
-    // Establishes connection to Solace message router
+    // Establishes connection to Solace PubSub+ Event Broker
     consumer.connect = function () {
         if (consumer.session !== null) {
             consumer.log('Already connected.');
@@ -67,12 +67,12 @@ var QueueConsumer = function (queueName) {
         var pass = document.getElementById('password').value;
         var vpn = document.getElementById('message-vpn').value;
         if (!hosturl || !username || !pass || !vpn) {
-            consumer.log('Cannot connect: please specify all the Solace message router properties.');
+            consumer.log('Cannot connect: please specify all the Solace PubSub+ Event Broker properties.');
             return;
         }
-        consumer.log('Connecting to Solace message router using url: ' + hosturl);
+        consumer.log('Connecting to Solace PubSub+ Event Broker using url: ' + hosturl);
         consumer.log('Client username: ' + username);
-        consumer.log('Solace message router VPN name: ' + vpn);
+        consumer.log('Solace PubSub+ Event Broker VPN name: ' + vpn);
         // create session
         try {
             consumer.session = solace.SolclientFactory.createSession({
@@ -123,7 +123,7 @@ var QueueConsumer = function (queueName) {
         }
     };
 
-    // Starts message replay from a queue on Solace message router
+    // Starts message replay from a queue on Solace PubSub+ Event Broker
     consumer.startReplay = function () {
         if (consumer.session !== null) {
             if (consumer.consuming) {
@@ -147,7 +147,7 @@ var QueueConsumer = function (queueName) {
                 consumer.createFlow();
             }
         } else {
-            consumer.log('Cannot start the queue consumer because not connected to Solace message router.');
+            consumer.log('Cannot start the queue consumer because not connected to Solace PubSub+ Event Broker.');
         }
     };
 
@@ -170,7 +170,7 @@ var QueueConsumer = function (queueName) {
                 consumer.log('\n=== Error: the message consumer could not bind to queue "' + consumer.queueName +
 			"' ===\nError message: " + error.message +
                         "\nEnsure that:" +
-                        "\n   - The queue exists on the message router vpn" +
+                        "\n   - The queue exists on the Solace PubSub+ Event Broker" +
 			"\n   - You have created the replay log.");
             });
             consumer.messageConsumer.on(solace.MessageConsumerEventName.DOWN, function () {
@@ -216,7 +216,7 @@ var QueueConsumer = function (queueName) {
         }
     };
 
-    // Disconnects the consumer from queue on Solace message router
+    // Disconnects the consumer from queue on Solace PubSub+ Event Broker
     consumer.stopConsume = function () {
         if (consumer.session !== null) {
             if (consumer.consuming) {
@@ -233,13 +233,13 @@ var QueueConsumer = function (queueName) {
                     consumer.queueName + '"');
             }
         } else {
-            consumer.log('Cannot disconnect the consumer because not connected to Solace message router.');
+            consumer.log('Cannot disconnect the consumer because not connected to Solace PubSub+ Event Broker.');
         }
     };
 
-    // Gracefully disconnects from Solace message router
+    // Gracefully disconnects from Solace PubSub+ Event Broker
     consumer.disconnect = function () {
-        consumer.log('Disconnecting from Solace message router...');
+        consumer.log('Disconnecting from Solace PubSub+ Event Broker...');
         if (consumer.session !== null) {
             try {
                 consumer.session.disconnect();
@@ -247,7 +247,7 @@ var QueueConsumer = function (queueName) {
                 consumer.log(error.toString());
             }
         } else {
-            consumer.log('Not connected to Solace message router.');
+            consumer.log('Not connected to Solace PubSub+ Event Broker.');
         }
     };
 
