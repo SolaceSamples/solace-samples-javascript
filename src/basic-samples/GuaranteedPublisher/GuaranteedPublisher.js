@@ -46,7 +46,7 @@ var GuaranteedPublisher = function (topicName) {
 
     publisher.log('\n*** publisher to topic "' + publisher.topicName + '/*" is ready to connect ***');
 
-    // Establishes connection to Solace message router
+    // Establishes connection to Solace PubSub+ Event Broker
     publisher.connect = function () {
         if (publisher.session !== null) {
             publisher.log('Already connected and ready to publish messages.');
@@ -63,12 +63,12 @@ var GuaranteedPublisher = function (topicName) {
         var pass = document.getElementById('password').value;
         var vpn = document.getElementById('message-vpn').value;
         if (!hosturl || !username || !pass || !vpn) {
-            publisher.log('Cannot connect: please specify all the Solace message router properties.');
+            publisher.log('Cannot connect: please specify all the Solace PubSub+ Event Broker properties.');
             return;
         }
-        publisher.log('Connecting to Solace message router using url: ' + hosturl);
+        publisher.log('Connecting to Solace PubSub+ Event Broker using url: ' + hosturl);
         publisher.log('Client username: ' + username);
-        publisher.log('Solace message router VPN name: ' + vpn);
+        publisher.log('Solace PubSub+ Event Broker VPN name: ' + vpn);
         // create session
         try {
             publisher.session = solace.SolclientFactory.createSession({
@@ -130,7 +130,8 @@ var GuaranteedPublisher = function (topicName) {
             var message = solace.SolclientFactory.createMessage();
             message.setBinaryAttachment(messageText);
             message.setDeliveryMode(solace.MessageDeliveryModeType.PERSISTENT);
-            // Define a correlation key object
+            // OPTIONAL: You can set a correlation key on the message and check for the correlation
+            // in the ACKNOWLEDGE_MESSAGE callback. Define a correlation key object
             const correlationKey = {
                 name: "MESSAGE_CORRELATIONKEY",
                 id: Date.now()
@@ -147,13 +148,13 @@ var GuaranteedPublisher = function (topicName) {
                 publisher.log(error.toString());
             }
         } else {
-            publisher.log('Cannot publish messages because not connected to Solace message router.');
+            publisher.log('Cannot publish messages because not connected to Solace PubSub+ Event Broker.');
         }
     };
 
-    // Gracefully disconnects from Solace message router
+    // Gracefully disconnects from Solace PubSub+ Event Broker
     publisher.disconnect = function () {
-        publisher.log('Disconnecting from Solace message router...');
+        publisher.log('Disconnecting from Solace PubSub+ Event Broker...');
         if (publisher.session !== null) {
             try {
                 publisher.session.disconnect();
@@ -161,7 +162,7 @@ var GuaranteedPublisher = function (topicName) {
                 publisher.log(error.toString());
             }
         } else {
-            publisher.log('Not connected to Solace message router.');
+            publisher.log('Not connected to Solace PubSub+ Event Broker.');
         }
     };
 

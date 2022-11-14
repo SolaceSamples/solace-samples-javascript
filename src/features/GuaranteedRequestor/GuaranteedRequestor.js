@@ -56,7 +56,7 @@ var GuaranteedRequestor = function (requestTopicName) {
 
     requestor.log('\n*** requestor to topic "' + requestor.requestTopicName + '" is ready to connect ***');
 
-    // Establishes connection to Solace message router
+    // Establishes connection to Solace PubSub+ Event Broker
     requestor.connect = function () {
         if (requestor.session !== null) {
             requestor.log('Already connected and ready to send requests.');
@@ -73,12 +73,12 @@ var GuaranteedRequestor = function (requestTopicName) {
         var pass = document.getElementById('password').value;
         var vpn = document.getElementById('message-vpn').value;
         if (!hosturl || !username || !pass || !vpn) {
-            requestor.log('Cannot connect: please specify all the Solace message router properties.');
+            requestor.log('Cannot connect: please specify all the Solace PubSub+ Event Broker properties.');
             return;
         }
-        requestor.log('Connecting to Solace message router using url: ' + hosturl);
+        requestor.log('Connecting to Solace PubSub+ Event Broker using url: ' + hosturl);
         requestor.log('Client username: ' + username);
-        requestor.log('Solace message router VPN name: ' + vpn);
+        requestor.log('Solace PubSub+ Event Broker VPN name: ' + vpn);
         // create session
         try {
             requestor.session = solace.SolclientFactory.createSession({
@@ -152,13 +152,13 @@ var GuaranteedRequestor = function (requestTopicName) {
             });
             replyMessageConsumer.connect();
         } else {
-            requestor.log('Cannot send request because not connected to Solace message router.');
+            requestor.log('Cannot send request because not connected to Solace PubSub+ Event Broker.');
         }
     };
 
-    // Gracefully disconnects from Solace message router
+    // Gracefully disconnects from Solace PubSub+ Event Broker
     requestor.disconnect = function () {
-        requestor.log('Disconnecting from Solace message router...');
+        requestor.log('Disconnecting from Solace PubSub+ Event Broker...');
         if (requestor.session !== null) {
             try {
                 requestor.session.disconnect();
@@ -166,7 +166,7 @@ var GuaranteedRequestor = function (requestTopicName) {
                 requestor.log(error.toString());
             }
         } else {
-            requestor.log('Not connected to Solace message router.');
+            requestor.log('Not connected to Solace PubSub+ Event Broker.');
         }
     };
 

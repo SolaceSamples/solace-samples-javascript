@@ -62,7 +62,7 @@ var NoLocalPubSub = function (topicName) {
 
     sample.log('\n*** NoLocalPubSub is ready to connect ***');
 
-    // Establishes connection to Solace message router
+    // Establishes connection to Solace PubSub+ Event Broker
     sample.connect = function () {
         if (sample.session1 !== null) {
             sample.log('Already connected and ready to start demo.');
@@ -79,12 +79,12 @@ var NoLocalPubSub = function (topicName) {
         var pass = document.getElementById('password').value;
         var vpn = document.getElementById('message-vpn').value;
         if (!hosturl || !username || !pass || !vpn) {
-            sample.log('Cannot connect: please specify all the Solace message router properties.');
+            sample.log('Cannot connect: please specify all the Solace PubSub+ Event Broker properties.');
             return;
         }
-        sample.log('Connecting to Solace message router using url: ' + hosturl);
+        sample.log('Connecting to Solace PubSub+ Event Broker using url: ' + hosturl);
         sample.log('Client username: ' + username);
-        sample.log('Solace message router VPN name: ' + vpn);
+        sample.log('Solace PubSub+ Event Broker VPN name: ' + vpn);
         sample.sessionProperties = new solace.SessionProperties({
             url:      hosturl,
             vpnName:  vpn,
@@ -226,9 +226,9 @@ var NoLocalPubSub = function (topicName) {
         fromSession.send(message);
     };
 
-    // Gracefully disconnects from Solace message router
+    // Gracefully disconnects from Solace PubSub+ Event Broker
     sample.disconnect = function () {
-        sample.log('Disconnecting both sessions from Solace message router...');
+        sample.log('Disconnecting both sessions from Solace PubSub+ Event Broker...');
         [sample.session1, sample.session2].forEach(function(session) {
             if (session && session !== null) {
                 try {

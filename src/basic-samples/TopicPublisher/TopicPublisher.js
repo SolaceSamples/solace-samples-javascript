@@ -46,7 +46,7 @@ var TopicPublisher = function (topicName) {
 
     publisher.log('\n*** Publisher to topic "' + publisher.topicName + '" is ready to connect ***');
 
-    // Establishes connection to Solace message router
+    // Establishes connection to Solace PubSub+ Event Broker
     publisher.connect = function () {
         // extract params
         if (publisher.session !== null) {
@@ -64,12 +64,12 @@ var TopicPublisher = function (topicName) {
         var pass = document.getElementById('password').value;
         var vpn = document.getElementById('message-vpn').value;
         if (!hosturl || !username || !pass || !vpn) {
-            publisher.log('Cannot connect: please specify all the Solace message router properties.');
+            publisher.log('Cannot connect: please specify all the Solace PubSub+ Event Broker properties.');
             return;
         }
-        publisher.log('Connecting to Solace message router using url: ' + hosturl);
+        publisher.log('Connecting to Solace PubSub+ Event Broker using url: ' + hosturl);
         publisher.log('Client username: ' + username);
-        publisher.log('Solace message router VPN name: ' + vpn);
+        publisher.log('Solace PubSub+ Event Broker VPN name: ' + vpn);
         // create session
         try {
             publisher.session = solace.SolclientFactory.createSession({
@@ -127,13 +127,13 @@ var TopicPublisher = function (topicName) {
                 publisher.log(error.toString());
             }
         } else {
-            publisher.log('Cannot publish because not connected to Solace message router.');
+            publisher.log('Cannot publish because not connected to Solace PubSub+ Event Broker.');
         }
     };
 
-    // Gracefully disconnects from Solace message router
+    // Gracefully disconnects from Solace PubSub+ Event Broker
     publisher.disconnect = function () {
-        publisher.log('Disconnecting from Solace message router...');
+        publisher.log('Disconnecting from Solace PubSub+ Event Broker...');
         if (publisher.session !== null) {
             try {
                 publisher.session.disconnect();
@@ -141,7 +141,7 @@ var TopicPublisher = function (topicName) {
                 publisher.log(error.toString());
             }
         } else {
-            publisher.log('Not connected to Solace message router.');
+            publisher.log('Not connected to Solace PubSub+ Event Broker.');
         }
     };
 

@@ -54,7 +54,7 @@
         solace.SolclientFactory.setLogLevel(solace.LogLevel.WARN);
 
         // create the consumer, specifying name of the queue
-        subscriber = new GuaranteedSubscriber('tutorial/queue', 'solace/samples/js/pers/>');
+        subscriber = new GuaranteedSubscriber('tutorial/queue');
         // assign buttons to the subscriber functions
         document.getElementById("connect").addEventListener("click", subscriber.connect);
         document.getElementById("disconnect").addEventListener("click", subscriber.disconnect);

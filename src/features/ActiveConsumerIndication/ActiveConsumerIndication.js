@@ -64,7 +64,7 @@ var QueueConsumer = function (queueName) {
 
     sample.log('\n*** Consumer to queue "' + sample.queueName + '" is ready to connect ***');
 
-    // Establishes connection to Solace message router
+    // Establishes connection to Solace PubSub+ Event Broker
     sample.connect = function (argv) {
         if (sample.session !== null) {
             sample.log('Already connected and ready to consume messages.');
@@ -81,12 +81,12 @@ var QueueConsumer = function (queueName) {
         var pass = document.getElementById('password').value;
         var vpn = document.getElementById('message-vpn').value;
         if (!hosturl || !username || !pass || !vpn) {
-            sample.log('Cannot connect: please specify all the Solace message router properties.');
+            sample.log('Cannot connect: please specify all the Solace PubSub+ Event Broker properties.');
             return;
         }
-        sample.log('Connecting to Solace message router using url: ' + hosturl);
+        sample.log('Connecting to Solace PubSub+ Event Broker using url: ' + hosturl);
         sample.log('Client username: ' + username);
-        sample.log('Solace message router VPN name: ' + vpn);
+        sample.log('Solace PubSub+ Event Broker VPN name: ' + vpn);
         // create session
         try {
             sample.session = solace.SolclientFactory.createSession({
@@ -129,7 +129,7 @@ var QueueConsumer = function (queueName) {
         }
     };
 
-    // Starts consuming from a queue on Solace message router
+    // Starts consuming from a queue on Solace PubSub+ Event Broker
     sample.startConsume = function () {
         if (sample.session !== null) {
             if (sample.consuming) {
@@ -151,7 +151,7 @@ var QueueConsumer = function (queueName) {
                 }
             }
         } else {
-            sample.log('Cannot start the queue consumer because not connected to Solace message router.');
+            sample.log('Cannot start the queue consumer because not connected to Solace PubSub+ Event Broker.');
         }
     };
 
@@ -205,9 +205,9 @@ var QueueConsumer = function (queueName) {
         return messageConsumer;
     }
 
-    // Gracefully disconnects from Solace message router
+    // Gracefully disconnects from Solace PubSub+ Event Broker
     sample.disconnect = function () {
-        sample.log('Disconnecting from Solace message router...');
+        sample.log('Disconnecting from Solace PubSub+ Event Broker...');
         if (sample.session !== null) {
             try {
                 sample.session.disconnect();
@@ -215,7 +215,7 @@ var QueueConsumer = function (queueName) {
                 sample.log(error.toString());
             }
         } else {
-            sample.log('Not connected to Solace message router.');
+            sample.log('Not connected to Solace PubSub+ Event Broker.');
         }
     };
 
