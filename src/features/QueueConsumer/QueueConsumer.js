@@ -47,9 +47,6 @@ var QueueConsumer = function (queueName) {
     };
 
     consumer.log('\n*** Consumer to queue "' + consumer.queueName + '" is ready to connect ***');
-    consumer.log('\n/*********************************************************************' +
-                  '\nNOTE: Ensure that the required queue is created on the Broker.' +
-                  '\n/********************************************************************/')
 
     // Establishes connection to Solace PubSub+ Event Broker
     consumer.connect = function () {
@@ -129,6 +126,7 @@ var QueueConsumer = function (queueName) {
                         // solace.MessageConsumerProperties
                         queueDescriptor: { name: consumer.queueName, type: solace.QueueType.QUEUE },
                         acknowledgeMode: solace.MessageConsumerAcknowledgeMode.CLIENT, // Enabling Client ack
+                        createIfMissing: true // Create queue if not exists
                     });
                     // Define message consumer event listeners
                     consumer.messageConsumer.on(solace.MessageConsumerEventName.UP, function () {

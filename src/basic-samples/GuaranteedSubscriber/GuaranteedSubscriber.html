@@ -54,7 +54,7 @@
         solace.SolclientFactory.setLogLevel(solace.LogLevel.WARN);
 
         // create the consumer, specifying name of the queue
-        subscriber = new GuaranteedSubscriber('tutorial/queue');
+        subscriber = new GuaranteedSubscriber('tutorial/queue', 'solace/samples/js/pers/>');
         // assign buttons to the subscriber functions
         document.getElementById("connect").addEventListener("click", subscriber.connect);
         document.getElementById("disconnect").addEventListener("click", subscriber.disconnect);
@@ -143,10 +143,6 @@
           </div>
 
         </fieldset>
-        <div class="box">
-          NOTE: Before you proceed, please ensure that the required queue with topic subscription 
-          'solace/samples/js/pers/>' is created on the Solace PubSub+ Event Broker.
-        </div>
         <div>
           <button type="button" class="pure-button pure-button-primary" id="connect">Connect</button>
           <button type="button" class="pure-button button-error" id="disconnect">Disconnect</button>
