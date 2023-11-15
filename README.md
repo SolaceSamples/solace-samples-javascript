@@ -47,7 +47,7 @@ Note: the code in the `master` branch of this repository depends on Solace JavaS
 
 These samples depend on version 10 or later of the Solace JavaScript API library.
 
-The Solace JavaScript API library can be [downloaded here](https://solace.com/downloads/).  The instructions in this tutorial assume you have downloaded the Web Messaging API for JavaScript library and unpacked it to a known location. The samples assume a  `lib` directory containing the API libraries will be installed in the current `solace-samples-javascript` directory at the root of the cloned repo:
+The Solace JavaScript API (Browser) library can be [downloaded here](https://solace.com/downloads/).  The instructions in this tutorial assume you have downloaded the Web Messaging API for JavaScript library and unpacked it to a known location. The samples assume a  `lib` directory containing the API libraries will be installed in the current `solace-samples-javascript` directory at the root of the cloned repo:
 
 ```bash
 cp -R <path_to_unzipped_API_distribution_package>/lib .
