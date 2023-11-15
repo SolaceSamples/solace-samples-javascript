@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge;" />
+  <meta charset="utf-8" />
+  <link rel="stylesheet" type="text/css" href="../../resources/css/pure.css">
+  </link>
+  <link rel="stylesheet" type="text/css" href="../../resources/css/samples.css">
+  </link>
+
+
+  <script src="../../../lib/solclient-debug.js"></script>
+</head>
+
+<body>
+  <script>
+
+    var factoryProps = new solace.SolclientFactoryProperties();
+    factoryProps.profile = solace.SolclientFactoryProfiles.version10;
+    solace.SolclientFactory.init(factoryProps);
+
+    // enable logging to JavaScript console at WARN level
+    // NOTICE: works only with "solclientjs-debug.js"
+    solace.SolclientFactory.setLogLevel(solace.LogLevel.INFO);
+
+
+
+
+
+
+
+
+
+
+    var client = {};
+
+    // Logger
+    client.log = function (line) {
+      var now = new Date();
+      var time = [('0' + now.getHours()).slice(-2), ('0' + now.getMinutes()).slice(-2),
+      ('0' + now.getSeconds()).slice(-2)];
+      var timestamp = '[' + time.join(':') + '] ';
+      console.log(timestamp + line);
+    };
+
+
+    try {
+      client.session = solace.SolclientFactory.createSession({
+        // solace.SessionProperties
+        url: 'ws://localhost:8008',
+        vpnName: 'default',
+        userName: 'default',
+      });
+      client.session.on(solace.SessionEventCode.MESSAGE, function (message) {
+        client.log('Received message, details:\n' +
+          message.dump());
+      });
+      client.session.on(solace.SessionEventCode.SUBSCRIPTION_ERROR, function (sessionEvent) {
+        client.log('Cannot subscribe to topic: ' + sessionEvent.correlationKey);
+        });
+        client.session.on(solace.SessionEventCode.SUBSCRIPTION_OK, function (sessionEvent) {
+          client.log('SUCCESS subscribe to topic: ' + sessionEvent.correlationKey);
+          console.log(sessionEvent);
+                // subscriber.log('Successfully unsubscribed from topic: ' + sessionEvent.correlationKey);
+        });
+
+
+
+      client.session.connect();
+    } catch (error) {
+      client.log(error.toString());
+    }
+
+
+
+    // define session event listeners
+    client.session.on(solace.SessionEventCode.UP_NOTICE, function (sessionEvent) {
+      client.log('=== Successfully connected and ready to subscribe. ===');
+      try {
+/*        client.session.subscribe(
+          solace.SolclientFactory.createTopicDestination('a/b'),
+          true, // generate confirmation when subscription is added successfully
+          'a/b', // use topic name as correlation key
+          10000 // 10 seconds timeout for this operation
+        );
+        client.session.subscribe(
+          solace.SolclientFactory.createTopicDestination('c/d'),
+          true, // generate confirmation when subscription is added successfully
+          'c/d', // use topic name as correlation key
+          10000 // 10 seconds timeout for this operation
+        );
+*/
+
+        // why do I have to provide all of these values???
+        var cs = client.session.createCacheSession({ cacheName: 'dc1', maxAgeSec: 25000, maxMessages: 1, timeoutMsec: 10000 });
+/*
+    // Callback for replies
+    requestor.replyReceivedCb = function (session, message) {
+        requestor.log('Received reply: "' + message.getSdtContainer().getValue() + '"' +
+            ' details:\n' + message.dump());
+    };
+*/
+        cs.cbInfo = new solace.CacheCBInfo(function( reqId, result ) { client.log("Received cache response for req"+reqId+":  " + JSON.stringify(result)); });
+        cs.sendCacheRequest(1, solace.SolclientFactory.createTopicDestination('>'), true, solace.CacheLiveDataAction.FLOW_THRU, cs.cbInfo);
+        // cs.sendCacheRequest(2, solace.SolclientFactory.createTopicDestination('c/d'), true, solace.CacheLiveDataAction.FLOW_THRU, cs.cbInfo);
+
+
+      } catch (error) {
+        client.log(error.toString());
+      }
+
+
+    });
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  </script>
+  <h1>hi</h1>
+</body>
+
+</html>

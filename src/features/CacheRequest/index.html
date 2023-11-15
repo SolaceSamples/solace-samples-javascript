@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html xmlns="">
+<head>
+    <title>Solclientjs: SolCache Request</title>
+    <!-- style -->
+    <link type="text/css" href="../common/ui-lightness/jquery-ui-1.8.6.custom.css" rel="stylesheet">
+    <link type="text/css" href="../common/style.css" rel="stylesheet">
+    <!-- jquery ui -->
+    <script type="text/javascript" src="../common/jquery-1.4.2.min.js"></script>
+    <script type="text/javascript" src="../common/jquery-ui-1.8.6.custom.min.js"></script>
+    <script type="text/javascript" src="../common/jquery.layout-latest.js"></script>
+    <!-- sample ui -->
+    <script type="text/javascript" src="../common/solui.js"></script>
+    <!-- solclientjs -->
+    <script type="text/javascript" src="../../lib/solclient.js"></script>
+    <!-- sample code -->
+    <script type="text/javascript" src="sol-cache-ui.js"></script>
+    <script type="text/javascript" src="sol-cache.js"></script>
+</head>
+
+<body vlink="#eb8f00">
+
+<a style="visibility:hidden;" href="#" id="dialog_link"></a>
+
+<!-- alternate layout -->
+
+<DIV class="ui-layout-center">
+    <table width="800px" border="0" cellpadding="0">
+        <tr>
+            <td>
+                <span class="breadcrumb">
+                    <h1><a href="../index.html"> Solclientjs Samples </a> > SolCache Request </h1>
+                </span>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <div style="text-align:left; padding-bottom: 4px">
+                    <span class="breadcrumb" style=" font-size:1.5em;" id="nickname">
+                        SolCache - Signed Out -
+                    </span>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <button id="LoginButton" onclick="solace.sample.fireOnclick('dialog_link');">Login</button>
+                <button id="LogoutButton" onclick="solace.sample.onLogout();">Logout</button>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <hr style="height:1px;border-width:0;color:#eb8f00;background-color:#eb8f00">
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <div>
+                    <table width="100%">
+                        <tr>
+                            <td>Cache Cluster Name</td>
+                            <td width="80%" class="ui-widget-content content">
+                                <div>
+                                    <input type="input" id="input_clusterName"
+                                           style="font: 120% sans-serif; background-color:#ffffff;"
+                                           value="MaxMsgs1" size="50"/>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Max Message Age</td>
+                            <td width="80%" class="ui-widget-content content">
+                                <div>
+                                    <input type="input" id="input_maxAge"
+                                           style="font: 120% sans-serif; background-color:#ffffff;"
+                                           value="0" size="50"/>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Max Message Count</td>
+                            <td width="80%" class="ui-widget-content content">
+                                <div>
+                                    <input type="input" id="input_maxMessages"
+                                           style="font: 120% sans-serif; background-color:#ffffff;"
+                                           value="0" size="50"/>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Request Timeout</td>
+                            <td width="80%" class="ui-widget-content content">
+                                <div>
+                                    <input type="input" id="input_requestTimeout"
+                                           style="font: 120% sans-serif; background-color:#ffffff;"
+                                           value="10000" size="50"/>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colspan="2">
+                                <button id="CacheConnect" onclick="solace.sample.onCacheCreate();"
+                                        class="solbutton"
+                                        style="width: 160px;">Create Cache Session
+                                </button>
+                                <button id="CacheDisconnect" onclick="solace.sample.onCacheDispose();"
+                                        class="solbutton"
+                                        style="width: 160px;">Dispose Cache Session
+                                </button>
+                            </td>
+                        </tr>
+                            <td>Cache Topic</td>
+                            <td width="80%" class="ui-widget-content content">
+                                <div>
+                                    <input type="input" id="input_cacheTopic"
+                                           style="font: 120% sans-serif; background-color:#ffffff;"
+                                           value="MaxMsgs1/data1" size="50"/>
+                                    <label for="input_subscribe">Subscribe</label>
+                                    <input type="checkbox" id="input_subscribe"/>
+                                </div>
+                            </td>
+                        </tr>
+                        </tr>
+                            <td>Live Data Action</td>
+                            <td width="80%" class="ui-widget-content content">
+                                <div>
+                                    <select name="input_liveDataAction" id="input_liveDataAction">
+                                        <option value="1">Fulfill</option>
+                                        <option value="2">Queue</option>
+                                        <option value="3">Flow-Throughl</option>
+                                    </select>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td></td>
+                            <td>
+                                <button id="CacheRequest" onclick="solace.sample.onCacheRequest();"
+                                        class="solbutton ui-icon-transfer-e-w"
+                                        style="width: 160px">Issue Request
+                                </button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                            </td>
+                            <td align="right">
+                                <button id="ClearResponseButton" onclick="solace.sample.onClearCacheReply();">Clear</button>
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td>Cache Reply</td>
+                            <td>
+								<textarea style="font: 85% sans-serif; width:700px;" readonly="true" id="cache_reply" wrap="on"
+								  rows="12"
+								  class="ui-widget-content ui-corner-all"></textarea>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <table>
+                    <tr>
+                        <td style="width: 100%;">
+                            <input type="checkbox" id="input_show_console"
+                                   value="false"
+                                   onclick="solace.sample.onShowConsole();"
+                                   class="ui-widget-content ui-corner-all solbutton"/>
+                            <span style="font-size: 120%; font-family: sans-serif">Show Console</span>
+                        </td>
+                        <td style="align: right;">
+                            <button id="ClearButton" onclick="solace.sample.onClearConsole();">Clear</button>
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+        <tr>
+            <td  colspan="2">
+                <textarea style="font: 95% sans-serif; width:800px;" readonly="true" id="output_console" wrap="on"
+                          rows="10"
+                          class="ui-widget-content ui-corner-all"></textarea>
+            </td>
+        </tr>
+        <tr>
+            <td style="padding-top: 10px">
+            <h4>Copyright 2009-2016 Solace Corporation. All rights reserved. </h4>
+
+            <h6>Permission is hereby granted, free of charge, to any person obtaining a copy of
+                this software and associated documentation files (the "Software"), to use and
+                copy the Software, and to permit persons to whom the Software is furnished to
+                do so, subject to the following conditions:</h6>
+            <h6>The above copyright notice and this permission notice shall be included in all
+                copies or substantial portions of the Software.
+            </h6>
+            <h6>
+                UNLESS STATED ELSEWHERE BETWEEN YOU AND SOLACE CORPORATION, THE SOFTWARE IS
+                PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING
+                BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
+                PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS
+                BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF
+                CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
+                SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+            </h6>
+            <a href="http://www.solacesystems.com">http://www.SolaceSystems.com</a>            </td>
+        </tr>
+    </table>
+</DIV>
+
+<!-- Login Dialog -->
+
+<div class="ui-overlay">
+    <div class="ui-widget-overlay"></div>
+    <div class="ui-widget-shadow ui-corner-all"
+         style="width: 100px; height: 152px; position: absolute; left: 20px; top: 30px;"></div>
+</div>
+
+<div style="position: absolute; width: 100px; height: 130px;left: 50px; top: 30px; padding: 5px;"
+     class="ui-widget ui-widget-content ui-corner-all">
+    <div class="ui-dialog-content ui-widget-content" style="background: none; border: 0;">
+    </div>
+</div>
+
+<div id="dialog" title="Login">
+    <strong>Nickname:
+    </strong>
+    <br>
+    <input type="input" style="background-color:#ffffff;" id="input_session_nickname"
+           size="50"
+           value=""
+           class="ui-widget-content ui-corner-all"/>
+    <br>
+    <strong>
+        Appliance url:
+    </strong>
+    <br>
+    <input type="input" style="background-color:#ffffff;" id="input_session_url" size="50"
+           value=""
+           class="ui-widget-content ui-corner-all"/>
+    <br>
+    <strong>User
+        name:
+    </strong>
+    <br>
+    <input type="input" style="background-color:#ffffff;" id="input_session_username"
+           value=""
+           size="50"
+           class="ui-widget-content ui-corner-all"/>
+    <br>
+    <strong>
+        Message VPN:
+    </strong>
+    <br>
+    <input type="input" style="background-color:#ffffff;" id="input_session_vpn"
+           value=""
+           size="50"
+           class="ui-widget-content ui-corner-all"/>
+    <br>
+    <strong>
+        Password:
+    </strong>
+    <br>
+    <input type="input" style="background-color:#ffffff;" id="input_session_password"
+           value="secret"
+           size="50"
+           class="ui-widget-content ui-corner-all"/>
+    <br>
+</div>
+
+</body>
+
+</html>
+
+
+
+
