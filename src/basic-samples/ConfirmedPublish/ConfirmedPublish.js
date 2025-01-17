@@ -134,9 +134,11 @@ var QueueProducer = function (queueName) {
     // Sends one message
     producer.sendMessage = function (sequenceNr) {
         var messageText = 'Sample Message';
+        // var binaryPayload = new TextEncoder().encode(messageText);
         var message = solace.SolclientFactory.createMessage();
         message.setDestination(solace.SolclientFactory.createDurableQueueDestination(producer.queueName));
-        message.setBinaryAttachment(messageText);
+        message.setSdtContainer(solace.SDTField.create(solace.SDTFieldType.STRING, messageText));  // TextMessage
+        // message.setBinaryAttachment(binaryPayload);  // BytesMessage
         message.setDeliveryMode(solace.MessageDeliveryModeType.PERSISTENT);
         // Define a correlation key object
         const correlationKey = {

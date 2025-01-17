@@ -122,6 +122,7 @@ var EventSubscriber = function () {
         });
         // define message event listener
         subscriber.session.on(solace.SessionEventCode.MESSAGE, function (message) {
+            // Broker event log over the message bus sent as BytesMessage with string payload
             subscriber.log('Received Client Connect event: "' + message.getBinaryAttachment());
         });
 

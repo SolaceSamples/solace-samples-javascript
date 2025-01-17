@@ -114,12 +114,15 @@ var TopicSubscriber = function (topicName) {
         });
         // define message event listener
         subscriber.session.on(solace.SessionEventCode.MESSAGE, function (message) {
-            subscriber.log('Received message: "' + message.getBinaryAttachment() + '", details:\n' +
-                message.dump());
+            if (message.getType() == solace.MessageType.TEXT) {  // in case someone sends text message
+                var payload = message.getSdtContainer().getValue();
+                subscriber.log('Received TextMessage: "' + payload + '", details:\n' + message.dump());
+            } else {
+                subscriber.log('Received message: "' + message.getBinaryAttachment() +
+                        '", details:\n' + message.dump());
+            }
         });
-
-
-       subscriber.connectToSolace();   
+        subscriber.connectToSolace();   
 
 
 

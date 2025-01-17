@@ -205,8 +205,13 @@ var QueueConsumer = function (queueName) {
             });
             // Define message received event listener
             consumer.messageConsumer.on(solace.MessageConsumerEventName.MESSAGE, function (message) {
-                consumer.log('Received message: "' + message.getBinaryAttachment() + '",' +
-                    ' details:\n' + message.dump());
+                if (message.getType() == solace.MessageType.TEXT) {  // in case someone sends text message
+                    var payload = message.getSdtContainer().getValue();
+                    consumer.log('Received TextMessage: "' + payload + '", details:\n' + message.dump());
+                } else {
+                    consumer.log('Received message: "' + message.getBinaryAttachment() +
+                            '", details:\n' + message.dump());
+                }
                 // Need to explicitly ack otherwise it will not be deleted from the message router
                 message.acknowledge();
             });
