@@ -45,7 +45,7 @@
       window.onload = function () {
         // Initialize factory with the most recent API defaults
         var factoryProps = new solace.SolclientFactoryProperties();
-        factoryProps.profile = solace.SolclientFactoryProfiles.version10;
+        factoryProps.profile = solace.SolclientFactoryProfiles.version10_5;
         solace.SolclientFactory.init(factoryProps);
 
         // enable logging to JavaScript console at WARN level
