@@ -127,10 +127,12 @@ var QueueProducer = function (queueName) {
     producer.sendMessage = function () {
         if (producer.session !== null) {
             var messageText = 'Sample Message';
+            var binaryPayload = new TextEncoder().encode(messageText);
             var message = solace.SolclientFactory.createMessage();
             producer.log('Sending message "' + messageText + '" to queue "' + producer.queueName + '"...');
             message.setDestination(solace.SolclientFactory.createDurableQueueDestination(producer.queueName));
-            message.setBinaryAttachment(messageText);
+            // message.setSdtContainer(solace.SDTField.create(solace.SDTFieldType.STRING, messageText));  // TextMesage
+            message.setBinaryAttachment(binaryPayload);  // BytesMessage
             message.setDeliveryMode(solace.MessageDeliveryModeType.PERSISTENT);
             // OPTIONAL: You can set a correlation key on the message and check for the correlation
             // in the ACKNOWLEDGE_MESSAGE callback. Define a correlation key object

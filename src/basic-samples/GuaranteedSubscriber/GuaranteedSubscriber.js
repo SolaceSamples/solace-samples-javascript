@@ -164,8 +164,13 @@ var GuaranteedSubscriber = function (queueName, topicName) {
                     });
                     // Define message received event listener
                     subscriber.messageSubscriber.on(solace.MessageConsumerEventName.MESSAGE, function (message) {
-                        subscriber.log('Received message: "' + message.getBinaryAttachment() + '",' +
-                            ' details:\n' + message.dump());
+                        if (message.getType() == solace.MessageType.TEXT) {  // in case someone sends text message
+                            var payload = message.getSdtContainer().getValue();
+                            subscriber.log('Received TextMessage: "' + payload + '", details:\n' + message.dump());
+                        } else {
+                            subscriber.log('Received message: "' + message.getBinaryAttachment() +
+                                    '", details:\n' + message.dump());
+                        }
                         // Need to explicitly ack otherwise it will not be deleted from the message router
                         message.acknowledge();
                     });

@@ -156,8 +156,13 @@ var DTEConsumer = function (topicEndpointName, topicName) {
                     });
                     // Define message event listener
                     consumer.messageConsumer.on(solace.MessageConsumerEventName.MESSAGE, function (message) {
-                        consumer.log('Received message: "' + message.getBinaryAttachment() + '",' +
-                            ' details:\n' + message.dump());
+                        if (message.getType() == solace.MessageType.TEXT) {  // in case someone sends text message
+                            var payload = message.getSdtContainer().getValue();
+                            consumer.log('Received TextMessage: "' + payload + '", details:\n' + message.dump());
+                        } else {
+                            consumer.log('Received message: "' + message.getBinaryAttachment() +
+                                    '", details:\n' + message.dump());
+                       }
                     });
                     // Connect the message consumer
                     consumer.messageConsumer.connect();

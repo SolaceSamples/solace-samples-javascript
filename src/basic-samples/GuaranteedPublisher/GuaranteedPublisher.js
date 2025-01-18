@@ -127,8 +127,10 @@ var GuaranteedPublisher = function (topicName) {
     publisher.publish = function () {
         if (publisher.session !== null) {
             var messageText = 'Sample Message';
+            var binaryPayload = new TextEncoder().encode(messageText);
             var message = solace.SolclientFactory.createMessage();
-            message.setBinaryAttachment(messageText);
+            // message.setSdtContainer(solace.SDTField.create(solace.SDTFieldType.STRING, messageText));  // TextMesage
+            message.setBinaryAttachment(binaryPayload);  // BytesMessage
             message.setDeliveryMode(solace.MessageDeliveryModeType.PERSISTENT);
             // OPTIONAL: You can set a correlation key on the message and check for the correlation
             // in the ACKNOWLEDGE_MESSAGE callback. Define a correlation key object
