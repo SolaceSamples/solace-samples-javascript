@@ -113,6 +113,7 @@
 
         cs.cbInfo = new solace.CacheCBInfo(function( reqId, result ) {
           client.log("Received cache response for req"+reqId+":  " + JSON.stringify(result, null, 2));
+          console.log(result);  // raw dump
         });
         cs.sendCacheRequest(1, solace.SolclientFactory.createTopicDestination('a/b'), true, solace.CacheLiveDataAction.FLOW_THRU, cs.cbInfo);
         // cs.sendCacheRequest(2, solace.SolclientFactory.createTopicDestination('c/d'), true, solace.CacheLiveDataAction.FLOW_THRU, cs.cbInfo);
