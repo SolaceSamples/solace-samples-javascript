@@ -17,7 +17,7 @@
   <script>
 
     var factoryProps = new solace.SolclientFactoryProperties();
-    factoryProps.profile = solace.SolclientFactoryProfiles.version10;
+    factoryProps.profile = solace.SolclientFactoryProfiles.version10_5;
     solace.SolclientFactory.init(factoryProps);
 
     // enable logging to JavaScript console at WARN level
@@ -50,18 +50,26 @@
         // solace.SessionProperties
         url: 'ws://localhost:8008',
         vpnName: 'default',
-        userName: 'default',
-      });
-      client.session.on(solace.SessionEventCode.MESSAGE, function (message) {
-        client.log('Received message, details:\n' +
-          message.dump());
-      });
+        userName: 'foo',
+        password: 'bar',
+      },
+      new solace.MessageRxCBInfo(
+                    function(session, message) {
+                        messageEventCb(session, message);
+                    },
+                    this
+                ),
+      );
+      // client.session.on(solace.SessionEventCode.MESSAGE, function (message) {
+      //   client.log('Received message, details:\n' +
+      //     message.dump());
+      // });
       client.session.on(solace.SessionEventCode.SUBSCRIPTION_ERROR, function (sessionEvent) {
         client.log('Cannot subscribe to topic: ' + sessionEvent.correlationKey);
         });
         client.session.on(solace.SessionEventCode.SUBSCRIPTION_OK, function (sessionEvent) {
           client.log('SUCCESS subscribe to topic: ' + sessionEvent.correlationKey);
-          console.log(sessionEvent);
+          client.log(sessionEvent);
                 // subscriber.log('Successfully unsubscribed from topic: ' + sessionEvent.correlationKey);
         });
 
@@ -94,15 +102,19 @@
 
         // why do I have to provide all of these values???
         var cs = client.session.createCacheSession({ cacheName: 'dc1', maxAgeSec: 25000, maxMessages: 1, timeoutMsec: 10000 });
-/*
+
     // Callback for replies
-    requestor.replyReceivedCb = function (session, message) {
-        requestor.log('Received reply: "' + message.getSdtContainer().getValue() + '"' +
-            ' details:\n' + message.dump());
-    };
-*/
-        cs.cbInfo = new solace.CacheCBInfo(function( reqId, result ) { client.log("Received cache response for req"+reqId+":  " + JSON.stringify(result)); });
-        cs.sendCacheRequest(1, solace.SolclientFactory.createTopicDestination('>'), true, solace.CacheLiveDataAction.FLOW_THRU, cs.cbInfo);
+    // client.replyReceivedCb = function (session, message) {
+    //     client.log('Received reply: "' + message.getSdtContainer().getValue() + '"' +
+    //         ' details:\n' + message.dump());
+    // };
+
+
+
+        cs.cbInfo = new solace.CacheCBInfo(function( reqId, result ) {
+          client.log("Received cache response for req"+reqId+":  " + JSON.stringify(result, null, 2));
+        });
+        cs.sendCacheRequest(1, solace.SolclientFactory.createTopicDestination('a/b'), true, solace.CacheLiveDataAction.FLOW_THRU, cs.cbInfo);
         // cs.sendCacheRequest(2, solace.SolclientFactory.createTopicDestination('c/d'), true, solace.CacheLiveDataAction.FLOW_THRU, cs.cbInfo);
 
 
@@ -118,6 +130,36 @@
 
 
 
+    messageEventCb = function (session, message) {
+        try {
+            if (message.getCacheRequestId() === null) {
+                client.log("Received message: " + JSON.stringify(message));
+            } else {
+                var status;
+                switch (message.getCacheStatus()) {
+                    case solace.MessageCacheStatus.LIVE:
+                        status = "Live";
+                        break;
+                    case solace.MessageCacheStatus.CACHED:
+                        status = "Cached";
+                        break;
+                    case solace.MessageCacheStatus.SUSPECT:
+                        status = "Suspect";
+                }
+
+                // if (!receivingCacheMessages) {
+                    client.log("Receiving cache messages for request: " + message.getCacheRequestId() + " " +
+                        "Status: " + status);
+                    client.log(message);
+                    // receivingCacheMessages = true;
+                // }
+                // messageCount++;
+            }
+        } catch (error) {
+            console.error("Failed to send reply ");
+            console.error(error.toString());
+        }
+    };
 
 
 
@@ -128,7 +170,12 @@
 
 
   </script>
-  <h1>hi</h1>
+  <h1>Rough working SolCache JS sample</h1>
+  <p>
+    Hello.  This sample was copied/modified from a very old Solace JS sample.  It required a bunch of
+    other libraries that are out of date.  So the basic cache request code was put into this file.
+    It's not pretty, but look/modify the code to connect to the broker and make the cache request succeed.
+  </p>
 </body>
 
 </html>
